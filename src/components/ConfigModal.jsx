@@ -12,6 +12,73 @@ export default function ConfigModal() {
   const [appId, setAppId] = useState("");
   const [error, setError] = useState("");
 
+  const handleDownloadEnv = () => {
+    setError("");
+    let finalConfig = {};
+
+    if (configType === "paste") {
+      try {
+        let cleanJson = jsonConfig.trim();
+        cleanJson = cleanJson.replace(/^(const|let|var)\s+\w+\s*=\s*/i, "");
+        cleanJson = cleanJson.replace(/;\s*$/, "");
+        try {
+          finalConfig = JSON.parse(cleanJson);
+        } catch {
+          const extractField = (field) => {
+            const regex = new RegExp(`${field}\\s*:\\s*["'\`]([^"'\`]+)["'\`]`, "i");
+            const match = cleanJson.match(regex);
+            return match ? match[1] : "";
+          };
+          
+          finalConfig = {
+            apiKey: extractField("apiKey"),
+            authDomain: extractField("authDomain"),
+            projectId: extractField("projectId"),
+            storageBucket: extractField("storageBucket"),
+            messagingSenderId: extractField("messagingSenderId"),
+            appId: extractField("appId"),
+          };
+        }
+      } catch (err) {
+        setError("Failed to parse the configuration for download. Please check the format.");
+        return;
+      }
+    } else {
+      finalConfig = {
+        apiKey: apiKey.trim(),
+        authDomain: authDomain.trim(),
+        projectId: projectId.trim(),
+        storageBucket: storageBucket.trim(),
+        messagingSenderId: messagingSenderId.trim(),
+        appId: appId.trim(),
+      };
+    }
+
+    if (!finalConfig.apiKey || !finalConfig.projectId) {
+      setError("Please fill in at least API Key and Project ID to download.");
+      return;
+    }
+
+    const envContent = `# Firebase Environment Configurations
+VITE_FIREBASE_API_KEY=${finalConfig.apiKey || ""}
+VITE_FIREBASE_AUTH_DOMAIN=${finalConfig.authDomain || ""}
+VITE_FIREBASE_PROJECT_ID=${finalConfig.projectId || ""}
+VITE_FIREBASE_STORAGE_BUCKET=${finalConfig.storageBucket || ""}
+VITE_FIREBASE_MESSAGING_SENDER_ID=${finalConfig.messagingSenderId || ""}
+VITE_FIREBASE_APP_ID=${finalConfig.appId || ""}
+`;
+
+    const blob = new Blob([envContent], { type: "text/plain;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", ".env");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
@@ -195,14 +262,24 @@ export default function ConfigModal() {
             </div>
           )}
 
-          <div className="pt-2">
+          <div className="pt-2 flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              onClick={handleDownloadEnv}
+              className="flex-1 rounded-xl border border-slate-200 py-3.5 text-center text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all focus:outline-none cursor-pointer"
+            >
+              Download .env File
+            </button>
             <button
               type="submit"
-              className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white shadow-md hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
+              className="flex-1 rounded-xl bg-slate-900 py-3.5 text-center text-sm font-semibold text-white shadow-md hover:bg-slate-800 focus:outline-none cursor-pointer"
             >
               Save & Connect
             </button>
           </div>
+          <p className="text-[10px] text-slate-400 text-center mt-2 leading-tight">
+            💡 <strong>Deploying to Vercel/GitHub?</strong> Click <em>Download .env</em> to get the configuration file template to save locally, or copy these variables into Vercel's Environment Variables panel!
+          </p>
         </form>
       </div>
     </div>

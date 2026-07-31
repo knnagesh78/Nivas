@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { db, auth, firebaseConfig } from "../firebase";
+import { db, auth, firebaseConfig, clearFirebaseConfig } from "../firebase";
 import { Mail, Lock, User, GraduationCap, Shield, Wrench } from "lucide-react";
 
 export default function Login() {
@@ -322,22 +322,33 @@ export default function Login() {
           </div>
         )}
 
-        {/* Browser Seeding Utility for testing */}
-        <div className="pt-4 border-t border-slate-800/60 mt-4 text-center">
+        {/* Browser Seeding & Connection Reset Utility */}
+        <div className="pt-4 border-t border-slate-800/60 mt-4 flex flex-col items-center space-y-2">
           {seedMsg && (
-            <div className="mb-3 rounded-xl bg-indigo-950/40 border border-indigo-800/50 p-3 text-xs text-indigo-300">
+            <div className="mb-2 rounded-xl bg-indigo-950/40 border border-indigo-800/50 p-3 text-xs text-indigo-300 w-full text-center">
               {seedMsg}
             </div>
           )}
-          <button
-            type="button"
-            disabled={seedLoading}
-            onClick={handleSeedDatabase}
-            className="inline-flex items-center space-x-1.5 text-xs text-slate-400 hover:text-white transition-all font-semibold"
-          >
-            <Wrench className="h-3.5 w-3.5 text-slate-500" />
-            <span>{seedLoading ? "Seeding..." : "Seed Default Admin & Warden"}</span>
-          </button>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs">
+            <button
+              type="button"
+              disabled={seedLoading}
+              onClick={handleSeedDatabase}
+              className="inline-flex items-center space-x-1.5 text-slate-400 hover:text-white transition-all font-semibold cursor-pointer"
+            >
+              <Wrench className="h-3.5 w-3.5 text-slate-500" />
+              <span>{seedLoading ? "Seeding..." : "Seed Default DB"}</span>
+            </button>
+            {localStorage.getItem("firebase_config") && (
+              <button
+                type="button"
+                onClick={clearFirebaseConfig}
+                className="text-rose-450 hover:text-rose-350 transition-all font-semibold cursor-pointer"
+              >
+                Reset Connection
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
