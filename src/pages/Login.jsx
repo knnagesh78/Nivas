@@ -170,14 +170,12 @@ export default function Login() {
 
       <div className="w-full max-w-md space-y-8 bg-slate-850 p-8 rounded-3xl border border-slate-800 shadow-2xl relative z-10 bg-slate-950/60 backdrop-blur-md">
         <div>
-          <div className="mx-auto h-12 w-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-indigo-500/20">
-            H
-          </div>
+          <img src="/logo.svg" className="mx-auto h-16 w-16 rounded-2xl shadow-lg shadow-indigo-500/10 animate-pulse" alt="Nivas Logo" />
           <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-white">
-            {isSignUp ? "Create Student Account" : "Sign In to Hostelify"}
+            {isSignUp ? "Create Student Account" : "Sign In to Nivas"}
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-400">
-            {isSignUp ? "Register as a new student" : "Choose your role and enter credentials"}
+          <p className="mt-2 text-center text-sm text-indigo-400 font-medium">
+            Every stay, sorted
           </p>
         </div>
 

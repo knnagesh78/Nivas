@@ -115,8 +115,8 @@ export default function StudentDashboard() {
     if (!currentUser) return;
 
     const fetchData = async () => {
+      // 1. Notices (all notices)
       try {
-        // 1. Notices (all notices)
         const noticesQuery = query(
           collection(db, "notices"),
           orderBy("postedAt", "desc"),
@@ -128,49 +128,79 @@ export default function StudentDashboard() {
           noticesList.push({ id: doc.id, ...doc.data() });
         });
         setNotices(noticesList);
+      } catch (err) {
+        console.error("Error loading notices:", err);
+      }
 
-        // 2. Leave Requests
+      // 2. Leave Requests (Query without orderBy to avoid composite index requirements, sort in memory)
+      try {
         const leavesQuery = query(
           collection(db, "leaveRequests"),
-          where("studentUid", "==", currentUser.uid),
-          orderBy("requestedAt", "desc")
+          where("studentUid", "==", currentUser.uid)
         );
         const leavesSnap = await getDocs(leavesQuery);
         const leavesList = [];
         leavesSnap.forEach((doc) => {
           leavesList.push({ id: doc.id, ...doc.data() });
         });
+        // Sort in memory by requestedAt desc
+        leavesList.sort((a, b) => {
+          const aTime = a.requestedAt?.seconds || a.requestedAt?.toMillis?.() / 1000 || 0;
+          const bTime = b.requestedAt?.seconds || b.requestedAt?.toMillis?.() / 1000 || 0;
+          return bTime - aTime;
+        });
         setLeaves(leavesList);
+      } catch (err) {
+        console.error("Error loading leaves:", err);
+      }
 
-        // 3. Complaints
+      // 3. Complaints (Query without orderBy to avoid composite index requirements, sort in memory)
+      try {
         const complaintsQuery = query(
           collection(db, "complaints"),
-          where("studentUid", "==", currentUser.uid),
-          orderBy("raisedAt", "desc")
+          where("studentUid", "==", currentUser.uid)
         );
         const complaintsSnap = await getDocs(complaintsQuery);
         const complaintsList = [];
         complaintsSnap.forEach((doc) => {
           complaintsList.push({ id: doc.id, ...doc.data() });
         });
+        // Sort in memory by raisedAt desc
+        complaintsList.sort((a, b) => {
+          const aTime = a.raisedAt?.seconds || a.raisedAt?.toMillis?.() / 1000 || 0;
+          const bTime = b.raisedAt?.seconds || b.raisedAt?.toMillis?.() / 1000 || 0;
+          return bTime - aTime;
+        });
         setComplaints(complaintsList);
+      } catch (err) {
+        console.error("Error loading complaints:", err);
+      }
 
-        // 4. Attendance
-        // For the last 30 days, check records parallelly
+      // 4. Attendance
+      // For the last 30 days, check records parallelly using local date strings
+      try {
         const last30Days = [];
         for (let i = 0; i < 30; i++) {
           const d = new Date();
           d.setDate(d.getDate() - i);
-          const dateStr = d.toISOString().split("T")[0]; // YYYY-MM-DD
+          // Format using local date string format (YYYY-MM-DD)
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          const dateStr = `${year}-${month}-${day}`;
           last30Days.push(dateStr);
         }
 
         const attendancePromises = last30Days.map(async (dateStr) => {
-          const recordDoc = await getDoc(
-            doc(db, "attendance", dateStr, "records", currentUser.uid)
-          );
-          if (recordDoc.exists()) {
-            return { date: dateStr, status: recordDoc.data().status };
+          try {
+            const recordDoc = await getDoc(
+              doc(db, "attendance", dateStr, "records", currentUser.uid)
+            );
+            if (recordDoc.exists()) {
+              return { date: dateStr, status: recordDoc.data().status };
+            }
+          } catch (e) {
+            console.error(`Error reading attendance for ${dateStr}:`, e);
           }
           return { date: dateStr, status: "Not Marked" };
         });
@@ -178,7 +208,7 @@ export default function StudentDashboard() {
         const attendanceResults = await Promise.all(attendancePromises);
         setAttendance(attendanceResults.filter((r) => r.status !== "Not Marked"));
       } catch (err) {
-        console.error("Error loading dashboard data:", err);
+        console.error("Error loading attendance log:", err);
       }
     };
 

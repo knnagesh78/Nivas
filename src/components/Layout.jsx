@@ -86,12 +86,10 @@ export default function Layout({ children, activeTab, setActiveTab }) {
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           {/* Brand header */}
           <div className="flex items-center px-6 mb-6">
-            <div className="h-9 w-9 rounded-xl bg-slate-900 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-              H
-            </div>
+            <img src="/logo.svg" className="h-9 w-9 rounded-xl shadow-sm animate-pulse" alt="Nivas Logo" />
             <div className="ml-3">
-              <h1 className="text-lg font-bold text-slate-900 tracking-tight leading-none">Hostelify</h1>
-              <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Management System</span>
+              <h1 className="text-lg font-bold text-slate-900 tracking-tight leading-none">Nivas</h1>
+              <span className="text-[10px] text-indigo-500 font-semibold uppercase tracking-wider">Every stay, sorted</span>
             </div>
           </div>
 
@@ -155,10 +153,8 @@ export default function Layout({ children, activeTab, setActiveTab }) {
       <div className="flex flex-col flex-1 w-full md:w-auto overflow-hidden">
         <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 md:hidden">
           <div className="flex items-center">
-            <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center text-white font-bold shadow-sm">
-              H
-            </div>
-            <span className="ml-2.5 font-bold text-slate-800 text-base">Hostelify</span>
+            <img src="/logo.svg" className="h-8 w-8 rounded-lg shadow-sm" alt="Nivas Logo" />
+            <span className="ml-2.5 font-bold text-slate-800 text-base font-sans tracking-tight">Nivas</span>
           </div>
 
           <div className="flex items-center space-x-2">

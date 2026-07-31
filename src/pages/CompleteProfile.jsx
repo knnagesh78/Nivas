@@ -64,10 +64,8 @@ export default function CompleteProfile() {
       <div className="w-full max-w-xl bg-white p-8 rounded-3xl border border-slate-200 shadow-2xl relative z-10 animate-fadeIn">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-2.5">
-            <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">
-              H
-            </div>
-            <span className="font-bold text-slate-800 text-lg">Hostelify Onboarding</span>
+            <img src="/logo.svg" className="h-8 w-8 rounded-lg shadow-sm" alt="Nivas Logo" />
+            <span className="font-bold text-slate-800 text-lg">Nivas Onboarding</span>
           </div>
           <button
             onClick={handleLogout}
