@@ -1,0 +1,106 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function getUserRole() {
+      // Safely check role by reading users/{uid}
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && getUserRole() == 'admin';
+    }
+    
+    function isWarden() {
+      return isSignedIn() && getUserRole() == 'warden';
+    }
+    
+    function isStudent() {
+      return isSignedIn() && getUserRole() == 'student';
+    }
+    
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // users collection
+    match /users/{uid} {
+      allow read, write: if isAdmin();
+      allow read: if isSignedIn() && (isOwner(uid) || isWarden());
+      // Students can create their users record during registration, but only for themselves
+      allow create: if isSignedIn() && isOwner(uid);
+      // Students can update their own email or profileComplete flag, but NOT their role
+      allow update: if isSignedIn() && isOwner(uid) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) || isAdmin());
+    }
+
+    // students collection
+    match /students/{uid} {
+      allow read, write: if isAdmin();
+      allow read: if isSignedIn() && (isOwner(uid) || isWarden());
+      allow create, update: if isSignedIn() && isOwner(uid);
+    }
+
+    // wardens collection
+    match /wardens/{uid} {
+      allow read, write: if isAdmin();
+      allow read: if isSignedIn();
+    }
+
+    // attendance collection
+    // path: attendance/{date}/records/{studentUid}
+    match /attendance/{date} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || isWarden();
+      
+      match /records/{studentUid} {
+        allow read: if isSignedIn() && (isOwner(studentUid) || isWarden() || isAdmin());
+        allow write: if isAdmin() || isWarden();
+      }
+    }
+
+    // leaveRequests collection
+    // path: leaveRequests/{requestId}
+    match /leaveRequests/{requestId} {
+      allow read: if isAdmin() || isWarden();
+      allow read: if isStudent() && resource.data.studentUid == request.auth.uid;
+      // Allow students to create a request with their own studentUid
+      allow create: if isStudent() && request.resource.data.studentUid == request.auth.uid;
+      // Allow wardens/admins to update (approve/reject/remark)
+      allow update: if isAdmin() || isWarden();
+      // Allow student to update their own pending requests (e.g. cancel/modify reason)
+      allow update: if isStudent() && resource.data.studentUid == request.auth.uid && resource.data.status == 'pending';
+    }
+
+    // complaints collection
+    // path: complaints/{complaintId}
+    match /complaints/{complaintId} {
+      allow read: if isAdmin() || isWarden();
+      allow read: if isStudent() && resource.data.studentUid == request.auth.uid;
+      // Allow students to create a complaint
+      allow create: if isStudent() && request.resource.data.studentUid == request.auth.uid;
+      // Allow wardens/admins to update
+      allow update: if isAdmin() || isWarden();
+      // Allow student to update their own open complaints (e.g. edit description)
+      allow update: if isStudent() && resource.data.studentUid == request.auth.uid && resource.data.status == 'open';
+    }
+
+    // notices collection
+    // path: notices/{noticeId}
+    match /notices/{noticeId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || isWarden();
+    }
+
+    // rooms collection
+    // path: rooms/{roomId}
+    match /rooms/{roomId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || isWarden();
+    }
+  }
+}
