@@ -2,13 +2,19 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+const getEnvVal = (envValue, defaultValue) => {
+  return envValue && envValue !== "your_api_key_here" && envValue.trim() !== ""
+    ? envValue
+    : defaultValue;
+};
+
 let firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: getEnvVal(import.meta.env.VITE_FIREBASE_API_KEY, "AIzaSyACTx17O0nOj960fX70GrU3VFN2TbEWBXI"),
+  authDomain: getEnvVal(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN, "nivas-33144.firebaseapp.com"),
+  projectId: getEnvVal(import.meta.env.VITE_FIREBASE_PROJECT_ID, "nivas-33144"),
+  storageBucket: getEnvVal(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET, "nivas-33144.firebasestorage.app"),
+  messagingSenderId: getEnvVal(import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID, "166280590956"),
+  appId: getEnvVal(import.meta.env.VITE_FIREBASE_APP_ID, "1:166280590956:web:074e445773de5c20484a49"),
 };
 
 // Check if configured via env or stored config
