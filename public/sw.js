@@ -1,7 +1,7 @@
 // ─── Nivas Service Worker ────────────────────────────────────────────────────
 // Bump CACHE_VERSION every time you deploy so ALL clients immediately get
 // the new icons, manifest and app shell.
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const CACHE_NAME    = `nivas-cache-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
@@ -49,12 +49,19 @@ self.addEventListener('fetch', (e) => {
 
   // ── Navigation (HTML pages / SPA routes) ──────────────────────────────────
   // Always serve the cached index.html for navigation requests to support SPA routing.
-  // This avoids querying the server for subroutes that don't physically exist as files.
   if (e.request.mode === 'navigate') {
     e.respondWith(
-      caches.match('/index.html').then((cachedResponse) => {
-        return cachedResponse || fetch(e.request);
-      })
+      caches.match('/index.html')
+        .then((cachedResponse) => {
+          return cachedResponse || fetch(e.request);
+        })
+        .catch(() => {
+          // If offline and index.html is missing, return a basic offline page instead of failing with ERR_FAILED
+          return new Response(
+            '<h1>Nivas Offline</h1><p>Please check your connection and try again.</p>',
+            { status: 503, headers: { 'Content-Type': 'text/html' } }
+          );
+        })
     );
     return;
   }
@@ -73,23 +80,32 @@ self.addEventListener('fetch', (e) => {
           }
           return response;
         })
-        .catch(() => caches.match(e.request))
+        .catch(() => {
+          return caches.match(e.request).then((cached) => {
+            return cached || new Response('Offline asset', { status: 503 });
+          });
+        })
     );
     return;
   }
 
   // ── All other static assets → Cache-first, dynamic cache on miss ───────────
   e.respondWith(
-    caches.match(e.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(e.request).then((response) => {
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-        }
-        return response;
-      });
-    })
+    caches.match(e.request)
+      .then((cached) => {
+        if (cached) return cached;
+        return fetch(e.request).then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          }
+          return response;
+        });
+      })
+      .catch((err) => {
+        console.warn('[SW] Fetch failed for:', e.request.url, err);
+        return new Response('Network error', { status: 408 });
+      })
   );
 });
 
