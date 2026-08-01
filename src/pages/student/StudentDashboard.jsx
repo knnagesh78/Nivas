@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase";
 import {
@@ -17,6 +17,7 @@ import {
   limit
 } from "firebase/firestore";
 import Layout from "../../components/Layout";
+import CameraCapture from "../../components/CameraCapture";
 import {
   Home,
   User,
@@ -35,9 +36,34 @@ import {
 
 export default function StudentDashboard() {
   const { currentUser, userData, completeStudentProfile } = useAuth();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";
-  const setActiveTab = (tab) => setSearchParams({ tab });
+  const setActiveTab = useCallback((tab) => setSearchParams({ tab }), [setSearchParams]);
+
+  // Mobile Back Button interception
+  useEffect(() => {
+    // Push a dummy state to ensure we always have an entry to pop
+    window.history.pushState({ noExit: true }, "", window.location.href);
+
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab") || "dashboard";
+
+      if (tab !== "dashboard") {
+        setActiveTab("dashboard");
+        // Push the dummy state back to intercept the next back click
+        window.history.pushState({ noExit: true }, "", window.location.href);
+      } else {
+        navigate("/login");
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [activeTab, navigate, setActiveTab]);
   const [studentDetails, setStudentDetails] = useState(null);
   const [roommates, setRoommates] = useState([]);
   const [notices, setNotices] = useState([]);
@@ -62,6 +88,8 @@ export default function StudentDashboard() {
   const [editName, setEditName] = useState("");
   const [editPhone, setEditPhone] = useState("");
   const [editParent, setEditParent] = useState("");
+  const [editFather, setEditFather] = useState("");
+  const [editMother, setEditMother] = useState("");
   const [editCourse, setEditCourse] = useState("");
   const [editYear, setEditYear] = useState("");
   const [editPhoto, setEditPhoto] = useState("");
@@ -85,6 +113,8 @@ export default function StudentDashboard() {
           setEditName(details.name || "");
           setEditPhone(details.phone || "");
           setEditParent(details.parentContact || "");
+          setEditFather(details.fatherName || "");
+          setEditMother(details.motherName || "");
           setEditCourse(details.course || "");
           setEditYear(details.year || "");
           setEditPhoto(details.photoUrl || "");
@@ -326,6 +356,8 @@ export default function StudentDashboard() {
         name: editName.trim(),
         phone: editPhone.trim(),
         parentContact: editParent.trim(),
+        fatherName: editFather.trim(),
+        motherName: editMother.trim(),
         course: editCourse.trim(),
         year: editYear,
         photoUrl: editPhoto.trim() || null
@@ -341,6 +373,8 @@ export default function StudentDashboard() {
         name: editName.trim(),
         phone: editPhone.trim(),
         parentContact: editParent.trim(),
+        fatherName: editFather.trim(),
+        motherName: editMother.trim(),
         course: editCourse.trim(),
         year: editYear,
         photoUrl: editPhoto.trim() || null
@@ -965,6 +999,34 @@ export default function StudentDashboard() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                  Father's Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Father's Full Name"
+                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
+                  value={editFather}
+                  onChange={(e) => setEditFather(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                  Mother's Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Mother's Full Name"
+                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
+                  value={editMother}
+                  onChange={(e) => setEditMother(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
                   Course
                 </label>
                 <input
@@ -994,15 +1056,7 @@ export default function StudentDashboard() {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Photo URL
-                </label>
-                <input
-                  type="url"
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                  value={editPhoto}
-                  onChange={(e) => setEditPhoto(e.target.value)}
-                />
+                <CameraCapture photoUrl={editPhoto} onCapture={setEditPhoto} label="Profile Photo (Optional)" />
               </div>
             </div>
 

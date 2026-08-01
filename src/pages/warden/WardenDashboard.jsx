@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase";
 import {
@@ -40,9 +40,34 @@ import {
 
 export default function WardenDashboard() {
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";
-  const setTab = (tab) => setSearchParams({ tab });
+  const setTab = useCallback((tab) => setSearchParams({ tab }), [setSearchParams]);
+
+  // Mobile Back Button interception
+  useEffect(() => {
+    // Push a dummy state to ensure we always have an entry to pop
+    window.history.pushState({ noExit: true }, "", window.location.href);
+
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab") || "dashboard";
+
+      if (tab !== "dashboard") {
+        setTab("dashboard");
+        // Push the dummy state back to intercept the next back click
+        window.history.pushState({ noExit: true }, "", window.location.href);
+      } else {
+        navigate("/login");
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [activeTab, navigate, setTab]);
 
   // Data states
   const [students, setStudents] = useState([]);
@@ -659,6 +684,8 @@ export default function WardenDashboard() {
                     <td className="py-3.5 text-xs text-slate-500 space-y-0.5">
                       <p><span className="font-semibold text-slate-600">Self:</span> {s.phone || "N/A"}</p>
                       <p><span className="font-semibold text-slate-600">Parent:</span> {s.parentContact || "N/A"}</p>
+                      <p><span className="font-semibold text-slate-600">Father:</span> {s.fatherName || "N/A"}</p>
+                      <p><span className="font-semibold text-slate-600">Mother:</span> {s.motherName || "N/A"}</p>
                     </td>
                     <td className="py-3.5">
                       <button

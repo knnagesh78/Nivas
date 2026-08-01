@@ -268,10 +268,14 @@ export default function Layout({ children, activeTab, setActiveTab }) {
         )}
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto bg-slate-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+        <main className="flex-1 overflow-y-auto bg-slate-50 flex flex-col justify-between">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 w-full flex-grow">
             {children}
           </div>
+          {/* Footer */}
+          <footer className="py-4 border-t border-slate-200 bg-white text-center text-xs text-slate-500">
+            Developed by <span className="font-semibold text-slate-700">K. N. Nagesh, diploma cme</span>
+          </footer>
         </main>
       </div>
       <InstallWizardModal isOpen={wizardOpen} onClose={() => setWizardOpen(false)} />

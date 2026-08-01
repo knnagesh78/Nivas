@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GraduationCap, Phone, User, Home, UserCheck, ShieldAlert } from "lucide-react";
+import CameraCapture from "../components/CameraCapture";
 
 export default function CompleteProfile() {
   const { completeStudentProfile, logout, userData } = useAuth();
@@ -12,6 +13,8 @@ export default function CompleteProfile() {
   const [year, setYear] = useState("1st Year");
   const [phone, setPhone] = useState("");
   const [parentContact, setParentContact] = useState("");
+  const [fatherName, setFatherName] = useState("");
+  const [motherName, setMotherName] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +23,15 @@ export default function CompleteProfile() {
     e.preventDefault();
     setError("");
 
-    if (!name.trim() || !roomNumber.trim() || !course.trim() || !phone.trim() || !parentContact.trim()) {
+    if (
+      !name.trim() ||
+      !roomNumber.trim() ||
+      !course.trim() ||
+      !phone.trim() ||
+      !parentContact.trim() ||
+      !fatherName.trim() ||
+      !motherName.trim()
+    ) {
       setError("Please fill out all required fields.");
       return;
     }
@@ -34,6 +45,8 @@ export default function CompleteProfile() {
         year,
         phone: phone.trim(),
         parentContact: parentContact.trim(),
+        fatherName: fatherName.trim(),
+        motherName: motherName.trim(),
         photoUrl: photoUrl.trim() || null,
       });
       // Redirect to student page
@@ -205,17 +218,46 @@ export default function CompleteProfile() {
               </div>
             </div>
 
-            <div className="sm:col-span-2">
+            <div>
               <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Profile Photo URL (Optional)
+                Father's Name <span className="text-red-500">*</span>
               </label>
-              <input
-                type="url"
-                placeholder="e.g. https://images.unsplash.com/photo-..."
-                className="w-full rounded-xl border border-slate-200 py-2.5 px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                value={photoUrl}
-                onChange={(e) => setPhotoUrl(e.target.value)}
-              />
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <User className="h-4 w-4 text-slate-400" />
+                </div>
+                <input
+                  type="text"
+                  required
+                  placeholder="Father's Full Name"
+                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  value={fatherName}
+                  onChange={(e) => setFatherName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                Mother's Name <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <User className="h-4 w-4 text-slate-400" />
+                </div>
+                <input
+                  type="text"
+                  required
+                  placeholder="Mother's Full Name"
+                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  value={motherName}
+                  onChange={(e) => setMotherName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-2">
+              <CameraCapture photoUrl={photoUrl} onCapture={setPhotoUrl} label="Profile Photo (Optional)" />
             </div>
           </div>
 
