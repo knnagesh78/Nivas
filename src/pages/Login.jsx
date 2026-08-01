@@ -5,7 +5,8 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth, firebaseConfig, clearFirebaseConfig } from "../firebase";
-import { Mail, Lock, User, GraduationCap, Shield, Wrench } from "lucide-react";
+import { Mail, Lock, User, GraduationCap, Shield, Wrench, Download } from "lucide-react";
+import InstallWizardModal from "../components/InstallWizardModal";
 
 export default function Login() {
   const [role, setRole] = useState("student"); // "student" | "warden" | "admin"
@@ -15,6 +16,7 @@ export default function Login() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
   
   const { login, signupStudent, logout } = useAuth();
   const navigate = useNavigate();
@@ -167,6 +169,17 @@ export default function Login() {
       {/* Background shapes */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800 opacity-50 blur-3xl"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800 opacity-50 blur-3xl"></div>
+
+      {/* Floating Download/Install App Badge */}
+      <div className="absolute top-6 right-6 z-20">
+        <button
+          onClick={() => setWizardOpen(true)}
+          className="flex items-center space-x-2 bg-slate-800/40 border border-slate-700/60 text-indigo-400 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all backdrop-blur-md cursor-pointer hover:bg-slate-800/70 shadow-lg shadow-indigo-500/5 hover:scale-105 active:scale-95"
+        >
+          <Download className="h-4 w-4 animate-bounce" />
+          <span>Download App</span>
+        </button>
+      </div>
 
       <div className="w-full max-w-md space-y-8 bg-slate-850 p-8 rounded-3xl border border-slate-800 shadow-2xl relative z-10 bg-slate-950/60 backdrop-blur-md">
         <div>
@@ -351,6 +364,7 @@ export default function Login() {
           </div>
         </div>
       </div>
+      <InstallWizardModal isOpen={wizardOpen} onClose={() => setWizardOpen(false)} />
     </div>
   );
 }
