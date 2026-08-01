@@ -24,26 +24,29 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 )
 
-// ── Service Worker Registration with Update Detection ────────────────────────
+// ── Service Worker Registration with Safe Update Detection ──────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    // Check if the page is already controlled by a service worker on load
+    const hasController = !!navigator.serviceWorker.controller;
+
     navigator.serviceWorker.register('/sw.js')
       .then((reg) => {
         console.log('[SW] Registered:', reg.scope);
 
-        // Check for waiting worker on each page load (for returning users)
+        // Check if there's already a waiting worker on load
         if (reg.waiting) {
           notifyUpdate(reg.waiting);
         }
 
-        // A new SW finished installing and is waiting to activate
+        // Listen for new service workers installing
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
           if (!newWorker) return;
 
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // New content is available — notify the user
+              // A new service worker is installed and waiting to take over
               notifyUpdate(newWorker);
             }
           });
@@ -51,9 +54,15 @@ if ('serviceWorker' in navigator) {
       })
       .catch((err) => console.warn('[SW] Registration failed:', err));
 
-    // When the new SW takes control, reload so the user gets fresh assets
+    // Only reload the page when the service worker changes IF we were already controlled.
+    // This prevents reload loops or double-reloads on the very first install.
+    let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      window.location.reload();
+      if (refreshing) return;
+      if (hasController) {
+        refreshing = true;
+        window.location.reload();
+      }
     });
   });
 }
@@ -63,7 +72,6 @@ if ('serviceWorker' in navigator) {
  * Sends SKIP_WAITING to the new worker so it activates immediately.
  */
 function notifyUpdate(worker) {
-  // Avoid duplicate toasts
   if (document.getElementById('sw-update-toast')) return;
 
   const toast = document.createElement('div');
@@ -96,7 +104,6 @@ function notifyUpdate(worker) {
     ">✕</button>
   `;
 
-  // Inject keyframe once
   if (!document.getElementById('sw-toast-style')) {
     const style = document.createElement('style');
     style.id = 'sw-toast-style';

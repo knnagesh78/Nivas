@@ -1,7 +1,7 @@
 // ─── Nivas Service Worker ────────────────────────────────────────────────────
 // Bump CACHE_VERSION every time you deploy so ALL clients immediately get
 // the new icons, manifest and app shell.
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const CACHE_NAME    = `nivas-cache-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
@@ -19,7 +19,16 @@ const PRECACHE_ASSETS = [
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_ASSETS).catch(err => console.warn('[SW] Pre-cache failed:', err)))
+      .then((cache) => {
+        // Cache assets individually so that if one fails, it doesn't break the whole PWA install
+        return Promise.all(
+          PRECACHE_ASSETS.map((asset) => {
+            return cache.add(asset).catch((err) => {
+              console.warn(`[SW] Pre-cache failed for ${asset}:`, err);
+            });
+          })
+        );
+      })
       .then(() => self.skipWaiting()) // take control immediately
   );
 });
