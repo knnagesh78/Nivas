@@ -27,37 +27,31 @@ export default function Layout({ children, activeTab, setActiveTab }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
 
-  const [isAppInstalled, setIsAppInstalled] = useState(false);
+  // True when the browser has a deferred install prompt ready
+  const [canInstall, setCanInstall] = useState(() => !!window.deferredPrompt);
+
+  // True only when running as installed standalone PWA
+  const isStandaloneMode =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    !!window.navigator.standalone;
 
   useEffect(() => {
-    const checkInstalled = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-      const isLocalStorageMarked = localStorage.getItem('pwa_installed') === 'true';
-      setIsAppInstalled(isStandalone || isLocalStorageMarked);
-    };
-
-    checkInstalled();
-
+    const handleInstallable = () => setCanInstall(true);
+    const handleInstalled = () => { setCanInstall(false); setWizardOpen(false); };
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       window.deferredPrompt = e;
-      localStorage.setItem('pwa_installed', 'false');
-      setIsAppInstalled(false);
+      setCanInstall(true);
     };
 
-    const handleAppInstalled = () => {
-      localStorage.setItem('pwa_installed', 'true');
-      setIsAppInstalled(true);
-    };
-
+    window.addEventListener("pwa:installable", handleInstallable);
+    window.addEventListener("pwa:installed", handleInstalled);
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    window.addEventListener("appinstalled", handleAppInstalled);
-    window.addEventListener("storage", checkInstalled);
 
     return () => {
+      window.removeEventListener("pwa:installable", handleInstallable);
+      window.removeEventListener("pwa:installed", handleInstalled);
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-      window.removeEventListener("appinstalled", handleAppInstalled);
-      window.removeEventListener("storage", checkInstalled);
     };
   }, []);
 
@@ -176,7 +170,7 @@ export default function Layout({ children, activeTab, setActiveTab }) {
 
         {/* Footer Sign-out */}
         <div className="p-4 border-t border-slate-100 space-y-1.5">
-          {!isAppInstalled && (
+          {canInstall && !isStandaloneMode && (
             <button
               onClick={() => setWizardOpen(true)}
               className="flex items-center w-full px-3 py-2.5 text-sm font-semibold text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all border border-transparent hover:border-indigo-100 cursor-pointer"
@@ -278,10 +272,10 @@ export default function Layout({ children, activeTab, setActiveTab }) {
           </footer>
         </main>
       </div>
-      <InstallWizardModal 
-        isOpen={wizardOpen} 
+      <InstallWizardModal
+        isOpen={wizardOpen}
         onClose={() => setWizardOpen(false)}
-        onInstalled={() => { setIsAppInstalled(true); setWizardOpen(false); }}
+        onInstalled={() => { setCanInstall(false); setWizardOpen(false); }}
       />
     </div>
   );

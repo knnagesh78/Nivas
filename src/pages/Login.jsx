@@ -17,39 +17,35 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [isAppInstalled, setIsAppInstalled] = useState(false);
+
+  // True when the browser has a deferred install prompt ready
+  const [canInstall, setCanInstall] = useState(() => !!window.deferredPrompt);
+
+  // True only when the app is running in standalone (already installed)
+  const isStandaloneMode =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    !!window.navigator.standalone;
 
   useEffect(() => {
-    const checkInstalled = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-      const isLocalStorageMarked = localStorage.getItem('pwa_installed') === 'true';
-      setIsAppInstalled(isStandalone || isLocalStorageMarked);
-    };
-
-    checkInstalled();
-
+    const handleInstallable = () => setCanInstall(true);
+    const handleInstalled = () => { setCanInstall(false); setWizardOpen(false); };
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       window.deferredPrompt = e;
-      localStorage.setItem('pwa_installed', 'false');
-      setIsAppInstalled(false);
+      setCanInstall(true);
     };
 
-    const handleAppInstalled = () => {
-      localStorage.setItem('pwa_installed', 'true');
-      setIsAppInstalled(true);
-    };
-
+    window.addEventListener("pwa:installable", handleInstallable);
+    window.addEventListener("pwa:installed", handleInstalled);
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    window.addEventListener("appinstalled", handleAppInstalled);
-    window.addEventListener("storage", checkInstalled);
 
     return () => {
+      window.removeEventListener("pwa:installable", handleInstallable);
+      window.removeEventListener("pwa:installed", handleInstalled);
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-      window.removeEventListener("appinstalled", handleAppInstalled);
-      window.removeEventListener("storage", checkInstalled);
     };
   }, []);
+
   
   const { login, signupStudent, logout } = useAuth();
   const navigate = useNavigate();
@@ -203,8 +199,8 @@ export default function Login() {
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800 opacity-50 blur-3xl"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800 opacity-50 blur-3xl"></div>
 
-      {/* Floating Download/Install App Badge */}
-      {!isAppInstalled && (
+      {/* Floating Download/Install App Badge — visible when install prompt is ready and not in standalone mode */}
+      {canInstall && !isStandaloneMode && (
         <div className="absolute top-6 right-6 z-20">
           <button
             onClick={() => setWizardOpen(true)}
@@ -399,10 +395,10 @@ export default function Login() {
           </div>
         </div>
       </div>
-      <InstallWizardModal 
-        isOpen={wizardOpen} 
+      <InstallWizardModal
+        isOpen={wizardOpen}
         onClose={() => setWizardOpen(false)}
-        onInstalled={() => { setIsAppInstalled(true); setWizardOpen(false); }}
+        onInstalled={() => { setCanInstall(false); setWizardOpen(false); }}
       />
     </div>
   );

@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { 
-  X, 
-  ArrowRight, 
-  ArrowLeft, 
-  Smartphone, 
-  Monitor, 
-  CheckCircle2, 
-  Share2, 
-  PlusSquare, 
-  HelpCircle, 
-  Zap, 
-  CloudOff, 
-  Download, 
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import {
+  X,
+  ArrowRight,
+  ArrowLeft,
+  Smartphone,
+  Monitor,
+  CheckCircle2,
+  Share2,
+  PlusSquare,
+  HelpCircle,
+  Zap,
+  CloudOff,
+  Download,
   Sparkles,
   Info
 } from "lucide-react";
@@ -19,78 +19,112 @@ import {
 export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [platform, setPlatform] = useState("chrome"); // "chrome" | "ios" | "desktop"
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [deferredPrompt, setDeferredPrompt] = useState(() => window.deferredPrompt || null);
   const [installState, setInstallState] = useState("idle"); // "idle" | "installing" | "success" | "failed"
 
-  // Auto-close helper: show success step then close after delay
-  const handleInstallSuccess = () => {
-    setInstallState("success");
-    localStorage.setItem('pwa_installed', 'true');
-    window.dispatchEvent(new Event("storage"));
-    setCurrentStep(3);
-    if (onInstalled) onInstalled();
-    setTimeout(() => {
-      onClose();
-    }, 2500);
-  };
+  // Keep callback refs fresh so setTimeout/event handlers never go stale
+  const onCloseRef = useRef(onClose);
+  const onInstalledRef = useRef(onInstalled);
+  const successHandled = useRef(false); // prevent double-fire
 
   useEffect(() => {
-    // Detect platform on mount
+    onCloseRef.current = onClose;
+    onInstalledRef.current = onInstalled;
+  });
+
+  // Central success handler — safe against stale closures
+  const handleInstallSuccess = useCallback(() => {
+    if (successHandled.current) return;
+    successHandled.current = true;
+
+    setInstallState("success");
+    setCurrentStep(3);
+    localStorage.setItem("pwa_installed", "true");
+    window.dispatchEvent(new Event("storage"));
+    window.deferredPrompt = null;
+
+    onInstalledRef.current?.();
+
+    // Auto-close after 2.5 s
+    setTimeout(() => {
+      onCloseRef.current?.();
+    }, 2500);
+  }, []);
+
+  useEffect(() => {
+    // Reset success guard each time the modal opens fresh
+    if (isOpen) {
+      successHandled.current = false;
+      setCurrentStep(1);
+      setInstallState("idle");
+      // Pick up any already-captured prompt
+      if (window.deferredPrompt) setDeferredPrompt(window.deferredPrompt);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    // Detect platform
     const ua = navigator.userAgent;
     const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
 
-    if (isIOS) {
-      setPlatform("ios");
-    } else if (!isMobile) {
-      setPlatform("desktop");
-    } else {
-      setPlatform("chrome"); // default to chrome/android
-    }
+    if (isIOS) setPlatform("ios");
+    else if (!isMobile) setPlatform("desktop");
+    else setPlatform("chrome");
 
-    // Capture standard install prompt
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
+      window.deferredPrompt = e;
       setDeferredPrompt(e);
-      window.deferredPrompt = e; // share globally as fallback
     };
 
-    // Listen for the native appinstalled event (fires when OS installs the PWA)
+    // Listen for the native appinstalled event
     const handleAppInstalled = () => {
       handleInstallSuccess();
     };
 
+    // Also listen for our custom pwa:installable event from main.jsx
+    const handleInstallable = () => {
+      if (window.deferredPrompt) setDeferredPrompt(window.deferredPrompt);
+    };
+
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     window.addEventListener("appinstalled", handleAppInstalled);
-    
-    // Check if it was already saved on window
-    if (window.deferredPrompt) {
-      setDeferredPrompt(window.deferredPrompt);
-    }
+    window.addEventListener("pwa:installable", handleInstallable);
+    window.addEventListener("pwa:installed", handleInstallSuccess);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
       window.removeEventListener("appinstalled", handleAppInstalled);
+      window.removeEventListener("pwa:installable", handleInstallable);
+      window.removeEventListener("pwa:installed", handleInstallSuccess);
     };
-  }, []);
+  }, [handleInstallSuccess]);
 
   if (!isOpen) return null;
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-      alert("Installation shortcut not supported by your browser or already installed. Please check browser settings.");
+      alert(
+        "Automatic install is not available right now.\n\n" +
+        "Possible reasons:\n" +
+        "• Already installed on this device\n" +
+        "• Browser doesn't support PWA install\n" +
+        "• You previously dismissed the prompt (wait 24h)\n\n" +
+        "Try the manual steps below or use Chrome on Android/Desktop."
+      );
       return;
     }
-    
+
     setInstallState("installing");
     deferredPrompt.prompt();
-    
+
     const { outcome } = await deferredPrompt.userChoice;
+    setDeferredPrompt(null);
+
     if (outcome === "accepted") {
-      setDeferredPrompt(null);
-      window.deferredPrompt = null;
-      // handleInstallSuccess will be triggered by the `appinstalled` event.
-      // As a fallback (some browsers don't fire appinstalled), trigger manually:
+      // handleInstallSuccess will be called by the appinstalled event.
+      // Trigger it manually as a fallback for browsers that don't fire appinstalled.
       handleInstallSuccess();
     } else {
       setInstallState("failed");
@@ -107,14 +141,14 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300"
         onClick={onClose}
       />
 
       {/* Modal Container */}
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-10 transition-all duration-300 animate-fadeIn flex flex-col max-h-[90vh]">
-        
+
         {/* Header Gradient */}
         <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-800 px-6 py-5 text-white flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -126,7 +160,7 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
               <p className="text-xs text-indigo-200">Install web app for a native experience</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all text-white outline-none focus:ring-2 focus:ring-white/30"
           >
@@ -136,15 +170,15 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
 
         {/* Progress Bar */}
         <div className="flex bg-slate-100 h-1.5 w-full">
-          <div 
-            className="bg-indigo-600 h-full transition-all duration-300" 
+          <div
+            className="bg-indigo-600 h-full transition-all duration-300"
             style={{ width: `${(currentStep / steps.length) * 100}%` }}
           />
         </div>
 
         {/* Body Content */}
         <div className="flex-grow p-6 overflow-y-auto">
-          
+
           {/* STEP 1: BENEFITS */}
           {currentStep === 1 && (
             <div className="space-y-5 animate-fadeIn">
@@ -254,15 +288,18 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
                         disabled={installState === "installing"}
                         className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl transition-all shadow-md shadow-indigo-600/20 active:scale-95 disabled:opacity-50"
                       >
-                        {installState === "installing" ? "Installing App..." : "Install Nivas Now"}
+                        {installState === "installing" ? "Installing App…" : "Install Nivas Now"}
                       </button>
+                      {installState === "failed" && (
+                        <p className="text-xs text-rose-500">You cancelled the install. Try again anytime.</p>
+                      )}
                     </div>
                   ) : (
                     <div className="space-y-3.5">
                       <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start space-x-2.5 text-xs text-amber-800">
                         <Info className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                         <div>
-                          <strong>Manual Mode:</strong> Your browser has either already installed the application, or does not support automatic prompts. Follow these quick steps to download manually:
+                          <strong>Manual Mode:</strong> Your browser has either already installed the app, or the install prompt is not ready yet. Try refreshing the page, or follow these steps:
                         </div>
                       </div>
 
@@ -289,7 +326,7 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
               {platform === "ios" && (
                 <div className="space-y-5 pt-1">
                   <div className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-3.5 flex items-start space-x-3 text-xs text-indigo-850">
-                    <Info className="h-4.5 w-4.5 text-indigo-500 flex-shrink-0 mt-0.5" />
+                    <Info className="h-4 w-4 text-indigo-500 flex-shrink-0 mt-0.5" />
                     <div>
                       Apple iOS does not support direct click-to-install. Please open this page in <strong>Safari browser</strong> and follow these steps:
                     </div>
@@ -358,7 +395,7 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
                     <div>
                       <h6 className="font-bold text-xs text-indigo-600 uppercase tracking-wide">macOS Safari</h6>
                       <p className="text-sm text-slate-700 mt-1">
-                        Click <strong>File</strong> in the top macOS menu bar, and choose <strong>"Add to Dock..."</strong> to place Nivas directly into your desktop launcher bar.
+                        Click <strong>File</strong> in the top macOS menu bar, and choose <strong>"Add to Dock…"</strong> to place Nivas directly into your desktop launcher bar.
                       </p>
                     </div>
                   </div>
@@ -376,13 +413,13 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
               <div className="space-y-2">
                 <h4 className="text-xl font-bold text-slate-800">You're All Set!</h4>
                 <p className="text-sm text-slate-500 max-w-sm mx-auto">
-                  Nivas has been queued for download or successfully installed. Look for the Nivas logo on your device home screen, dock, or apps dashboard.
+                  Nivas has been successfully installed. Look for the Nivas icon on your home screen, dock, or apps dashboard.
                 </p>
               </div>
-              
-              <div className="inline-flex items-center space-x-2 text-xs bg-slate-50 text-slate-500 py-2 px-3 rounded-full border border-slate-100">
-                <HelpCircle className="h-4 w-4 text-slate-400" />
-                <span>This window will close automatically in a moment…</span>
+
+              <div className="inline-flex items-center space-x-2 text-xs bg-green-50 text-green-700 py-2 px-3 rounded-full border border-green-200">
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                <span>This window will close automatically…</span>
               </div>
             </div>
           )}
@@ -392,7 +429,7 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
         {/* Footer Actions */}
         <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between">
           <div>
-            {currentStep > 1 ? (
+            {currentStep > 1 && currentStep < 3 ? (
               <button
                 onClick={() => setCurrentStep(prev => prev - 1)}
                 className="flex items-center space-x-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-all py-2 px-3 hover:bg-slate-200/50 rounded-xl"
@@ -409,7 +446,7 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
             {currentStep < steps.length ? (
               <button
                 onClick={() => setCurrentStep(prev => prev + 1)}
-                className="flex items-center space-x-1.5 py-2 px-4.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-600/10"
+                className="flex items-center space-x-1.5 py-2 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-600/10"
               >
                 <span>Continue</span>
                 <ArrowRight className="h-4 w-4" />
@@ -417,7 +454,7 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
             ) : (
               <button
                 onClick={() => {
-                  localStorage.setItem('pwa_installed', 'true');
+                  localStorage.setItem("pwa_installed", "true");
                   window.dispatchEvent(new Event("storage"));
                   onClose();
                 }}
