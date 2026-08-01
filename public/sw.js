@@ -1,7 +1,7 @@
 // ─── Nivas Service Worker ────────────────────────────────────────────────────
 // Bump CACHE_VERSION every time you deploy so ALL clients immediately get
 // the new icons, manifest and app shell.
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v8';
 const CACHE_NAME    = `nivas-cache-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
@@ -65,7 +65,6 @@ self.addEventListener('fetch', (e) => {
           return cachedResponse || fetch(e.request);
         })
         .catch(() => {
-          // If offline and index.html is missing, return a basic offline page instead of failing with ERR_FAILED
           return new Response(
             '<h1>Nivas Offline</h1><p>Please check your connection and try again.</p>',
             { status: 503, headers: { 'Content-Type': 'text/html' } }
@@ -105,6 +104,16 @@ self.addEventListener('fetch', (e) => {
         if (cached) return cached;
         return fetch(e.request).then((response) => {
           if (response && response.status === 200) {
+            // Guard: If the server rewrote a missing JS/CSS asset to index.html,
+            // do not cache it as JS, and return a proper 404 response instead.
+            const contentType = response.headers.get('content-type') || '';
+            const isHtml = contentType.includes('text/html');
+            const isAsset = url.pathname.startsWith('/assets/');
+
+            if (isAsset && isHtml) {
+              return new Response('Asset not found', { status: 404, statusText: 'Not Found' });
+            }
+
             const clone = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
           }
