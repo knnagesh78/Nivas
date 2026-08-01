@@ -399,7 +399,11 @@ export default function Login() {
           </div>
         </div>
       </div>
-      <InstallWizardModal isOpen={wizardOpen} onClose={() => setWizardOpen(false)} />
+      <InstallWizardModal 
+        isOpen={wizardOpen} 
+        onClose={() => setWizardOpen(false)}
+        onInstalled={() => { setIsAppInstalled(true); setWizardOpen(false); }}
+      />
     </div>
   );
 }

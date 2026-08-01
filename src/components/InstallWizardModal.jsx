@@ -16,11 +16,23 @@ import {
   Info
 } from "lucide-react";
 
-export default function InstallWizardModal({ isOpen, onClose }) {
+export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [platform, setPlatform] = useState("chrome"); // "chrome" | "ios" | "desktop"
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [installState, setInstallState] = useState("idle"); // "idle" | "installing" | "success" | "failed"
+
+  // Auto-close helper: show success step then close after delay
+  const handleInstallSuccess = () => {
+    setInstallState("success");
+    localStorage.setItem('pwa_installed', 'true');
+    window.dispatchEvent(new Event("storage"));
+    setCurrentStep(3);
+    if (onInstalled) onInstalled();
+    setTimeout(() => {
+      onClose();
+    }, 2500);
+  };
 
   useEffect(() => {
     // Detect platform on mount
@@ -43,7 +55,13 @@ export default function InstallWizardModal({ isOpen, onClose }) {
       window.deferredPrompt = e; // share globally as fallback
     };
 
+    // Listen for the native appinstalled event (fires when OS installs the PWA)
+    const handleAppInstalled = () => {
+      handleInstallSuccess();
+    };
+
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
     
     // Check if it was already saved on window
     if (window.deferredPrompt) {
@@ -52,6 +70,7 @@ export default function InstallWizardModal({ isOpen, onClose }) {
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -68,12 +87,11 @@ export default function InstallWizardModal({ isOpen, onClose }) {
     
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
-      setInstallState("success");
-      localStorage.setItem('pwa_installed', 'true');
-      window.dispatchEvent(new Event("storage"));
       setDeferredPrompt(null);
       window.deferredPrompt = null;
-      setCurrentStep(3); // skip to completion
+      // handleInstallSuccess will be triggered by the `appinstalled` event.
+      // As a fallback (some browsers don't fire appinstalled), trigger manually:
+      handleInstallSuccess();
     } else {
       setInstallState("failed");
       setTimeout(() => setInstallState("idle"), 2500);
@@ -364,7 +382,7 @@ export default function InstallWizardModal({ isOpen, onClose }) {
               
               <div className="inline-flex items-center space-x-2 text-xs bg-slate-50 text-slate-500 py-2 px-3 rounded-full border border-slate-100">
                 <HelpCircle className="h-4 w-4 text-slate-400" />
-                <span>Need help? Open this wizard anytime from the sidebar settings!</span>
+                <span>This window will close automatically in a moment…</span>
               </div>
             </div>
           )}
@@ -405,7 +423,7 @@ export default function InstallWizardModal({ isOpen, onClose }) {
                 }}
                 className="py-2 px-5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all"
               >
-                Close Wizard
+                Close Now
               </button>
             )}
           </div>

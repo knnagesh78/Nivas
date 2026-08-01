@@ -278,7 +278,11 @@ export default function Layout({ children, activeTab, setActiveTab }) {
           </footer>
         </main>
       </div>
-      <InstallWizardModal isOpen={wizardOpen} onClose={() => setWizardOpen(false)} />
+      <InstallWizardModal 
+        isOpen={wizardOpen} 
+        onClose={() => setWizardOpen(false)}
+        onInstalled={() => { setIsAppInstalled(true); setWizardOpen(false); }}
+      />
     </div>
   );
 }
