@@ -33,7 +33,8 @@ import {
   AlertTriangle,
   DoorOpen,
   ClipboardList,
-  Plus
+  Plus,
+  Trash2
 } from "lucide-react";
 
 export default function WardenDashboard() {
@@ -338,6 +339,32 @@ export default function WardenDashboard() {
       setNotices(prev => prev.filter(n => n.id !== id));
     } catch (err) {
       console.error("Error deleting notice:", err);
+    }
+  };
+
+  // Delete Complaint
+  const handleDeleteComplaint = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this complaint?")) return;
+    try {
+      await deleteDoc(doc(db, "complaints", id));
+      setComplaints((prev) => prev.filter((c) => c.id !== id));
+      alert("Complaint deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting complaint:", err);
+      alert("Failed to delete complaint.");
+    }
+  };
+
+  // Delete Leave Request
+  const handleDeleteLeave = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this leave request?")) return;
+    try {
+      await deleteDoc(doc(db, "leaveRequests", id));
+      setLeaves((prev) => prev.filter((l) => l.id !== id));
+      alert("Leave request deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting leave request:", err);
+      alert("Failed to delete leave request.");
     }
   };
 
@@ -827,9 +854,20 @@ export default function WardenDashboard() {
                       </p>
                     </div>
 
-                    <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full uppercase border text-center max-w-fit ${getStatusStyle(req.status)}`}>
-                      {req.status}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full uppercase border text-center max-w-fit ${getStatusStyle(req.status)}`}>
+                        {req.status}
+                      </span>
+                      {(req.status === "approved" || req.status === "rejected") && (
+                        <button
+                          onClick={() => handleDeleteLeave(req.id)}
+                          className="p-1.5 border border-slate-200 hover:border-red-200 text-slate-400 hover:text-red-500 rounded-lg transition-all"
+                          title="Delete Leave Request"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div>
@@ -978,9 +1016,20 @@ export default function WardenDashboard() {
                       </p>
                     </div>
 
-                    <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full uppercase border text-center max-w-fit ${getStatusStyle(item.status)}`}>
-                      {item.status}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full uppercase border text-center max-w-fit ${getStatusStyle(item.status)}`}>
+                        {item.status}
+                      </span>
+                      {item.status === "resolved" && (
+                        <button
+                          onClick={() => handleDeleteComplaint(item.id)}
+                          className="p-1.5 border border-slate-200 hover:border-red-200 text-slate-400 hover:text-red-500 rounded-lg transition-all"
+                          title="Delete Complaint"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

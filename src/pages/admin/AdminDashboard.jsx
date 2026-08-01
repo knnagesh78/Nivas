@@ -388,6 +388,50 @@ export default function AdminDashboard() {
     }
   };
 
+  // Delete Complaint
+  const handleDeleteComplaint = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this complaint?")) return;
+    try {
+      await deleteDoc(doc(db, "complaints", id));
+      setComplaints(prev => prev.filter(c => c.id !== id));
+      // update stats count
+      setStats(prev => {
+        const item = complaints.find(c => c.id === id);
+        const isOpen = item && item.status !== "resolved";
+        return {
+          ...prev,
+          openComplaints: isOpen ? prev.openComplaints - 1 : prev.openComplaints
+        };
+      });
+      alert("Complaint deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting complaint:", err);
+      alert("Failed to delete complaint.");
+    }
+  };
+
+  // Delete Leave Request
+  const handleDeleteLeave = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this leave request?")) return;
+    try {
+      await deleteDoc(doc(db, "leaveRequests", id));
+      setLeaves(prev => prev.filter(l => l.id !== id));
+      // update stats count
+      setStats(prev => {
+        const item = leaves.find(l => l.id === id);
+        const isPending = item && item.status === "pending";
+        return {
+          ...prev,
+          pendingLeaves: isPending ? prev.pendingLeaves - 1 : prev.pendingLeaves
+        };
+      });
+      alert("Leave request deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting leave request:", err);
+      alert("Failed to delete leave request.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-slate-50">
@@ -490,19 +534,38 @@ export default function AdminDashboard() {
                       <p className="text-slate-400 mt-0.5">{req.fromDate} to {req.toDate}</p>
                     </div>
                     
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => handleOverrideLeave(req.id, "rejected")}
-                        className="p-1 border border-red-200 rounded-lg text-red-500 hover:bg-red-50"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleOverrideLeave(req.id, "approved")}
-                        className="p-1 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
-                      >
-                        <Check className="h-4 w-4" />
-                      </button>
+                    <div className="flex space-x-1 items-center">
+                      {req.status === "pending" ? (
+                        <>
+                          <button
+                            onClick={() => handleOverrideLeave(req.id, "rejected")}
+                            className="p-1 border border-red-200 rounded-lg text-red-500 hover:bg-red-50"
+                            title="Reject Override"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleOverrideLeave(req.id, "approved")}
+                            className="p-1 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
+                            title="Approve Override"
+                          >
+                            <Check className="h-4 w-4" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <span className={`px-2 py-0.5 mr-1 text-[9px] font-bold rounded-full uppercase border ${getStatusStyle(req.status)}`}>
+                            {req.status}
+                          </span>
+                          <button
+                            onClick={() => handleDeleteLeave(req.id)}
+                            className="p-1.5 border border-slate-200 hover:border-red-200 text-slate-400 hover:text-red-500 rounded-lg transition-all"
+                            title="Delete Leave Request"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -524,12 +587,27 @@ export default function AdminDashboard() {
                       <p className="text-slate-400 mt-0.5">{item.studentName} | Room {item.roomNumber}</p>
                     </div>
 
-                    <button
-                      onClick={() => handleOverrideComplaint(item.id, "resolved")}
-                      className="px-2.5 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold"
-                    >
-                      Resolve
-                    </button>
+                    {item.status !== "resolved" ? (
+                      <button
+                        onClick={() => handleOverrideComplaint(item.id, "resolved")}
+                        className="px-2.5 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold"
+                      >
+                        Resolve
+                      </button>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase border ${getStatusStyle(item.status)}`}>
+                          {item.status}
+                        </span>
+                        <button
+                          onClick={() => handleDeleteComplaint(item.id)}
+                          className="p-1.5 border border-slate-200 hover:border-red-200 text-slate-400 hover:text-red-500 rounded-lg transition-all"
+                          title="Delete Complaint"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
                 {complaints.length === 0 && <p className="text-xs text-slate-400 italic">No open complaints.</p>}

@@ -10,6 +10,7 @@ import {
   doc,
   addDoc,
   updateDoc,
+  deleteDoc,
   orderBy,
   serverTimestamp,
   limit
@@ -27,7 +28,8 @@ import {
   Clock,
   Plus,
   Send,
-  BookOpen
+  BookOpen,
+  Trash2
 } from "lucide-react";
 
 export default function StudentDashboard() {
@@ -349,6 +351,32 @@ export default function StudentDashboard() {
     }
   };
 
+  // Delete Complaint
+  const handleDeleteComplaint = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this complaint?")) return;
+    try {
+      await deleteDoc(doc(db, "complaints", id));
+      setComplaints((prev) => prev.filter((c) => c.id !== id));
+      alert("Complaint deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting complaint:", err);
+      alert("Failed to delete complaint.");
+    }
+  };
+
+  // Delete Leave Request
+  const handleDeleteLeave = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this leave request?")) return;
+    try {
+      await deleteDoc(doc(db, "leaveRequests", id));
+      setLeaves((prev) => prev.filter((l) => l.id !== id));
+      alert("Leave request deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting leave request:", err);
+      alert("Failed to delete leave request.");
+    }
+  };
+
   if (loadingData) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-slate-50">
@@ -655,9 +683,20 @@ export default function StudentDashboard() {
                         <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Duration</span>
                         <p className="text-sm font-bold text-slate-700">{request.fromDate} to {request.toDate}</p>
                       </div>
-                      <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full uppercase border ${getStatusStyle(request.status)}`}>
-                        {request.status}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full uppercase border ${getStatusStyle(request.status)}`}>
+                          {request.status}
+                        </span>
+                        {(request.status === "approved" || request.status === "rejected") && (
+                          <button
+                            onClick={() => handleDeleteLeave(request.id)}
+                            className="p-1 border border-slate-200 hover:border-red-200 text-slate-400 hover:text-red-500 rounded-lg transition-all"
+                            title="Delete Leave Request"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     <div>
@@ -807,9 +846,20 @@ export default function StudentDashboard() {
                           {item.priority} Priority
                         </span>
                       </div>
-                      <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full uppercase border ${getStatusStyle(item.status)}`}>
-                        {item.status}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full uppercase border ${getStatusStyle(item.status)}`}>
+                          {item.status}
+                        </span>
+                        {item.status === "resolved" && (
+                          <button
+                            onClick={() => handleDeleteComplaint(item.id)}
+                            className="p-1 border border-slate-200 hover:border-red-200 text-slate-400 hover:text-red-500 rounded-lg transition-all"
+                            title="Delete Complaint"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     <div>

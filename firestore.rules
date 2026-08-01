@@ -74,6 +74,8 @@ service cloud.firestore {
       allow update: if isAdmin() || isWarden();
       // Allow student to update their own pending requests (e.g. cancel/modify reason)
       allow update: if isStudent() && resource.data.studentUid == request.auth.uid && resource.data.status == 'pending';
+      // Allow deletion by admin, warden, or owning student
+      allow delete: if isAdmin() || isWarden() || (isStudent() && resource.data.studentUid == request.auth.uid);
     }
 
     // complaints collection
@@ -87,6 +89,8 @@ service cloud.firestore {
       allow update: if isAdmin() || isWarden();
       // Allow student to update their own open complaints (e.g. edit description)
       allow update: if isStudent() && resource.data.studentUid == request.auth.uid && resource.data.status == 'open';
+      // Allow deletion by admin, warden, or owning student
+      allow delete: if isAdmin() || isWarden() || (isStudent() && resource.data.studentUid == request.auth.uid);
     }
 
     // notices collection
