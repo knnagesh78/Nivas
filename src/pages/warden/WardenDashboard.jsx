@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase";
 import {
@@ -39,7 +40,9 @@ import {
 
 export default function WardenDashboard() {
   const { currentUser } = useAuth();
-  const [activeTab, setTab] = useState("dashboard");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "dashboard";
+  const setTab = (tab) => setSearchParams({ tab });
 
   // Data states
   const [students, setStudents] = useState([]);

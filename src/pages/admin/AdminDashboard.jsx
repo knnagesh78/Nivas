@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { db, firebaseConfig } from "../../firebase";
 import { initializeApp } from "firebase/app";
@@ -37,7 +38,9 @@ import {
 
 export default function AdminDashboard() {
   const { currentUser, userData, updateEmail, updatePassword } = useAuth();
-  const [activeTab, setTab] = useState("dashboard");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "dashboard";
+  const setTab = (tab) => setSearchParams({ tab });
 
   // Data logs
   const [stats, setStats] = useState({
