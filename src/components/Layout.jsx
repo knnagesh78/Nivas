@@ -237,7 +237,7 @@ export default function Layout({ children, activeTab, setActiveTab }) {
                 );
               })}
               <div className="pt-2 mt-2 border-t border-slate-100 space-y-1">
-                {!isAppInstalled && (
+                {canInstall && !isStandaloneMode && (
                   <button
                     onClick={() => {
                       setWizardOpen(true);
