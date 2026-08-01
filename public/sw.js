@@ -30,8 +30,20 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Only handle local HTTP/HTTPS requests
+  // Only handle local GET requests
   if (e.request.url.startsWith(self.location.origin) && e.request.method === 'GET') {
+    
+    // For navigation requests (pages/subroutes), serve the cached index.html to support client-side SPA routing
+    if (e.request.mode === 'navigate') {
+      e.respondWith(
+        caches.match('/index.html').then((cachedResponse) => {
+          return cachedResponse || fetch(e.request);
+        })
+      );
+      return;
+    }
+
+    // For static assets, use cache-first and dynamically cache new responses
     e.respondWith(
       caches.match(e.request).then((cachedResponse) => {
         if (cachedResponse) {
@@ -48,7 +60,7 @@ self.addEventListener('fetch', (e) => {
           return response;
         }).catch(() => {
           // Offline fallback
-          return caches.match('/');
+          return caches.match('/index.html') || caches.match('/');
         });
       })
     );
