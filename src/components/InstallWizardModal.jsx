@@ -69,6 +69,8 @@ export default function InstallWizardModal({ isOpen, onClose }) {
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
       setInstallState("success");
+      localStorage.setItem('pwa_installed', 'true');
+      window.dispatchEvent(new Event("storage"));
       setDeferredPrompt(null);
       window.deferredPrompt = null;
       setCurrentStep(3); // skip to completion
@@ -396,7 +398,11 @@ export default function InstallWizardModal({ isOpen, onClose }) {
               </button>
             ) : (
               <button
-                onClick={onClose}
+                onClick={() => {
+                  localStorage.setItem('pwa_installed', 'true');
+                  window.dispatchEvent(new Event("storage"));
+                  onClose();
+                }}
                 className="py-2 px-5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all"
               >
                 Close Wizard

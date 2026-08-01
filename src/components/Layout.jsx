@@ -27,14 +27,37 @@ export default function Layout({ children, activeTab, setActiveTab }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
 
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
+
   useEffect(() => {
+    const checkInstalled = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      const isLocalStorageMarked = localStorage.getItem('pwa_installed') === 'true';
+      setIsAppInstalled(isStandalone || isLocalStorageMarked);
+    };
+
+    checkInstalled();
+
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       window.deferredPrompt = e;
+      localStorage.setItem('pwa_installed', 'false');
+      setIsAppInstalled(false);
     };
+
+    const handleAppInstalled = () => {
+      localStorage.setItem('pwa_installed', 'true');
+      setIsAppInstalled(true);
+    };
+
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+    window.addEventListener("storage", checkInstalled);
+
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+      window.removeEventListener("storage", checkInstalled);
     };
   }, []);
 
@@ -153,13 +176,15 @@ export default function Layout({ children, activeTab, setActiveTab }) {
 
         {/* Footer Sign-out */}
         <div className="p-4 border-t border-slate-100 space-y-1.5">
-          <button
-            onClick={() => setWizardOpen(true)}
-            className="flex items-center w-full px-3 py-2.5 text-sm font-semibold text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all border border-transparent hover:border-indigo-100 cursor-pointer"
-          >
-            <Download className="mr-3 h-5 w-5 text-indigo-500 animate-pulse" />
-            Download App
-          </button>
+          {!isAppInstalled && (
+            <button
+              onClick={() => setWizardOpen(true)}
+              className="flex items-center w-full px-3 py-2.5 text-sm font-semibold text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all border border-transparent hover:border-indigo-100 cursor-pointer"
+            >
+              <Download className="mr-3 h-5 w-5 text-indigo-500 animate-pulse" />
+              Download App
+            </button>
+          )}
           <button
             onClick={handleLogout}
             className="flex items-center w-full px-3 py-2.5 text-sm font-semibold text-red-600 rounded-xl hover:bg-red-50 transition-all cursor-pointer"
@@ -218,16 +243,18 @@ export default function Layout({ children, activeTab, setActiveTab }) {
                 );
               })}
               <div className="pt-2 mt-2 border-t border-slate-100 space-y-1">
-                <button
-                  onClick={() => {
-                    setWizardOpen(true);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="flex items-center w-full px-3 py-2 text-sm font-semibold text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer"
-                >
-                  <Download className="mr-3 h-5 w-5 text-indigo-500" />
-                  Download App
-                </button>
+                {!isAppInstalled && (
+                  <button
+                    onClick={() => {
+                      setWizardOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center w-full px-3 py-2 text-sm font-semibold text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer"
+                  >
+                    <Download className="mr-3 h-5 w-5 text-indigo-500" />
+                    Download App
+                  </button>
+                )}
                 <button
                   onClick={handleLogout}
                   className="flex items-center w-full px-3 py-2 text-sm font-semibold text-red-600 rounded-lg hover:bg-red-50 cursor-pointer"

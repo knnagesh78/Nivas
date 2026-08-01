@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -17,6 +17,39 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
+
+  useEffect(() => {
+    const checkInstalled = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      const isLocalStorageMarked = localStorage.getItem('pwa_installed') === 'true';
+      setIsAppInstalled(isStandalone || isLocalStorageMarked);
+    };
+
+    checkInstalled();
+
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      window.deferredPrompt = e;
+      localStorage.setItem('pwa_installed', 'false');
+      setIsAppInstalled(false);
+    };
+
+    const handleAppInstalled = () => {
+      localStorage.setItem('pwa_installed', 'true');
+      setIsAppInstalled(true);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+    window.addEventListener("storage", checkInstalled);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+      window.removeEventListener("storage", checkInstalled);
+    };
+  }, []);
   
   const { login, signupStudent, logout } = useAuth();
   const navigate = useNavigate();
@@ -171,15 +204,17 @@ export default function Login() {
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800 opacity-50 blur-3xl"></div>
 
       {/* Floating Download/Install App Badge */}
-      <div className="absolute top-6 right-6 z-20">
-        <button
-          onClick={() => setWizardOpen(true)}
-          className="flex items-center space-x-2 bg-slate-800/40 border border-slate-700/60 text-indigo-400 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all backdrop-blur-md cursor-pointer hover:bg-slate-800/70 shadow-lg shadow-indigo-500/5 hover:scale-105 active:scale-95"
-        >
-          <Download className="h-4 w-4 animate-bounce" />
-          <span>Download App</span>
-        </button>
-      </div>
+      {!isAppInstalled && (
+        <div className="absolute top-6 right-6 z-20">
+          <button
+            onClick={() => setWizardOpen(true)}
+            className="flex items-center space-x-2 bg-slate-800/40 border border-slate-700/60 text-indigo-400 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all backdrop-blur-md cursor-pointer hover:bg-slate-800/70 shadow-lg shadow-indigo-500/5 hover:scale-105 active:scale-95"
+          >
+            <Download className="h-4 w-4 animate-bounce" />
+            <span>Download App</span>
+          </button>
+        </div>
+      )}
 
       <div className="w-full max-w-md space-y-8 bg-slate-850 p-8 rounded-3xl border border-slate-800 shadow-2xl relative z-10 bg-slate-950/60 backdrop-blur-md">
         <div>
