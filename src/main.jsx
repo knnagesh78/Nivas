@@ -24,10 +24,92 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 )
 
+// ── Service Worker Registration with Update Detection ────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('Service Worker registered successfully:', reg.scope))
-      .catch(err => console.log('Service Worker registration failed:', err));
+      .then((reg) => {
+        console.log('[SW] Registered:', reg.scope);
+
+        // Check for waiting worker on each page load (for returning users)
+        if (reg.waiting) {
+          notifyUpdate(reg.waiting);
+        }
+
+        // A new SW finished installing and is waiting to activate
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (!newWorker) return;
+
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New content is available — notify the user
+              notifyUpdate(newWorker);
+            }
+          });
+        });
+      })
+      .catch((err) => console.warn('[SW] Registration failed:', err));
+
+    // When the new SW takes control, reload so the user gets fresh assets
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+  });
+}
+
+/**
+ * Show a lightweight "Update available" toast and reload on confirmation.
+ * Sends SKIP_WAITING to the new worker so it activates immediately.
+ */
+function notifyUpdate(worker) {
+  // Avoid duplicate toasts
+  if (document.getElementById('sw-update-toast')) return;
+
+  const toast = document.createElement('div');
+  toast.id = 'sw-update-toast';
+  toast.style.cssText = [
+    'position:fixed', 'bottom:20px', 'left:50%', 'transform:translateX(-50%)',
+    'z-index:99999', 'display:flex', 'align-items:center', 'gap:12px',
+    'background:#1e293b', 'color:#f1f5f9',
+    'padding:14px 20px', 'border-radius:14px',
+    'box-shadow:0 8px 32px rgba(0,0,0,0.4)',
+    'font-family:system-ui,sans-serif', 'font-size:14px',
+    'border:1px solid rgba(255,255,255,0.08)',
+    'backdrop-filter:blur(12px)',
+    'animation:slideUp 0.3s ease'
+  ].join(';');
+
+  toast.innerHTML = `
+    <span style="font-size:18px">🔄</span>
+    <span><strong style="color:#a5b4fc">Nivas updated!</strong><br>
+    <span style="font-size:12px;color:#94a3b8">Reload to get the latest version & icons.</span></span>
+    <button id="sw-reload-btn" style="
+      background:#4f46e5;color:white;border:none;
+      padding:8px 16px;border-radius:8px;cursor:pointer;
+      font-size:13px;font-weight:600;white-space:nowrap;
+      transition:background 0.2s
+    ">Reload Now</button>
+    <button id="sw-dismiss-btn" style="
+      background:transparent;color:#64748b;border:none;
+      padding:4px;cursor:pointer;font-size:18px;line-height:1
+    ">✕</button>
+  `;
+
+  // Inject keyframe once
+  if (!document.getElementById('sw-toast-style')) {
+    const style = document.createElement('style');
+    style.id = 'sw-toast-style';
+    style.textContent = '@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+    document.head.appendChild(style);
+  }
+
+  document.body.appendChild(toast);
+
+  document.getElementById('sw-reload-btn').addEventListener('click', () => {
+    worker.postMessage('SKIP_WAITING');
+  });
+  document.getElementById('sw-dismiss-btn').addEventListener('click', () => {
+    toast.remove();
   });
 }
