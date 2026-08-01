@@ -7,7 +7,6 @@ import App from './App.jsx'
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   window.deferredPrompt = e;
-  // Let any already-mounted React components know they can show install UI
   window.dispatchEvent(new CustomEvent('pwa:installable'));
 });
 
@@ -24,29 +23,26 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 )
 
-// ── Service Worker Registration with Safe Update Detection ──────────────────
+// ── Service Worker Registration temporarily disabled for debugging ──────────
+/*
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    // Check if the page is already controlled by a service worker on load
     const hasController = !!navigator.serviceWorker.controller;
 
     navigator.serviceWorker.register('/sw.js')
       .then((reg) => {
         console.log('[SW] Registered:', reg.scope);
 
-        // Check if there's already a waiting worker on load
         if (reg.waiting) {
           notifyUpdate(reg.waiting);
         }
 
-        // Listen for new service workers installing
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
           if (!newWorker) return;
 
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // A new service worker is installed and waiting to take over
               notifyUpdate(newWorker);
             }
           });
@@ -54,8 +50,6 @@ if ('serviceWorker' in navigator) {
       })
       .catch((err) => console.warn('[SW] Registration failed:', err));
 
-    // Only reload the page when the service worker changes IF we were already controlled.
-    // This prevents reload loops or double-reloads on the very first install.
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (refreshing) return;
@@ -67,10 +61,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-/**
- * Show a lightweight "Update available" toast and reload on confirmation.
- * Sends SKIP_WAITING to the new worker so it activates immediately.
- */
 function notifyUpdate(worker) {
   if (document.getElementById('sw-update-toast')) return;
 
@@ -120,3 +110,4 @@ function notifyUpdate(worker) {
     toast.remove();
   });
 }
+*/
