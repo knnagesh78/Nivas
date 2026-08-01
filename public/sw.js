@@ -1,7 +1,7 @@
 // ─── Nivas Service Worker ────────────────────────────────────────────────────
 // Bump CACHE_VERSION every time you deploy so ALL clients immediately get
 // the new icons, manifest and app shell.
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const CACHE_NAME    = `nivas-cache-${CACHE_VERSION}`;
 
 // Assets to pre-cache on install
@@ -47,16 +47,14 @@ self.addEventListener('fetch', (e) => {
   // Only handle same-origin GET requests
   if (url.origin !== self.location.origin || e.request.method !== 'GET') return;
 
-  // ── Navigation (HTML pages / SPA routes) → Network-first, cache fallback ──
+  // ── Navigation (HTML pages / SPA routes) ──────────────────────────────────
+  // Always serve the cached index.html for navigation requests to support SPA routing.
+  // This avoids querying the server for subroutes that don't physically exist as files.
   if (e.request.mode === 'navigate') {
     e.respondWith(
-      fetch(e.request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-          return response;
-        })
-        .catch(() => caches.match('/index.html'))
+      caches.match('/index.html').then((cachedResponse) => {
+        return cachedResponse || fetch(e.request);
+      })
     );
     return;
   }
@@ -69,8 +67,10 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(
       fetch(e.request)
         .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(e.request))
@@ -83,12 +83,12 @@ self.addEventListener('fetch', (e) => {
     caches.match(e.request).then((cached) => {
       if (cached) return cached;
       return fetch(e.request).then((response) => {
-        if (response && response.status === 200 && response.type === 'basic') {
+        if (response && response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
         }
         return response;
-      }).catch(() => caches.match('/index.html'));
+      });
     })
   );
 });
