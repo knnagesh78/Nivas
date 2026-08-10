@@ -320,8 +320,19 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
             {children}
 
             {/* Standard Footer */}
-            <footer className="mt-8 py-4 border-t border-slate-200 text-center text-xs text-slate-500">
-              Developed by <span className="font-semibold text-slate-700">KNNAGESH, Diploma CME Student, Dharmavaram</span>
+            <footer className="mt-8 py-5 border-t border-slate-200 text-center text-xs tracking-wider text-slate-500 font-sans">
+              Developed by{" "}
+              <span className="font-bold text-slate-800 tracking-widest uppercase ml-1">
+                KNNAGESH
+              </span>{" "}
+              <span className="mx-2 text-indigo-400 font-bold">•</span>{" "}
+              <span className="font-semibold text-slate-700 tracking-wide">
+                Diploma CME Student
+              </span>{" "}
+              <span className="mx-2 text-indigo-400 font-bold">•</span>{" "}
+              <span className="font-semibold text-slate-700 tracking-wide">
+                Dharmavaram
+              </span>
             </footer>
           </div>
         </main>
