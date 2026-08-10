@@ -321,111 +321,43 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
             {children}
           </div>
 
-          {/* Vibrant & Attractive Footer */}
-          <footer className="mt-auto border-t border-slate-200 bg-slate-950 text-slate-300 relative overflow-hidden">
+          {/* Mobile-Friendly Minimal Footer - Developer Details Only */}
+          <footer className="mt-auto border-t border-slate-800 bg-slate-950 text-slate-300 py-5 px-4 relative overflow-hidden z-20">
             {/* Top Gradient Glow Line */}
-            <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 to-emerald-400"></div>
+            <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 to-emerald-400 absolute top-0 left-0 right-0"></div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-slate-800/80">
-                {/* Brand Column */}
-                <div className="md:col-span-2 space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <img src="/logo.svg" className="h-9 w-9 rounded-xl shadow-lg shadow-indigo-500/30" alt="Nivas Logo" />
-                    <span className="text-2xl font-extrabold text-white tracking-tight">Nivas</span>
-                    <span className="px-3 py-0.5 text-[10px] font-extrabold text-indigo-400 bg-indigo-950/80 border border-indigo-800/60 rounded-full tracking-wider uppercase shadow-xs">
-                      v2.0 Stable
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-                    Next-Gen Hostel Operations Platform for students, wardens, and management. Streamlined leave approvals, attendance logging, lost & found, and maintenance dispatch.
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
-                    <span className="flex items-center text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-800/50 px-3 py-1 rounded-xl">
-                      <span className="h-2 w-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
-                      System Operational
-                    </span>
-                    <span className="flex items-center text-slate-300 bg-slate-900 border border-slate-800 px-3 py-1 rounded-xl">
-                      <ShieldCheck className="h-3.5 w-3.5 mr-1.5 text-indigo-400" />
-                      Firebase Protected
-                    </span>
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left pt-1">
+              {/* Developer Details */}
+              <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3.5">
+                <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-md shadow-indigo-500/30 flex-shrink-0">
+                  <div className="h-full w-full bg-slate-950 rounded-[14px] flex items-center justify-center text-white font-black text-xs tracking-wider">
+                    KN
                   </div>
                 </div>
-
-                {/* Quick Links Column */}
                 <div>
-                  <h4 className="text-xs font-extrabold text-white uppercase tracking-wider mb-3.5 flex items-center">
-                    <Sparkles className="h-3.5 w-3.5 mr-1 text-indigo-400" />
-                    Quick Activities
-                  </h4>
-                  <ul className="space-y-2 text-xs">
-                    {navItems.slice(0, 5).map((item) => (
-                      <li key={item.id}>
-                        <button
-                          onClick={() => {
-                            if (setActiveTab) setActiveTab(item.id);
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }}
-                          className="text-slate-400 hover:text-white hover:translate-x-1.5 transition-all duration-200 cursor-pointer flex items-center group font-medium"
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                          {item.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Developer & Credits Column */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-extrabold text-indigo-400 uppercase tracking-wider mb-3.5 flex items-center">
-                    <Sparkles className="h-3.5 w-3.5 mr-1.5 text-indigo-400 animate-pulse" />
-                    Platform Developer
-                  </h4>
-                  <div className="bg-slate-900/90 border border-indigo-500/30 rounded-2xl p-4 space-y-3 relative overflow-hidden shadow-lg shadow-indigo-500/10 hover:border-indigo-500/60 transition-all duration-300 group">
-                    <div className="flex items-center space-x-3 relative z-10">
-                      <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-md shadow-indigo-500/30 group-hover:scale-105 transition-transform duration-300">
-                        <div className="h-full w-full bg-slate-950 rounded-[14px] flex items-center justify-center text-white font-black text-xs tracking-wider">
-                          KN
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm font-black text-white tracking-wider group-hover:text-indigo-300 transition-colors">
-                          KNNAGESH
-                        </p>
-                        <p className="text-[11px] text-indigo-400 font-bold">
-                          Diploma CME Student
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-                      <span className="flex items-center text-amber-400 font-bold bg-amber-950/40 border border-amber-800/50 px-2.5 py-0.5 rounded-lg shadow-2xs">
-                        <MapPin className="h-3 w-3 mr-1 text-amber-400 animate-bounce" />
-                        Dharmavaram
-                      </span>
-                      <span className="text-slate-400 font-semibold text-[10px]">CME Engineering</span>
-                    </div>
+                  <div className="flex items-center justify-center sm:justify-start space-x-2">
+                    <span className="text-xs text-slate-400 font-medium">Developed by</span>
+                    <span className="text-sm font-black text-white tracking-wider">KNNAGESH</span>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-0.5 text-xs">
+                    <span className="text-indigo-400 font-bold">Diploma CME Student</span>
+                    <span className="text-slate-600 hidden sm:inline">•</span>
+                    <span className="inline-flex items-center text-amber-400 font-bold bg-amber-950/60 border border-amber-800/60 px-2.5 py-0.5 rounded-lg text-[11px] shadow-2xs">
+                      <MapPin className="h-3 w-3 mr-1 text-amber-400 animate-bounce" />
+                      Dharmavaram
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Bottom Legal / Copyright Bar */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-                <div className="flex items-center space-x-2">
-                  <span>© 2026 Nivas Platform. Developed by <strong className="text-white">KNNAGESH</strong> (Diploma CME, Dharmavaram) with</span>
-                  <Heart className="h-3.5 w-3.5 text-rose-500 fill-rose-500 animate-pulse" />
-                </div>
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="inline-flex items-center text-slate-300 hover:text-white bg-slate-900 hover:bg-indigo-600 px-4 py-2 rounded-xl border border-slate-800 hover:border-indigo-500 transition-all duration-200 cursor-pointer text-xs font-bold shadow-sm hover:shadow-md hover:shadow-indigo-500/25 hover:-translate-y-0.5 active:scale-95"
-                  >
-                    <ArrowUp className="h-3.5 w-3.5 mr-1.5 text-indigo-400 group-hover:text-white" />
-                    Back to Top
-                  </button>
-                </div>
-              </div>
+              {/* Back to Top */}
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="inline-flex items-center text-slate-300 hover:text-white bg-slate-900 hover:bg-indigo-600 px-3.5 py-1.5 rounded-xl border border-slate-800 hover:border-indigo-500 transition-all duration-200 cursor-pointer text-xs font-bold shadow-sm hover:shadow-md hover:shadow-indigo-500/25 active:scale-95"
+              >
+                <ArrowUp className="h-3.5 w-3.5 mr-1.5 text-indigo-400" />
+                Back to Top
+              </button>
             </div>
           </footer>
         </main>
