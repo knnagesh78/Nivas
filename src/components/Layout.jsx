@@ -283,26 +283,26 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
         )}
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto bg-slate-50 flex flex-col justify-between">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 w-full flex-grow">
+        <main className="flex-1 overflow-y-auto bg-slate-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
             {/* Activity Navigation / Back Button Bar */}
             {activeTab && activeTab !== "dashboard" && (
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-white via-indigo-50/40 to-purple-50/30 border border-indigo-100 shadow-md shadow-indigo-500/5 rounded-2xl p-3.5 sm:px-5 backdrop-blur-sm">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 shadow-sm rounded-2xl p-3.5 sm:px-5">
                 <div className="flex items-center space-x-3">
                   <button
                     onClick={() => {
                       if (setActiveTab) setActiveTab("dashboard");
                     }}
-                    className="inline-flex items-center px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 hover:from-indigo-500 hover:to-purple-600 shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:scale-95 transition-all duration-200 cursor-pointer group"
+                    className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-indigo-600 hover:text-white border border-slate-200 hover:border-indigo-600 transition-all cursor-pointer shadow-xs group"
                     title="Return to Dashboard Overview"
                   >
-                    <ArrowLeft className="mr-2 h-4 w-4 text-white group-hover:-translate-x-1.5 transition-transform duration-200" />
+                    <ArrowLeft className="mr-2 h-4 w-4 text-slate-500 group-hover:text-white transition-colors group-hover:-translate-x-1 transform" />
                     <span>Back to Dashboard</span>
                   </button>
-                  <div className="h-5 w-px bg-slate-200 hidden sm:block"></div>
+                  <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
                   <div className="hidden sm:flex items-center space-x-2 text-xs text-slate-500">
                     <span>Current Activity:</span>
-                    <span className="font-extrabold text-indigo-700 bg-indigo-100/80 border border-indigo-200 px-3 py-1 rounded-xl capitalize shadow-2xs">
+                    <span className="font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-lg capitalize">
                       {navItems.find((n) => n.id === activeTab)?.label || activeTab}
                     </span>
                   </div>
@@ -311,55 +311,19 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                   onClick={() => {
                     if (setActiveTab) setActiveTab("dashboard");
                   }}
-                  className="inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200 px-3.5 py-1.5 rounded-xl transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95"
+                  className="text-xs font-semibold text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer"
                 >
-                  <span>Dashboard Overview</span>
-                  <span className="ml-1 font-extrabold">→</span>
+                  Dashboard Overview →
                 </button>
               </div>
             )}
             {children}
+
+            {/* Standard Footer */}
+            <footer className="mt-8 py-4 border-t border-slate-200 text-center text-xs text-slate-500">
+              Developed by <span className="font-semibold text-slate-700">KNNAGESH, Diploma CME Student, Dharmavaram</span>
+            </footer>
           </div>
-
-          {/* Mobile-Friendly Minimal Footer - Developer Details Only */}
-          <footer className="mt-auto border-t border-slate-800 bg-slate-950 text-slate-300 py-5 px-4 relative overflow-hidden z-20">
-            {/* Top Gradient Glow Line */}
-            <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 to-emerald-400 absolute top-0 left-0 right-0"></div>
-
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left pt-1">
-              {/* Developer Details */}
-              <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3.5">
-                <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-md shadow-indigo-500/30 flex-shrink-0">
-                  <div className="h-full w-full bg-slate-950 rounded-[14px] flex items-center justify-center text-white font-black text-xs tracking-wider">
-                    KN
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-center sm:justify-start space-x-2">
-                    <span className="text-xs text-slate-400 font-medium">Developed by</span>
-                    <span className="text-sm font-black text-white tracking-wider">KNNAGESH</span>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-0.5 text-xs">
-                    <span className="text-indigo-400 font-bold">Diploma CME Student</span>
-                    <span className="text-slate-600 hidden sm:inline">•</span>
-                    <span className="inline-flex items-center text-amber-400 font-bold bg-amber-950/60 border border-amber-800/60 px-2.5 py-0.5 rounded-lg text-[11px] shadow-2xs">
-                      <MapPin className="h-3 w-3 mr-1 text-amber-400 animate-bounce" />
-                      Dharmavaram
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Back to Top */}
-              <button
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex items-center text-slate-300 hover:text-white bg-slate-900 hover:bg-indigo-600 px-3.5 py-1.5 rounded-xl border border-slate-800 hover:border-indigo-500 transition-all duration-200 cursor-pointer text-xs font-bold shadow-sm hover:shadow-md hover:shadow-indigo-500/25 active:scale-95"
-              >
-                <ArrowUp className="h-3.5 w-3.5 mr-1.5 text-indigo-400" />
-                Back to Top
-              </button>
-            </div>
-          </footer>
         </main>
       </div>
       <InstallWizardModal
