@@ -33,7 +33,9 @@ import {
   X,
   Settings,
   Shield,
-  Key
+  Key,
+  Search,
+  GraduationCap
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -86,6 +88,33 @@ export default function AdminDashboard() {
   const [notices, setNotices] = useState([]);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleRemoveStudent = async (studentId, studentName) => {
+    if (!window.confirm(`Are you sure you want to remove student "${studentName || "this student"}"? This will delete their student profile and user record.`)) {
+      return;
+    }
+    try {
+      await deleteDoc(doc(db, "students", studentId));
+      await deleteDoc(doc(db, "users", studentId));
+      setStudents(prev => prev.filter(s => s.id !== studentId));
+      setStats(prev => ({ ...prev, totalStudents: Math.max(0, prev.totalStudents - 1) }));
+      alert("Student removed successfully.");
+    } catch (err) {
+      console.error("Error removing student:", err);
+      alert("Failed to remove student: " + err.message);
+    }
+  };
+
+  const filteredStudents = students.filter(s => {
+    const q = searchQuery.toLowerCase();
+    return (
+      (s.name && s.name.toLowerCase().includes(q)) ||
+      (s.roomNumber && s.roomNumber.toLowerCase().includes(q)) ||
+      (s.course && s.course.toLowerCase().includes(q)) ||
+      (s.phone && s.phone.includes(q))
+    );
+  });
 
   // Form: Room creation
   const [roomNum, setRoomNum] = useState("");
@@ -641,6 +670,96 @@ export default function AdminDashboard() {
                 {complaints.length === 0 && <p className="text-xs text-slate-400 italic">No open complaints.</p>}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Student Manager Tab */}
+      {activeTab === "students" && (
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 animate-fadeIn">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Student Directory & Removal</h2>
+              <p className="text-xs text-slate-500">View student profile records and remove accounts when necessary.</p>
+            </div>
+
+            <div className="relative max-w-sm w-full">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400" />
+              </div>
+              <input
+                type="text"
+                className="w-full rounded-xl border border-slate-200 pl-9 pr-4 py-2 text-sm focus:outline-none"
+                placeholder="Search by name, room, course..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  <th className="pb-3">Student</th>
+                  <th className="pb-3">Room</th>
+                  <th className="pb-3">Course / Year</th>
+                  <th className="pb-3">Contacts</th>
+                  <th className="pb-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredStudents.map((s) => (
+                  <tr key={s.id} className="text-sm">
+                    <td className="py-3.5">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">
+                          {s.photoUrl ? (
+                            <img src={s.photoUrl} className="h-full w-full rounded-full object-cover" onError={(e) => e.target.style.display='none'} />
+                          ) : (
+                            s.name ? s.name[0].toUpperCase() : "S"
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-800">{s.name || "Incomplete Profile"}</p>
+                          <p className="text-[10px] text-slate-400">UID: {s.id.substring(0, 8)}...</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3.5">
+                      <span className="font-semibold text-slate-700 bg-slate-50 border border-slate-150 px-2.5 py-1 rounded-lg">
+                        {s.roomNumber || "Unassigned"}
+                      </span>
+                    </td>
+                    <td className="py-3.5 text-slate-500">
+                      <p>{s.course || "N/A"}</p>
+                      <p className="text-xs">{s.year || ""}</p>
+                    </td>
+                    <td className="py-3.5 text-xs text-slate-500 space-y-0.5">
+                      <p><span className="font-semibold text-slate-600">Self:</span> {s.phone || "N/A"}</p>
+                      <p><span className="font-semibold text-slate-600">Parent:</span> {s.parentContact || "N/A"}</p>
+                    </td>
+                    <td className="py-3.5 text-right">
+                      <button
+                        onClick={() => handleRemoveStudent(s.id, s.name)}
+                        className="p-2 border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-all inline-flex items-center space-x-1 cursor-pointer"
+                        title="Remove Student"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span className="text-xs font-semibold">Remove</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {filteredStudents.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="text-center py-8 text-slate-400 italic">
+                      No students found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

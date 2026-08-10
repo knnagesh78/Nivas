@@ -16,7 +16,8 @@ import {
   Settings,
   ShieldCheck,
   ClipboardList,
-  Download
+  Download,
+  GraduationCap
 } from "lucide-react";
 import InstallWizardModal from "./InstallWizardModal";
 
@@ -88,6 +89,7 @@ export default function Layout({ children, activeTab, setActiveTab }) {
     } else if (role === "admin") {
       return [
         { id: "dashboard", label: "Control Panel", icon: LayoutDashboard },
+        { id: "students", label: "Student Manager", icon: GraduationCap },
         { id: "wardens", label: "Warden Manager", icon: Users },
         { id: "rooms", label: "Room Config", icon: DoorOpen },
         { id: "notices", label: "Hostel Notices", icon: Megaphone },

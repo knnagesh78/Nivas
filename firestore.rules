@@ -32,6 +32,7 @@ service cloud.firestore {
     match /users/{uid} {
       allow read, write: if isAdmin();
       allow read: if isSignedIn() && (isOwner(uid) || isWarden());
+      allow delete: if isWarden();
       // Students can create their users record during registration, but only for themselves
       allow create: if isSignedIn() && isOwner(uid);
       // Students can update their own email or profileComplete flag, but NOT their role
@@ -40,7 +41,7 @@ service cloud.firestore {
 
     // students collection
     match /students/{uid} {
-      allow read, write: if isAdmin();
+      allow read, write: if isAdmin() || isWarden();
       allow read: if isSignedIn() && (isOwner(uid) || isWarden());
       allow create, update: if isSignedIn() && isOwner(uid);
     }

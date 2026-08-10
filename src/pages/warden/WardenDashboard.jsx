@@ -248,6 +248,22 @@ export default function WardenDashboard() {
     }
   };
 
+  // Remove Student
+  const handleRemoveStudent = async (studentId, studentName) => {
+    if (!window.confirm(`Are you sure you want to remove student "${studentName || "this student"}"? This will delete their student profile and user record.`)) {
+      return;
+    }
+    try {
+      await deleteDoc(doc(db, "students", studentId));
+      await deleteDoc(doc(db, "users", studentId));
+      setStudents(prev => prev.filter(s => s.id !== studentId));
+      alert("Student removed successfully.");
+    } catch (err) {
+      console.error("Error removing student:", err);
+      alert("Failed to remove student: " + err.message);
+    }
+  };
+
   // Action Leave (Approve/Reject)
   const handleActionLeave = async (requestId, status) => {
     const remark = leaveRemarks[requestId] || "";
@@ -688,16 +704,27 @@ export default function WardenDashboard() {
                       <p><span className="font-semibold text-slate-600">Mother:</span> {s.motherName || "N/A"}</p>
                     </td>
                     <td className="py-3.5">
-                      <button
-                        onClick={() => {
-                          setSelectedStudent(s);
-                          setAssignRoomNum(s.roomNumber || "");
-                        }}
-                        className="p-2 border border-slate-200 text-slate-600 hover:text-indigo-600 rounded-lg hover:border-indigo-200 transition-all flex items-center space-x-1"
-                      >
-                        <Edit2 className="h-3.5 w-3.5" />
-                        <span className="text-xs font-semibold">Assign Room</span>
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            setSelectedStudent(s);
+                            setAssignRoomNum(s.roomNumber || "");
+                          }}
+                          className="p-2 border border-slate-200 text-slate-600 hover:text-indigo-600 rounded-lg hover:border-indigo-200 transition-all flex items-center space-x-1"
+                          title="Assign Room"
+                        >
+                          <Edit2 className="h-3.5 w-3.5" />
+                          <span className="text-xs font-semibold">Assign Room</span>
+                        </button>
+                        <button
+                          onClick={() => handleRemoveStudent(s.id, s.name)}
+                          className="p-2 border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-all flex items-center space-x-1 cursor-pointer"
+                          title="Remove Student"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span className="text-xs font-semibold">Remove</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
