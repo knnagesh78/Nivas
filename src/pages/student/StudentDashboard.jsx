@@ -18,6 +18,7 @@ import {
 } from "firebase/firestore";
 import Layout from "../../components/Layout";
 import CameraCapture from "../../components/CameraCapture";
+import LostFoundFeed from "../../components/LostFoundFeed";
 import {
   Home,
   User,
@@ -44,6 +45,21 @@ export default function StudentDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";
   const setActiveTab = useCallback((tab) => setSearchParams({ tab }), [setSearchParams]);
+  const [selectedNotifItem, setSelectedNotifItem] = useState(null);
+
+  const handleSelectNotification = async (notif) => {
+    if (notif.itemId) {
+      try {
+        const docSnap = await getDoc(doc(db, "lostFoundItems", notif.itemId));
+        if (docSnap.exists()) {
+          setSelectedNotifItem({ id: docSnap.id, ...docSnap.data() });
+          setActiveTab("lostFound");
+        }
+      } catch (err) {
+        console.error("Error fetching notification item:", err);
+      }
+    }
+  };
 
   // Mobile Back Button interception
   useEffect(() => {
@@ -484,7 +500,19 @@ export default function StudentDashboard() {
   };
 
   return (
-    <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <Layout
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      onSelectNotification={handleSelectNotification}
+    >
+      {/* Lost & Found Tab */}
+      {activeTab === "lostFound" && (
+        <LostFoundFeed
+          initialSelectedItem={selectedNotifItem}
+          onClearSelectedItem={() => setSelectedNotifItem(null)}
+        />
+      )}
+
       {/* 1. Dashboard / Overview */}
       {activeTab === "dashboard" && (
         <div className="space-y-6 animate-fadeIn">

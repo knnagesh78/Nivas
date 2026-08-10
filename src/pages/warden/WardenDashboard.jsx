@@ -18,6 +18,7 @@ import {
   writeBatch
 } from "firebase/firestore";
 import Layout from "../../components/Layout";
+import WardenHandovers from "../../components/WardenHandovers";
 import {
   Users,
   Calendar,
@@ -50,6 +51,12 @@ export default function WardenDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";
   const setTab = useCallback((tab) => setSearchParams({ tab }), [setSearchParams]);
+
+  const handleSelectNotification = async (notif) => {
+    if (notif.itemId) {
+      setTab("handovers");
+    }
+  };
 
   // Mobile Back Button interception
   useEffect(() => {
@@ -569,7 +576,14 @@ export default function WardenDashboard() {
   }
 
   return (
-    <Layout activeTab={activeTab} setActiveTab={setTab}>
+    <Layout
+      activeTab={activeTab}
+      setActiveTab={setTab}
+      onSelectNotification={handleSelectNotification}
+    >
+      {/* Lost & Found Handovers Tab */}
+      {activeTab === "handovers" && <WardenHandovers />}
+
       {/* 1. Dashboard Overview */}
       {activeTab === "dashboard" && (
         <div className="space-y-6 animate-fadeIn">

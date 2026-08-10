@@ -17,11 +17,15 @@ import {
   ShieldCheck,
   ClipboardList,
   Download,
-  GraduationCap
+  GraduationCap,
+  Package,
+  Search,
+  PackageCheck
 } from "lucide-react";
 import InstallWizardModal from "./InstallWizardModal";
+import NotificationCenter from "./NotificationCenter";
 
-export default function Layout({ children, activeTab, setActiveTab }) {
+export default function Layout({ children, activeTab, setActiveTab, onSelectNotification }) {
   const { userData, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,6 +75,7 @@ export default function Layout({ children, activeTab, setActiveTab }) {
     if (role === "student") {
       return [
         { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { id: "lostFound", label: "Lost & Found", icon: Package },
         { id: "attendance", label: "My Attendance", icon: Calendar },
         { id: "leave", label: "Leave Requests", icon: FileText },
         { id: "complaints", label: "Complaints", icon: AlertCircle },
@@ -79,6 +84,7 @@ export default function Layout({ children, activeTab, setActiveTab }) {
     } else if (role === "warden") {
       return [
         { id: "dashboard", label: "Overview", icon: LayoutDashboard },
+        { id: "handovers", label: "Lost & Found Handovers", icon: PackageCheck },
         { id: "students", label: "Students", icon: Users },
         { id: "attendance", label: "Attendance Log", icon: ClipboardList },
         { id: "leave", label: "Leave Approvals", icon: FileText },
@@ -129,18 +135,21 @@ export default function Layout({ children, activeTab, setActiveTab }) {
 
           {/* User profile brief */}
           <div className="px-4 mb-4">
-            <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex items-center">
-              <div className="h-10 w-10 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center font-bold text-slate-700">
-                {userData?.email ? userData.email[0].toUpperCase() : "U"}
+            <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex items-center justify-between">
+              <div className="flex items-center space-x-3 overflow-hidden">
+                <div className="h-10 w-10 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center font-bold text-slate-700 flex-shrink-0">
+                  {userData?.email ? userData.email[0].toUpperCase() : "U"}
+                </div>
+                <div className="overflow-hidden">
+                  <p className="text-sm font-semibold text-slate-800 truncate">
+                    {userData?.email?.split("@")[0]}
+                  </p>
+                  <span className={`inline-block px-2 py-0.5 mt-1 text-[10px] font-bold tracking-wide uppercase border rounded-full ${getRoleBadge(userData?.role)}`}>
+                    {userData?.role}
+                  </span>
+                </div>
               </div>
-              <div className="ml-3 overflow-hidden">
-                <p className="text-sm font-semibold text-slate-800 truncate">
-                  {userData?.email?.split("@")[0]}
-                </p>
-                <span className={`inline-block px-2 py-0.5 mt-1 text-[10px] font-bold tracking-wide uppercase border rounded-full ${getRoleBadge(userData?.role)}`}>
-                  {userData?.role}
-                </span>
-              </div>
+              <NotificationCenter onSelectNotification={onSelectNotification} />
             </div>
           </div>
 
@@ -201,6 +210,7 @@ export default function Layout({ children, activeTab, setActiveTab }) {
           </div>
 
           <div className="flex items-center space-x-2">
+            <NotificationCenter onSelectNotification={onSelectNotification} />
             <span className={`inline-block px-2.5 py-0.5 text-[9px] font-bold tracking-wide uppercase border rounded-full ${getRoleBadge(userData?.role)}`}>
               {userData?.role}
             </span>

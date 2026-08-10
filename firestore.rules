@@ -107,5 +107,21 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if isAdmin() || isWarden();
     }
+
+    // lostFoundItems collection
+    match /lostFoundItems/{itemId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isAdmin() || isWarden() || (isSignedIn() && resource.data.reporterUid == request.auth.uid);
+    }
+
+    // notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.recipientUid == request.auth.uid;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource.data.recipientUid == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.recipientUid == request.auth.uid;
+    }
   }
 }
