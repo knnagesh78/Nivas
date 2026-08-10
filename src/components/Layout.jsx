@@ -25,7 +25,9 @@ import {
   ArrowUp,
   Sparkles,
   Heart,
-  MapPin
+  MapPin,
+  Sun,
+  Moon
 } from "lucide-react";
 import InstallWizardModal from "./InstallWizardModal";
 import NotificationCenter from "./NotificationCenter";
@@ -44,6 +46,17 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
   const isStandaloneMode =
     window.matchMedia('(display-mode: standalone)').matches ||
     !!window.navigator.standalone;
+
+  // Theme state: "light" (white) or "dark" (black)
+  const [theme, setTheme] = useState(() => localStorage.getItem("app_theme") || "light");
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
+  useEffect(() => {
+    localStorage.setItem("app_theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     const handleInstallable = () => setCanInstall(true);
@@ -158,28 +171,54 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
+    <div className={`flex h-screen overflow-hidden font-sans transition-colors duration-300 ${
+      theme === "dark" ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"
+    }`}>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:w-64 md:flex-col bg-white border-r border-slate-200">
+      <aside className={`hidden md:flex md:w-64 md:flex-col border-r transition-colors duration-300 ${
+        theme === "dark" ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+      }`}>
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           {/* Brand header */}
-          <div className="flex items-center px-6 mb-6">
-            <img src="/logo.svg" className="h-9 w-9 rounded-xl shadow-sm animate-pulse" alt="Nivas Logo" />
-            <div className="ml-3">
-              <h1 className="text-lg font-bold text-slate-900 tracking-tight leading-none">Nivas</h1>
-              <span className="text-[10px] text-indigo-500 font-semibold uppercase tracking-wider">Every stay, sorted</span>
+          <div className="flex items-center justify-between px-6 mb-6">
+            <div className="flex items-center">
+              <img src="/logo.svg" className="h-9 w-9 rounded-xl shadow-sm animate-pulse" alt="Nivas Logo" />
+              <div className="ml-3">
+                <h1 className={`text-lg font-bold tracking-tight leading-none ${
+                  theme === "dark" ? "text-white" : "text-slate-900"
+                }`}>Nivas</h1>
+                <span className="text-[10px] text-indigo-500 font-semibold uppercase tracking-wider">Every stay, sorted</span>
+              </div>
             </div>
+            {/* Theme Toggle Button (White / Black theme) */}
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-xl border transition-all cursor-pointer shadow-xs ${
+                theme === "dark"
+                  ? "bg-slate-800 border-slate-700 text-amber-400 hover:bg-slate-700"
+                  : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"
+              }`}
+              title={theme === "dark" ? "Switch to White Theme" : "Switch to Black Theme"}
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
           </div>
 
           {/* User profile brief */}
           <div className="px-4 mb-4">
-            <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex items-center justify-between">
+            <div className={`border rounded-xl p-3.5 flex items-center justify-between ${
+              theme === "dark" ? "bg-slate-950/60 border-slate-800" : "bg-slate-50 border-slate-100"
+            }`}>
               <div className="flex items-center space-x-3 overflow-hidden">
-                <div className="h-10 w-10 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center font-bold text-slate-700 flex-shrink-0">
+                <div className={`h-10 w-10 rounded-full border flex items-center justify-center font-bold flex-shrink-0 ${
+                  theme === "dark" ? "bg-slate-800 border-slate-700 text-white" : "bg-slate-200 border-slate-300 text-slate-700"
+                }`}>
                   {userData?.email ? userData.email[0].toUpperCase() : "U"}
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-sm font-semibold text-slate-800 truncate">
+                  <p className={`text-sm font-semibold truncate ${
+                    theme === "dark" ? "text-slate-200" : "text-slate-800"
+                  }`}>
                     {userData?.email?.split("@")[0]}
                   </p>
                   <span className={`inline-block px-2 py-0.5 mt-1 text-[10px] font-bold tracking-wide uppercase border rounded-full ${getRoleBadge(userData?.role)}`}>
@@ -192,7 +231,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex-1 px-3 space-y-1.5 bg-white">
+          <nav className="flex-1 px-3 space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -203,12 +242,14 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                   className={`group flex items-center w-full px-3.5 py-3 text-sm font-bold rounded-2xl transition-all duration-200 cursor-pointer ${
                     isActive
                       ? "bg-gradient-to-r from-indigo-600 via-indigo-700 to-slate-900 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]"
+                      : theme === "dark"
+                      ? "text-slate-400 hover:bg-slate-800 hover:text-white"
                       : "text-slate-600 hover:bg-indigo-50/70 hover:text-indigo-600 hover:translate-x-1 hover:shadow-xs"
                   }`}
                 >
                   <Icon
                     className={`mr-3 h-5 w-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                      isActive ? "text-white animate-pulse" : "text-slate-400 group-hover:text-indigo-600"
+                      isActive ? "text-white animate-pulse" : theme === "dark" ? "text-slate-400 group-hover:text-white" : "text-slate-400 group-hover:text-indigo-600"
                     }`}
                   />
                   <span>{item.label}</span>
@@ -222,7 +263,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
         </div>
 
         {/* Footer Sign-out & Download */}
-        <div className="p-4 border-t border-slate-100 space-y-2">
+        <div className={`p-4 border-t space-y-2 ${theme === "dark" ? "border-slate-800" : "border-slate-100"}`}>
           {canInstall && !isStandaloneMode && (
             <button
               onClick={() => setWizardOpen(true)}
@@ -244,20 +285,38 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
 
       {/* Mobile Top Header & Navigation */}
       <div className="flex flex-col flex-1 w-full md:w-auto overflow-hidden">
-        <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 md:hidden">
+        <header className={`flex items-center justify-between px-4 py-3 border-b md:hidden ${
+          theme === "dark" ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200"
+        }`}>
           <div className="flex items-center">
             <img src="/logo.svg" className="h-8 w-8 rounded-lg shadow-sm" alt="Nivas Logo" />
-            <span className="ml-2.5 font-bold text-slate-800 text-base font-sans tracking-tight">Nivas</span>
+            <span className={`ml-2.5 font-bold text-base font-sans tracking-tight ${
+              theme === "dark" ? "text-white" : "text-slate-800"
+            }`}>Nivas</span>
           </div>
 
           <div className="flex items-center space-x-2">
+            {/* Theme Toggle Button Mobile */}
+            <button
+              onClick={toggleTheme}
+              className={`p-1.5 rounded-xl border transition-all cursor-pointer ${
+                theme === "dark"
+                  ? "bg-slate-800 border-slate-700 text-amber-400"
+                  : "bg-slate-100 border-slate-200 text-slate-700"
+              }`}
+              title={theme === "dark" ? "Switch to White Theme" : "Switch to Black Theme"}
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
             <NotificationCenter onSelectNotification={onSelectNotification} />
             <span className={`inline-block px-2.5 py-0.5 text-[9px] font-bold tracking-wide uppercase border rounded-full ${getRoleBadge(userData?.role)}`}>
               {userData?.role}
             </span>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1 text-slate-600 hover:bg-slate-100 rounded-lg focus:outline-none"
+              className={`p-1 rounded-lg focus:outline-none ${
+                theme === "dark" ? "text-slate-300 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"
+              }`}
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -268,7 +327,9 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-40 bg-slate-900 bg-opacity-50 md:hidden" onClick={() => setMobileMenuOpen(false)}>
             <nav
-              className="fixed top-14 left-0 right-0 bg-white border-b border-slate-200 shadow-xl px-4 py-3 space-y-1"
+              className={`fixed top-14 left-0 right-0 border-b shadow-xl px-4 py-3 space-y-1 ${
+                theme === "dark" ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
               {navItems.map((item) => {
@@ -282,7 +343,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                       setMobileMenuOpen(false);
                     }}
                     className={`flex items-center w-full px-3 py-2 text-sm font-semibold rounded-lg ${
-                      isActive ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-50"
+                      isActive ? "bg-slate-900 text-white" : theme === "dark" ? "text-slate-300 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-50"
                     }`}
                   >
                     <Icon className="mr-3 h-5 w-5 text-slate-400" />
@@ -316,7 +377,9 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
         )}
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto bg-slate-50 pb-20 md:pb-6">
+        <main className={`flex-1 overflow-y-auto pb-20 md:pb-6 ${
+          theme === "dark" ? "bg-slate-950" : "bg-slate-50"
+        }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
             {/* Activity Navigation / Back Button Bar */}
             {activeTab && activeTab !== "dashboard" && (
