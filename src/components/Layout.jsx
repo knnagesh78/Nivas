@@ -247,11 +247,15 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                       : "text-slate-600 hover:bg-indigo-50/70 hover:text-indigo-600 hover:translate-x-1 hover:shadow-xs"
                   }`}
                 >
-                  <Icon
-                    className={`mr-3 h-5 w-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                      isActive ? "text-white animate-pulse" : theme === "dark" ? "text-slate-400 group-hover:text-white" : "text-slate-400 group-hover:text-indigo-600"
-                    }`}
-                  />
+                  <div className={`p-2 rounded-xl mr-3 flex items-center justify-center transition-all ${
+                    isActive
+                      ? "bg-white/20 text-white shadow-xs"
+                      : theme === "dark"
+                      ? "bg-slate-800 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white"
+                      : "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white"
+                  }`}>
+                    <Icon className="h-4 w-4 transition-transform group-hover:scale-110" />
+                  </div>
                   <span>{item.label}</span>
                   {isActive && (
                     <span className="ml-auto h-2 w-2 rounded-full bg-white animate-ping"></span>

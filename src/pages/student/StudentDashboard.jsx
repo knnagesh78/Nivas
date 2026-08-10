@@ -516,49 +516,70 @@ export default function StudentDashboard() {
       {/* 1. Dashboard / Overview */}
       {activeTab === "dashboard" && (
         <div className="space-y-6 animate-fadeIn">
-          {/* Welcome Banner */}
-          <div className="rounded-3xl bg-slate-900 p-6 sm:p-8 text-white relative overflow-hidden shadow-xl">
-            <div className="relative z-10 space-y-2">
-              <h2 className="text-3xl font-bold tracking-tight">
+          {/* Welcome Hero Banner with Gradient Glow */}
+          <div className="rounded-3xl bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-indigo-900/40">
+            {/* Ambient Background Glow Shapes */}
+            <div className="absolute -top-12 -right-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-12 left-1/3 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="relative z-10 space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 backdrop-blur-md">
+                  <Sparkles className="h-3.5 w-3.5 mr-1.5 text-indigo-400 animate-pulse" />
+                  Student Portal Active
+                </span>
+                {studentDetails?.roomNumber && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 border border-emerald-400/30 text-emerald-300">
+                    <DoorOpen className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+                    Room {studentDetails.roomNumber}
+                  </span>
+                )}
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
                 Welcome back, {studentDetails?.name}!
               </h2>
-              <p className="text-slate-300 text-sm max-w-md">
-                Keep track of your leaves, register complaints, check attendance, or read notices.
+              <p className="text-slate-300 text-sm max-w-md leading-relaxed">
+                Streamlined hostel living. Monitor leave approvals, attendance records, complaints dispatch, and notice announcements.
               </p>
             </div>
-            <div className="absolute right-8 bottom-4 text-[10rem] font-bold text-slate-800 opacity-20 pointer-events-none uppercase">
+            <div className="absolute right-8 bottom-4 text-[10rem] font-black text-slate-800/20 pointer-events-none uppercase">
               {studentDetails?.roomNumber || "N/A"}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Quick Stats / Info Widget */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
-              <h3 className="text-sm font-bold uppercase text-slate-400 tracking-wider">My Room Details</h3>
-              <div className="flex justify-between items-center bg-slate-50 border border-slate-100 p-4 rounded-xl">
-                <div>
-                  <span className="text-xs font-semibold text-slate-400">Room Number</span>
-                  <p className="text-2xl font-bold text-slate-800">{studentDetails?.roomNumber || "Not Assigned"}</p>
+            {/* Quick Stats / Room Details Widget */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm card-hover">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-extrabold uppercase text-slate-400 tracking-wider">My Room Details</h3>
+                <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+                  <DoorOpen className="h-5 w-5" />
                 </div>
-                <div className="h-10 w-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 font-bold">
-                  {studentDetails?.roomNumber}
+              </div>
+              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl">
+                <div>
+                  <span className="text-xs font-semibold text-slate-400">Assigned Room</span>
+                  <p className="text-2xl font-black text-slate-900 dark:text-white">{studentDetails?.roomNumber || "Not Assigned"}</p>
+                </div>
+                <div className="h-10 w-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md">
+                  {studentDetails?.roomNumber || "N/A"}
                 </div>
               </div>
 
               {/* Roommate details */}
               <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Roommates ({roommates.length})</span>
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Roommates ({roommates.length})</span>
                 {roommates.length === 0 ? (
                   <p className="text-xs text-slate-400 italic">No roommates assigned yet.</p>
                 ) : (
                   <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                     {roommates.map((rm) => (
-                      <div key={rm.id} className="flex items-center space-x-3 p-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-all border border-slate-150">
-                        <div className="h-7 w-7 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs text-slate-600">
+                      <div key={rm.id} className="flex items-center space-x-3 p-2.5 bg-slate-50 dark:bg-slate-950/40 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all border border-slate-150 dark:border-slate-800">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center font-bold text-xs shadow-xs">
                           {rm.name[0].toUpperCase()}
                         </div>
                         <div className="flex-1 overflow-hidden">
-                          <p className="text-xs font-bold text-slate-800 truncate">{rm.name}</p>
+                          <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{rm.name}</p>
                           <p className="text-[10px] text-slate-400 truncate">{rm.course}</p>
                         </div>
                       </div>
@@ -569,10 +590,15 @@ export default function StudentDashboard() {
             </div>
 
             {/* Quick Attendance Widget */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
-              <h3 className="text-sm font-bold uppercase text-slate-400 tracking-wider">Attendance (Last 30 Days)</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm card-hover">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Attendance (30 Days)</h3>
+                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/50 text-emerald-600 dark:text-emerald-400">
+                  <Calendar className="h-5 w-5" />
+                </div>
+              </div>
               <div className="flex items-center space-x-4">
-                <div className="h-16 w-16 rounded-full border-4 border-emerald-500 flex items-center justify-center font-bold text-emerald-600 text-lg">
+                <div className="h-16 w-16 rounded-full border-4 border-emerald-500 flex items-center justify-center font-black text-emerald-600 dark:text-emerald-400 text-lg shadow-sm">
                   {attendance.length > 0
                     ? Math.round(
                         (attendance.filter((r) => r.status === "present").length /

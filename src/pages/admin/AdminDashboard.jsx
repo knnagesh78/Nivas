@@ -523,57 +523,63 @@ export default function AdminDashboard() {
       {/* 1. Dashboard / Statistics */}
       {activeTab === "dashboard" && (
         <div className="space-y-6 animate-fadeIn">
-          <div className="rounded-3xl bg-indigo-900 p-6 sm:p-8 text-white relative overflow-hidden shadow-xl">
-            <div className="relative z-10 space-y-2">
-              <h2 className="text-3xl font-bold tracking-tight">Hostel Control Panel</h2>
-              <p className="text-indigo-200 text-sm max-w-md">
-                Administrator view. Manage rooms, register wardens, override requests, or adjust settings.
+          {/* Admin Control Panel Hero Banner */}
+          <div className="rounded-3xl bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-indigo-800/40">
+            <div className="absolute -top-12 -right-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="relative z-10 space-y-3">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 backdrop-blur-md">
+                <Shield className="h-3.5 w-3.5 mr-1.5 text-indigo-400 animate-pulse" />
+                Hostel Administration
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">Hostel Control Panel</h2>
+              <p className="text-indigo-200 text-sm max-w-md leading-relaxed">
+                Central management portal. Configure rooms, manage warden access, override requests, and system settings.
               </p>
             </div>
-            <div className="absolute right-8 bottom-4 text-[10rem] font-bold text-indigo-850 opacity-20 pointer-events-none uppercase">
+            <div className="absolute right-8 bottom-4 text-[10rem] font-black text-indigo-900/30 pointer-events-none uppercase">
               Admin
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Students</span>
-                <p className="text-3xl font-extrabold text-slate-800 mt-1">{stats.totalStudents}</p>
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Students</span>
+                <p className="text-3xl font-black text-slate-900 dark:text-white mt-1">{stats.totalStudents}</p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600">
+              <div className="h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-xs">
                 <Users className="h-6 w-6" />
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Wardens</span>
-                <p className="text-3xl font-extrabold text-indigo-600 mt-1">{stats.totalWardens}</p>
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Active Wardens</span>
+                <p className="text-3xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{stats.totalWardens}</p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <div className="h-12 w-12 rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-100 dark:border-purple-800/50 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-xs">
                 <Shield className="h-6 w-6" />
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Rooms Configured</span>
-                <p className="text-3xl font-extrabold text-slate-800 mt-1">{stats.totalRooms}</p>
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Rooms Configured</span>
+                <p className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-1">{stats.totalRooms}</p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600">
+              <div className="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-800/50 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-xs">
                 <DoorOpen className="h-6 w-6" />
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Beds Occupied</span>
-                <p className="text-3xl font-extrabold text-emerald-600 mt-1">
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Beds Occupied</span>
+                <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
                   {stats.occupiedBeds} / {stats.totalBeds}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <div className="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-xs">
                 <DoorOpen className="h-6 w-6" />
               </div>
             </div>

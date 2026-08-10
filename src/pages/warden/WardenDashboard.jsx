@@ -588,45 +588,45 @@ export default function WardenDashboard() {
       {activeTab === "dashboard" && (
         <div className="space-y-6 animate-fadeIn">
           {/* Top stats banner */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Students</span>
-                <p className="text-3xl font-extrabold text-slate-800 mt-1">{totalStudents}</p>
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Students</span>
+                <p className="text-3xl font-black text-slate-900 dark:text-white mt-1">{totalStudents}</p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <div className="h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-xs">
                 <Users className="h-6 w-6" />
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Pending Leaves</span>
-                <p className="text-3xl font-extrabold text-amber-600 mt-1">{pendingLeavesCount}</p>
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Pending Leaves</span>
+                <p className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-1">{pendingLeavesCount}</p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+              <div className="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-800/50 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-xs">
                 <FileText className="h-6 w-6" />
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Open Complaints</span>
-                <p className="text-3xl font-extrabold text-rose-600 mt-1">{openComplaintsCount}</p>
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Open Complaints</span>
+                <p className="text-3xl font-black text-rose-600 dark:text-rose-400 mt-1">{openComplaintsCount}</p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
+              <div className="h-12 w-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-100 dark:border-rose-800/50 flex items-center justify-center text-rose-600 dark:text-rose-400 shadow-xs">
                 <AlertCircle className="h-6 w-6" />
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Occupied Beds</span>
-                <p className="text-3xl font-extrabold text-emerald-600 mt-1">
+                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Occupied Beds</span>
+                <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
                   {Object.values(occupancyMap).reduce((a, b) => a + b, 0)}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <div className="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-xs">
                 <DoorOpen className="h-6 w-6" />
               </div>
             </div>
@@ -634,43 +634,53 @@ export default function WardenDashboard() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Quick Actions Panel */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-lg font-bold text-slate-800">Quick Operations</h3>
-              <p className="text-xs text-slate-500">Shortcut buttons for warden operations.</p>
-              <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">Quick Operations</h3>
+                <p className="text-xs text-slate-500">Shortcut buttons for warden operations.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 pt-1">
                 <button
                   onClick={() => setTab("attendance")}
-                  className="p-4 bg-slate-50 hover:bg-slate-100 border border-slate-150 rounded-xl text-left transition-all"
+                  className="p-4 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-indigo-200 rounded-2xl text-left transition-all duration-200 group cursor-pointer"
                 >
-                  <ClipboardList className="h-6 w-6 text-indigo-600 mb-2" />
-                  <p className="text-sm font-bold text-slate-700">Mark Attendance</p>
+                  <div className="h-10 w-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <ClipboardList className="h-5 w-5" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600">Mark Attendance</p>
                   <span className="text-[10px] text-slate-400">Mark present/absent logs</span>
                 </button>
 
                 <button
                   onClick={() => setTab("leave")}
-                  className="p-4 bg-slate-50 hover:bg-slate-100 border border-slate-150 rounded-xl text-left transition-all"
+                  className="p-4 bg-slate-50 dark:bg-slate-950/60 hover:bg-amber-50/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-amber-200 rounded-2xl text-left transition-all duration-200 group cursor-pointer"
                 >
-                  <FileText className="h-6 w-6 text-amber-600 mb-2" />
-                  <p className="text-sm font-bold text-slate-700">Approve Leaves</p>
+                  <div className="h-10 w-10 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-amber-600">Approve Leaves</p>
                   <span className="text-[10px] text-slate-400">Review student requests</span>
                 </button>
 
                 <button
                   onClick={() => setTab("complaints")}
-                  className="p-4 bg-slate-50 hover:bg-slate-100 border border-slate-150 rounded-xl text-left transition-all"
+                  className="p-4 bg-slate-50 dark:bg-slate-950/60 hover:bg-rose-50/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-rose-200 rounded-2xl text-left transition-all duration-200 group cursor-pointer"
                 >
-                  <AlertCircle className="h-6 w-6 text-rose-600 mb-2" />
-                  <p className="text-sm font-bold text-slate-700">Resolve Complaints</p>
+                  <div className="h-10 w-10 rounded-xl bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <AlertCircle className="h-5 w-5" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-rose-600">Resolve Complaints</p>
                   <span className="text-[10px] text-slate-400">Track issues box</span>
                 </button>
 
                 <button
                   onClick={() => setTab("notices")}
-                  className="p-4 bg-slate-50 hover:bg-slate-100 border border-slate-150 rounded-xl text-left transition-all"
+                  className="p-4 bg-slate-50 dark:bg-slate-950/60 hover:bg-emerald-50/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-emerald-200 rounded-2xl text-left transition-all duration-200 group cursor-pointer"
                 >
-                  <Megaphone className="h-6 w-6 text-emerald-600 mb-2" />
-                  <p className="text-sm font-bold text-slate-700">Post Notice</p>
+                  <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <Megaphone className="h-5 w-5" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600">Post Notice</p>
                   <span className="text-[10px] text-slate-400">Post announcements board</span>
                 </button>
               </div>
