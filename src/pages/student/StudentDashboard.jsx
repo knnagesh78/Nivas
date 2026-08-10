@@ -36,7 +36,9 @@ import {
   Lock,
   Key,
   Eye,
-  EyeOff
+  EyeOff,
+  Sparkles,
+  DoorOpen
 } from "lucide-react";
 
 export default function StudentDashboard() {
