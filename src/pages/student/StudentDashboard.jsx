@@ -38,7 +38,18 @@ import {
   Eye,
   EyeOff,
   Sparkles,
-  DoorOpen
+  DoorOpen,
+  Phone,
+  GraduationCap,
+  ShieldCheck,
+  QrCode,
+  Activity,
+  Check,
+  UserCheck,
+  BadgeCheck,
+  Camera,
+  Bell,
+  Package
 } from "lucide-react";
 
 export default function StudentDashboard() {
@@ -517,73 +528,139 @@ export default function StudentDashboard() {
 
       {/* 1. Dashboard / Overview */}
       {activeTab === "dashboard" && (
-        <div className="space-y-6 animate-fadeIn">
-          {/* Welcome Hero Banner with Gradient Glow */}
-          <div className="rounded-3xl bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-indigo-900/40">
-            {/* Ambient Background Glow Shapes */}
-            <div className="absolute -top-12 -right-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute -bottom-12 left-1/3 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="space-y-8 animate-fadeIn">
+          {/* Hero Banner with Glassmorphism & Action Hub */}
+          <div className="relative rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-6 sm:p-10 text-white overflow-hidden shadow-2xl border border-indigo-500/20">
+            {/* Ambient Background Glows */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-10 -left-10 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div className="relative z-10 space-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 backdrop-blur-md">
-                  <Sparkles className="h-3.5 w-3.5 mr-1.5 text-indigo-400 animate-pulse" />
-                  Student Portal Active
-                </span>
-                {studentDetails?.roomNumber && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 border border-emerald-400/30 text-emerald-300">
-                    <DoorOpen className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
-                    Room {studentDetails.roomNumber}
+            <div className="relative z-10 space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 backdrop-blur-md">
+                    <Sparkles className="h-3.5 w-3.5 mr-1.5 text-indigo-400 animate-pulse" />
+                    Student Dashboard
                   </span>
-                )}
+                  {studentDetails?.roomNumber && (
+                    <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 backdrop-blur-md">
+                      <DoorOpen className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+                      Room {studentDetails.roomNumber}
+                    </span>
+                  )}
+                  {studentDetails?.course && (
+                    <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-purple-500/20 border border-purple-400/30 text-purple-300 backdrop-blur-md">
+                      <GraduationCap className="h-3.5 w-3.5 mr-1.5 text-purple-400" />
+                      {studentDetails.course} ({studentDetails.year || "1st Year"})
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                  <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Active Resident</span>
+                </div>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-                Welcome back, {studentDetails?.name}!
-              </h2>
-              <p className="text-slate-300 text-sm max-w-md leading-relaxed">
-                Streamlined hostel living. Monitor leave approvals, attendance records, complaints dispatch, and notice announcements.
-              </p>
-            </div>
-            <div className="absolute right-8 bottom-4 text-[10rem] font-black text-slate-800/20 pointer-events-none uppercase">
-              {studentDetails?.roomNumber || "N/A"}
+
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-2">
+                <div className="space-y-2">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
+                    Welcome, <span className="bg-gradient-to-r from-indigo-300 via-white to-purple-300 bg-clip-text text-transparent">{studentDetails?.name || "Student"}</span>
+                  </h2>
+                  <p className="text-slate-300 text-sm max-w-xl leading-relaxed">
+                    Your central portal for hostel life. Track attendance, manage leave requests, monitor complaint resolutions, and view official notice board updates in real-time.
+                  </p>
+                </div>
+
+                {/* Quick Action Pills */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:flex md:flex-col gap-2.5 shrink-0">
+                  <button
+                    onClick={() => setActiveTab("leave")}
+                    className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/25 transition-all cursor-pointer hover:scale-105 active:scale-95"
+                  >
+                    <Send className="h-4 w-4" />
+                    <span>Apply Leave</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab("complaints")}
+                    className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold text-xs backdrop-blur-md transition-all cursor-pointer hover:scale-105 active:scale-95"
+                  >
+                    <Plus className="h-4 w-4 text-amber-400" />
+                    <span>File Complaint</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab("profile")}
+                    className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold text-xs backdrop-blur-md transition-all cursor-pointer hover:scale-105 active:scale-95"
+                  >
+                    <User className="h-4 w-4 text-emerald-400" />
+                    <span>Edit Profile</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab("lostFound")}
+                    className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold text-xs backdrop-blur-md transition-all cursor-pointer hover:scale-105 active:scale-95"
+                  >
+                    <Package className="h-4 w-4 text-indigo-400" />
+                    <span>Lost & Found</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
+          {/* Quick Metrics Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Quick Stats / Room Details Widget */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm card-hover">
+            {/* My Room & Roommates Card */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-extrabold uppercase text-slate-400 tracking-wider">My Room Details</h3>
-                <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
-                  <DoorOpen className="h-5 w-5" />
+                <div className="flex items-center space-x-2.5">
+                  <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+                    <DoorOpen className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Room Allocation</h3>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Hostel Accommodation</p>
+                  </div>
                 </div>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                  {studentDetails?.roomNumber ? `Room ${studentDetails.roomNumber}` : "Unassigned"}
+                </span>
               </div>
-              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl">
+
+              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/60 p-4 rounded-2xl">
                 <div>
-                  <span className="text-xs font-semibold text-slate-400">Assigned Room</span>
-                  <p className="text-2xl font-black text-slate-900 dark:text-white">{studentDetails?.roomNumber || "Not Assigned"}</p>
+                  <span className="text-xs font-medium text-slate-400">Room Number</span>
+                  <p className="text-3xl font-black text-slate-900 dark:text-white">{studentDetails?.roomNumber || "N/A"}</p>
                 </div>
-                <div className="h-10 w-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md">
-                  {studentDetails?.roomNumber || "N/A"}
+                <div className="h-12 w-12 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-base shadow-lg shadow-indigo-500/20">
+                  {studentDetails?.roomNumber || "?"}
                 </div>
               </div>
 
-              {/* Roommate details */}
-              <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Roommates ({roommates.length})</span>
+              <div className="space-y-2.5">
+                <div className="flex justify-between items-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                  <span>Roommates ({roommates.length})</span>
+                </div>
                 {roommates.length === 0 ? (
-                  <p className="text-xs text-slate-400 italic">No roommates assigned yet.</p>
+                  <p className="text-xs text-slate-400 italic py-2">No roommates currently registered in this room.</p>
                 ) : (
-                  <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                  <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
                     {roommates.map((rm) => (
                       <div key={rm.id} className="flex items-center space-x-3 p-2.5 bg-slate-50 dark:bg-slate-950/40 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all border border-slate-150 dark:border-slate-800">
                         <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                          {rm.name[0].toUpperCase()}
+                          {rm.name ? rm.name[0].toUpperCase() : "S"}
                         </div>
                         <div className="flex-1 overflow-hidden">
                           <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{rm.name}</p>
-                          <p className="text-[10px] text-slate-400 truncate">{rm.course}</p>
+                          <p className="text-[10px] text-slate-400 truncate">{rm.course || "Student"}</p>
                         </div>
+                        {rm.phone && (
+                          <a href={`tel:${rm.phone}`} className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-all text-xs" title="Call Roommate">
+                            <Phone className="h-3.5 w-3.5" />
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -591,99 +668,152 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            {/* Quick Attendance Widget */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm card-hover">
+            {/* Attendance Stat Meter */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Attendance (30 Days)</h3>
-                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/50 text-emerald-600 dark:text-emerald-400">
-                  <Calendar className="h-5 w-5" />
+                <div className="flex items-center space-x-2.5">
+                  <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/50 text-emerald-600 dark:text-emerald-400">
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Attendance Rate</h3>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Last 30 Days</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="h-16 w-16 rounded-full border-4 border-emerald-500 flex items-center justify-center font-black text-emerald-600 dark:text-emerald-400 text-lg shadow-sm">
-                  {attendance.length > 0
-                    ? Math.round(
-                        (attendance.filter((r) => r.status === "present").length /
-                          attendance.length) *
-                          100
-                      )
-                    : 100}
-                  %
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Attendance Rate</p>
-                  <p className="text-xs text-slate-500">
-                    Present: {attendance.filter((r) => r.status === "present").length} | Absent:{" "}
-                    {attendance.filter((r) => r.status === "absent").length}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="pt-2 border-t border-slate-100">
+
+              {(() => {
+                const total = attendance.length;
+                const present = attendance.filter((r) => r.status === "present").length;
+                const absent = attendance.filter((r) => r.status === "absent").length;
+                const rate = total > 0 ? Math.round((present / total) * 100) : 100;
+
+                return (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 p-4 rounded-2xl">
+                      <div>
+                        <span className="text-xs font-semibold text-slate-400">Monthly Average</span>
+                        <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{rate}%</p>
+                      </div>
+                      <div className="h-14 w-14 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 flex items-center justify-center font-extrabold text-emerald-600 dark:text-emerald-400 text-sm shadow-inner">
+                        {present}/{total}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-center">
+                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Present</span>
+                        <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">{present} Days</span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Absent</span>
+                        <span className="text-sm font-black text-rose-500">{absent} Days</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={() => setActiveTab("attendance")}
-                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-all flex items-center"
+                  className="w-full text-center text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline transition-all py-1 cursor-pointer flex items-center justify-center space-x-1"
                 >
-                  View full attendance log &rarr;
+                  <span>View detailed attendance records</span>
+                  <span>&rarr;</span>
                 </button>
               </div>
             </div>
 
-            {/* Quick Leave / Complaint Status Widget */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
-              <h3 className="text-sm font-bold uppercase text-slate-400 tracking-wider">Recent Activity</h3>
-              <div className="space-y-3">
-                {leaves.length > 0 ? (
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
-                    <div>
-                      <p className="text-xs font-bold text-slate-800">Leave Request</p>
-                      <p className="text-[10px] text-slate-400">{leaves[0].fromDate} to {leaves[0].toDate}</p>
-                    </div>
-                    <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase border ${getStatusStyle(leaves[0].status)}`}>
-                      {leaves[0].status}
-                    </span>
+            {/* Quick Activity Center */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2.5">
+                  <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-100 dark:border-purple-800/50 text-purple-600 dark:text-purple-400">
+                    <Activity className="h-5 w-5" />
                   </div>
-                ) : (
-                  <p className="text-xs text-slate-400 italic">No leaves applied yet.</p>
-                )}
+                  <div>
+                    <h3 className="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Recent Activity</h3>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Status Tracker</p>
+                  </div>
+                </div>
+              </div>
 
-                {complaints.length > 0 ? (
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
-                    <div>
-                      <p className="text-xs font-bold text-slate-800">Complaint: {complaints[0].category}</p>
-                      <p className="text-[10px] text-slate-400 truncate max-w-40">{complaints[0].description}</p>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Latest Leave Request</span>
+                  {leaves.length > 0 ? (
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800">
+                      <div className="overflow-hidden pr-2">
+                        <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{leaves[0].reason}</p>
+                        <p className="text-[10px] text-slate-400">{leaves[0].fromDate} to {leaves[0].toDate}</p>
+                      </div>
+                      <span className={`px-2.5 py-1 text-[9px] font-extrabold rounded-full uppercase border shrink-0 ${getStatusStyle(leaves[0].status)}`}>
+                        {leaves[0].status}
+                      </span>
                     </div>
-                    <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full uppercase border ${getStatusStyle(complaints[0].status)}`}>
-                      {complaints[0].status}
-                    </span>
-                  </div>
-                ) : (
-                  <p className="text-xs text-slate-400 italic">No complaints filed yet.</p>
-                )}
+                  ) : (
+                    <p className="text-xs text-slate-400 italic bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-xl text-center">No leave requests submitted yet.</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Latest Complaint</span>
+                  {complaints.length > 0 ? (
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800">
+                      <div className="overflow-hidden pr-2">
+                        <p className="text-xs font-bold text-slate-800 dark:text-slate-200 capitalize truncate">{complaints[0].category} Issue</p>
+                        <p className="text-[10px] text-slate-400 truncate max-w-44">{complaints[0].description}</p>
+                      </div>
+                      <span className={`px-2.5 py-1 text-[9px] font-extrabold rounded-full uppercase border shrink-0 ${getStatusStyle(complaints[0].status)}`}>
+                        {complaints[0].status}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-xl text-center">No complaints submitted yet.</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Notices Section */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-            <div className="flex items-center space-x-2">
-              <Megaphone className="h-5 w-5 text-indigo-600" />
-              <h3 className="text-lg font-bold text-slate-900">Hostel Notice Board</h3>
+          {/* Announcements & Notice Board Section */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+                  <Megaphone className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Hostel Notice Board</h3>
+                  <p className="text-xs text-slate-400">Official announcements from the Warden & Hostel Administration</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                {notices.length} Active {notices.length === 1 ? "Notice" : "Notices"}
+              </span>
             </div>
+
             {notices.length === 0 ? (
-              <p className="text-sm text-slate-400 italic py-4">No announcements posted at this time.</p>
+              <div className="text-center py-10 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl">
+                <Bell className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-slate-500">No active notices posted right now.</p>
+                <p className="text-xs text-slate-400 mt-1">Check back later for hostel updates, curfew times, and maintenance schedules.</p>
+              </div>
             ) : (
-              <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto pr-2 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[420px] overflow-y-auto pr-1">
                 {notices.map((notice) => (
-                  <div key={notice.id} className="pt-4 first:pt-0">
+                  <div key={notice.id} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-150 dark:border-slate-800 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all">
                     <div className="flex items-start justify-between">
-                      <h4 className="text-sm font-bold text-slate-800">{notice.title}</h4>
-                      <span className="text-[10px] text-slate-400">
-                        {notice.postedAt?.toDate ? notice.postedAt.toDate().toLocaleDateString() : "Just now"}
+                      <h4 className="text-base font-bold text-slate-900 dark:text-white leading-snug">{notice.title}</h4>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900 shrink-0">
+                        {notice.postedBy === "admin" ? "Admin" : "Warden"}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-slate-500 leading-relaxed whitespace-pre-line">{notice.message}</p>
-                    <p className="mt-1 text-[9px] font-semibold text-indigo-500">Posted by: {notice.postedBy === "admin" ? "Admin" : "Warden"}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{notice.message}</p>
+                    <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800 text-[10px] font-medium text-slate-400 flex justify-between items-center">
+                      <span>Posted: {notice.postedAt?.toDate ? notice.postedAt.toDate().toLocaleString() : "Recently"}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1032,237 +1162,373 @@ export default function StudentDashboard() {
 
       {/* 5. Profile Tab */}
       {activeTab === "profile" && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-2xl mx-auto space-y-6 animate-fadeIn">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">Manage Profile</h2>
-            <p className="text-xs text-slate-500">Update your contact information and student details.</p>
+        <div className="space-y-8 animate-fadeIn max-w-4xl mx-auto">
+          {/* Digital Hostel Student ID Card Header */}
+          <div className="relative rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-6 sm:p-8 text-white overflow-hidden shadow-2xl border border-indigo-500/30">
+            {/* Ambient Lighting */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
+              {/* Avatar Box */}
+              <div className="relative shrink-0">
+                <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-1 shadow-xl">
+                  <div className="h-full w-full rounded-[14px] bg-slate-900 overflow-hidden flex items-center justify-center">
+                    {editPhoto || studentDetails?.photoUrl ? (
+                      <img src={editPhoto || studentDetails.photoUrl} alt="Profile" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-4xl font-black text-white">
+                        {studentDetails?.name ? studentDetails.name[0].toUpperCase() : "S"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-slate-950 p-1.5 rounded-full shadow-lg border-2 border-slate-900" title="Active Verified Resident">
+                  <BadgeCheck className="h-4 w-4" />
+                </div>
+              </div>
+
+              {/* Student Identification Details */}
+              <div className="flex-1 text-center md:text-left space-y-3">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300">
+                    <ShieldCheck className="h-3.5 w-3.5 mr-1.5 text-indigo-400" />
+                    Digital Hostel ID Card
+                  </span>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 border border-emerald-400/30 text-emerald-300">
+                    <Check className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+                    Verified Resident
+                  </span>
+                </div>
+
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    {studentDetails?.name || "Student Name"}
+                  </h2>
+                  <p className="text-sm font-semibold text-indigo-300">
+                    {studentDetails?.course || "Course Unset"} &bull; {studentDetails?.year || "Year Unset"}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 text-xs">
+                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Room Assigned</span>
+                    <span className="font-extrabold text-white">{studentDetails?.roomNumber || "Unassigned"}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Mobile Phone</span>
+                    <span className="font-extrabold text-white truncate block">{studentDetails?.phone || "Not set"}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm col-span-2 sm:col-span-1">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Parent Contact</span>
+                    <span className="font-extrabold text-white truncate block">{studentDetails?.parentContact || "Not set"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* QR Badge graphic stamp */}
+              <div className="hidden lg:flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 shrink-0">
+                <QrCode className="h-16 w-16 text-indigo-300" />
+                <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mt-1">NIVAS PASS</span>
+              </div>
+            </div>
           </div>
 
-          {profileSuccess && (
-            <div className="rounded-xl bg-green-50 border border-green-200 p-3 text-xs text-green-600">
-              {profileSuccess}
+          {/* Profile Form Card */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex items-center space-x-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+                <User className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Personal & Academic Details</h3>
+                <p className="text-xs text-slate-400">Update your student information, contact numbers, and profile picture.</p>
+              </div>
             </div>
-          )}
 
-          <form onSubmit={handleUpdateProfile} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                />
+            {profileSuccess && (
+              <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 p-4 text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center space-x-2">
+                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                <span>{profileSuccess}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateProfile} className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {/* Full Name */}
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                    Full Name <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                      <User className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Your full name"
+                      className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Room Number (Read Only) */}
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                    Room Number (Assigned by Warden)
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                      <DoorOpen className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <input
+                      type="text"
+                      disabled
+                      className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950/80 py-3 pl-10 pr-4 text-sm text-slate-400 font-semibold cursor-not-allowed"
+                      value={studentDetails?.roomNumber || "Unassigned"}
+                    />
+                  </div>
+                </div>
+
+                {/* Phone Number */}
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                    Phone Number <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                      <Phone className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="e.g. +91 9876543210"
+                      className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Parent Contact */}
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                    Parent / Guardian Contact <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                      <Phone className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="Parent's phone number"
+                      className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all"
+                      value={editParent}
+                      onChange={(e) => setEditParent(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Father's Name */}
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                    Father's Name <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                      <User className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Father's full name"
+                      className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all"
+                      value={editFather}
+                      onChange={(e) => setEditFather(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Mother's Name */}
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                    Mother's Name <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                      <User className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Mother's full name"
+                      className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all"
+                      value={editMother}
+                      onChange={(e) => setEditMother(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Course */}
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                    Course / Branch <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                      <GraduationCap className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. B.Tech CSE"
+                      className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all"
+                      value={editCourse}
+                      onChange={(e) => setEditCourse(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Year of Study */}
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                    Year of Study <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 px-4 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none transition-all"
+                    value={editYear}
+                    onChange={(e) => setEditYear(e.target.value)}
+                  >
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                    <option value="Postgraduate">Postgraduate</option>
+                  </select>
+                </div>
+
+                {/* Profile Photo Camera Capture */}
+                <div className="sm:col-span-2 pt-2">
+                  <CameraCapture photoUrl={editPhoto} onCapture={setEditPhoto} label="Profile Photo Capture (Optional)" />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Room Number (Read Only)
-                </label>
-                <input
-                  type="text"
-                  disabled
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm bg-slate-50 text-slate-400 font-semibold cursor-not-allowed"
-                  value={studentDetails?.roomNumber || "Unassigned"}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  required
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                  value={editPhone}
-                  onChange={(e) => setEditPhone(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Parent / Guardian Contact
-                </label>
-                <input
-                  type="tel"
-                  required
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                  value={editParent}
-                  onChange={(e) => setEditParent(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Father's Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Father's Full Name"
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                  value={editFather}
-                  onChange={(e) => setEditFather(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Mother's Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Mother's Full Name"
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                  value={editMother}
-                  onChange={(e) => setEditMother(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Course
-                </label>
-                <input
-                  type="text"
-                  required
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                  value={editCourse}
-                  onChange={(e) => setEditCourse(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Year of Study
-                </label>
-                <select
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:outline-none"
-                  value={editYear}
-                  onChange={(e) => setEditYear(e.target.value)}
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={profileLoading}
+                  className="px-8 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25 transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center justify-center space-x-2"
                 >
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                  <option value="Postgraduate">Postgraduate</option>
-                </select>
+                  {profileLoading ? (
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  ) : (
+                    <>
+                      <UserCheck className="h-4 w-4" />
+                      <span>Save Profile Changes</span>
+                    </>
+                  )}
+                </button>
               </div>
+            </form>
+          </div>
 
-              <div className="sm:col-span-2">
-                <CameraCapture photoUrl={editPhoto} onCapture={setEditPhoto} label="Profile Photo (Optional)" />
+          {/* Change Password Security Card */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex items-center space-x-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+                <Lock className="h-6 w-6" />
               </div>
-            </div>
-
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={profileLoading}
-                className="w-full sm:w-auto px-6 rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center"
-              >
-                {profileLoading ? (
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                ) : (
-                  "Save Changes"
-                )}
-              </button>
-            </div>
-          </form>
-
-          {/* Change Password Card */}
-          <div className="pt-6 border-t border-slate-200 space-y-4">
-            <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center">
-                <Lock className="h-4 w-4 mr-2 text-indigo-600" />
-                Change Password
-              </h3>
-              <p className="text-xs text-slate-500">Update your account password securely.</p>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Account Security</h3>
+                <p className="text-xs text-slate-400">Update your account login password to keep your portal secure.</p>
+              </div>
             </div>
 
             {passwordSuccess && (
-              <div className="rounded-xl bg-green-50 border border-green-200 p-3 text-xs text-green-600">
-                {passwordSuccess}
+              <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 p-4 text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center space-x-2">
+                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                <span>{passwordSuccess}</span>
               </div>
             )}
 
             {passwordError && (
-              <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-xs text-red-600">
+              <div className="rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 p-4 text-xs font-bold text-rose-700 dark:text-rose-300">
                 {passwordError}
               </div>
             )}
 
-            <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+            <form onSubmit={handleChangePassword} className="space-y-5 max-w-lg">
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                   New Password
                 </label>
                 <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                     <Key className="h-4 w-4 text-slate-400" />
                   </div>
                   <input
                     type={showNewPassword ? "text" : "password"}
                     required
-                    placeholder="Min 6 characters"
-                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-10 text-sm focus:border-indigo-500 focus:outline-none"
+                    placeholder="At least 6 characters"
+                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 pl-10 pr-12 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none transition-all"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
                     title={showNewPassword ? "Hide password" : "Show password"}
                   >
-                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showNewPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                   Confirm New Password
                 </label>
                 <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                     <Key className="h-4 w-4 text-slate-400" />
                   </div>
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     required
                     placeholder="Repeat new password"
-                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-10 text-sm focus:border-indigo-500 focus:outline-none"
+                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 pl-10 pr-12 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none transition-all"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
                     title={showConfirmPassword ? "Hide password" : "Show password"}
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showConfirmPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
                   </button>
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={passwordLoading}
-                className="w-full sm:w-auto px-6 rounded-xl bg-indigo-600 py-2.5 text-center text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer"
-              >
-                {passwordLoading ? (
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                ) : (
-                  "Update Password"
-                )}
-              </button>
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={passwordLoading}
+                  className="px-6 py-3 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center justify-center space-x-2"
+                >
+                  {passwordLoading ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  ) : (
+                    <span>Update Password</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>

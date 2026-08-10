@@ -74,13 +74,13 @@ export default function CompleteProfile() {
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800 opacity-50 blur-3xl"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800 opacity-50 blur-3xl"></div>
 
-      <div className="w-full max-w-xl bg-white p-8 rounded-3xl border border-slate-200 shadow-2xl relative z-10 animate-fadeIn">
-        <div className="flex justify-between items-center mb-6">
+      <div className="w-full max-w-2xl bg-slate-950/80 p-8 sm:p-10 rounded-3xl border border-slate-800 shadow-2xl relative z-10 animate-fadeIn backdrop-blur-xl">
+        <div className="flex justify-between items-center mb-8 pb-4 border-b border-slate-800">
           <div className="flex items-center space-x-3">
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 text-xs font-semibold transition-all cursor-pointer border border-slate-200"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white text-xs font-bold transition-all cursor-pointer border border-slate-800"
               title="Back to Sign In"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -88,45 +88,45 @@ export default function CompleteProfile() {
             </button>
             <div className="flex items-center space-x-2">
               <img src="/logo.svg" className="h-8 w-8 rounded-lg shadow-sm" alt="Nivas Logo" />
-              <span className="font-bold text-slate-800 text-lg">Nivas Onboarding</span>
+              <span className="font-bold text-white text-lg tracking-tight">Nivas Onboarding</span>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="text-xs font-semibold text-slate-500 hover:text-red-600 transition-all"
+            className="text-xs font-bold text-slate-400 hover:text-rose-400 transition-all cursor-pointer"
           >
             Sign Out
           </button>
         </div>
 
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Complete Your Profile</h2>
-          <p className="mt-1.5 text-sm text-slate-500">
-            Please fill out your hostel and contact information to gain access to the Student Dashboard.
+        <div className="mb-8 space-y-2">
+          <h2 className="text-3xl font-black text-white tracking-tight">Complete Your Student Profile</h2>
+          <p className="text-sm text-indigo-300">
+            Please fill out your hostel identity details and contact information to access the Student Portal.
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600">
+          <div className="mb-6 rounded-2xl bg-rose-950/40 border border-rose-800/60 p-4 text-xs font-bold text-rose-300">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Full Name <span className="text-red-500">*</span>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">
+                Full Name <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <User className="h-4 w-4 text-slate-400" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <User className="h-4 w-4 text-slate-500" />
                 </div>
                 <input
                   type="text"
                   required
                   placeholder="e.g. John Doe"
-                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -134,40 +134,37 @@ export default function CompleteProfile() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Initial Room Number <span className="text-red-500">*</span>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">
+                Initial Room Number <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Home className="h-4 w-4 text-slate-400" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <Home className="h-4 w-4 text-slate-500" />
                 </div>
                 <input
                   type="text"
                   required
                   placeholder="e.g. 104"
-                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                   value={roomNumber}
                   onChange={(e) => setRoomNumber(e.target.value)}
                 />
               </div>
-              <p className="mt-1 text-[10px] text-slate-400">
-                You can change this or the Warden can reassign you later.
-              </p>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Course / Branch <span className="text-red-500">*</span>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">
+                Course / Branch <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <GraduationCap className="h-4 w-4 text-slate-400" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <GraduationCap className="h-4 w-4 text-slate-500" />
                 </div>
                 <input
                   type="text"
                   required
                   placeholder="e.g. B.Tech CSE"
-                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                   value={course}
                   onChange={(e) => setCourse(e.target.value)}
                 />
@@ -175,11 +172,11 @@ export default function CompleteProfile() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Year of Study <span className="text-red-500">*</span>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">
+                Year of Study <span className="text-rose-400">*</span>
               </label>
               <select
-                className="w-full rounded-xl border border-slate-200 py-2.5 px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 py-3 px-4 text-sm text-white focus:border-indigo-500 focus:outline-none transition-all"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
               >
@@ -192,18 +189,18 @@ export default function CompleteProfile() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Phone Number <span className="text-red-500">*</span>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">
+                Phone Number <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Phone className="h-4 w-4 text-slate-400" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <Phone className="h-4 w-4 text-slate-500" />
                 </div>
                 <input
                   type="tel"
                   required
                   placeholder="e.g. +91 9876543210"
-                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
@@ -211,18 +208,18 @@ export default function CompleteProfile() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Parent/Guardian Contact <span className="text-red-500">*</span>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">
+                Parent/Guardian Contact <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Phone className="h-4 w-4 text-slate-400" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <Phone className="h-4 w-4 text-slate-500" />
                 </div>
                 <input
                   type="tel"
                   required
                   placeholder="e.g. +91 9123456789"
-                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                   value={parentContact}
                   onChange={(e) => setParentContact(e.target.value)}
                 />
@@ -230,18 +227,18 @@ export default function CompleteProfile() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Father's Name <span className="text-red-500">*</span>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">
+                Father's Name <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <User className="h-4 w-4 text-slate-400" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <User className="h-4 w-4 text-slate-500" />
                 </div>
                 <input
                   type="text"
                   required
                   placeholder="Father's Full Name"
-                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none transition-all"
                   value={fatherName}
                   onChange={(e) => setFatherName(e.target.value)}
                 />
@@ -249,18 +246,18 @@ export default function CompleteProfile() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Mother's Name <span className="text-red-500">*</span>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">
+                Mother's Name <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <User className="h-4 w-4 text-slate-400" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <User className="h-4 w-4 text-slate-500" />
                 </div>
                 <input
                   type="text"
                   required
                   placeholder="Mother's Full Name"
-                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none transition-all"
                   value={motherName}
                   onChange={(e) => setMotherName(e.target.value)}
                 />
@@ -268,22 +265,22 @@ export default function CompleteProfile() {
             </div>
 
             <div className="sm:col-span-2">
-              <CameraCapture photoUrl={photoUrl} onCapture={setPhotoUrl} label="Profile Photo (Optional)" />
+              <CameraCapture photoUrl={photoUrl} onCapture={setPhotoUrl} label="Profile Photo Capture (Optional)" />
             </div>
           </div>
 
-          <div className="pt-2">
+          <div className="pt-4">
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white shadow-md hover:bg-slate-800 transition-all disabled:opacity-50 flex items-center justify-center"
+              className="w-full rounded-2xl bg-indigo-600 py-4 text-center text-sm font-bold text-white shadow-xl shadow-indigo-600/30 hover:bg-indigo-500 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
               ) : (
                 <>
-                  <UserCheck className="mr-2 h-4 w-4" />
-                  Save & Enter Dashboard
+                  <UserCheck className="h-4 w-4" />
+                  <span>Save Profile & Open Dashboard</span>
                 </>
               )}
             </button>
