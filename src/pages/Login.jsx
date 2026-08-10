@@ -5,7 +5,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth, firebaseConfig, clearFirebaseConfig } from "../firebase";
-import { Mail, Lock, User, GraduationCap, Shield, Wrench, Download, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User, GraduationCap, Shield, Wrench, Download, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import InstallWizardModal from "../components/InstallWizardModal";
 
 export default function Login() {
@@ -14,6 +14,8 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -318,13 +320,21 @@ export default function Login() {
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
-                className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-11 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
             </div>
 
             {isSignUp && (
@@ -335,13 +345,21 @@ export default function Login() {
                 <input
                   id="confirm-password"
                   name="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   required
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-11 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+                  title={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
             )}
           </div>

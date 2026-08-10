@@ -39,7 +39,9 @@ import {
   Settings,
   Lock,
   Key,
-  Mail
+  Mail,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 export default function WardenDashboard() {
@@ -122,6 +124,8 @@ export default function WardenDashboard() {
   const [wardenSelfEmail, setWardenSelfEmail] = useState(currentUser?.email || "");
   const [wardenNewPassword, setWardenNewPassword] = useState("");
   const [wardenConfirmPassword, setWardenConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState("");
   const [settingsError, setSettingsError] = useState("");
@@ -1431,12 +1435,20 @@ export default function WardenDashboard() {
                   <Key className="h-4 w-4 text-slate-400" />
                 </div>
                 <input
-                  type="password"
+                  type={showNewPassword ? "text" : "password"}
                   placeholder="Min 6 characters"
-                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-10 text-sm focus:border-indigo-500 focus:outline-none"
                   value={wardenNewPassword}
                   onChange={(e) => setWardenNewPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  title={showNewPassword ? "Hide password" : "Show password"}
+                >
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
 
@@ -1450,12 +1462,20 @@ export default function WardenDashboard() {
                     <Key className="h-4 w-4 text-slate-400" />
                   </div>
                   <input
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="Repeat new password"
-                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-10 text-sm focus:border-indigo-500 focus:outline-none"
                     value={wardenConfirmPassword}
                     onChange={(e) => setWardenConfirmPassword(e.target.value)}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    title={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
             )}

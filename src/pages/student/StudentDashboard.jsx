@@ -33,7 +33,9 @@ import {
   BookOpen,
   Trash2,
   Lock,
-  Key
+  Key,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 export default function StudentDashboard() {
@@ -100,6 +102,8 @@ export default function StudentDashboard() {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -1147,13 +1151,21 @@ export default function StudentDashboard() {
                     <Key className="h-4 w-4 text-slate-400" />
                   </div>
                   <input
-                    type="password"
+                    type={showNewPassword ? "text" : "password"}
                     required
                     placeholder="Min 6 characters"
-                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-10 text-sm focus:border-indigo-500 focus:outline-none"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    title={showNewPassword ? "Hide password" : "Show password"}
+                  >
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -1166,13 +1178,21 @@ export default function StudentDashboard() {
                     <Key className="h-4 w-4 text-slate-400" />
                   </div>
                   <input
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     required
                     placeholder="Repeat new password"
-                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-10 text-sm focus:border-indigo-500 focus:outline-none"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    title={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 

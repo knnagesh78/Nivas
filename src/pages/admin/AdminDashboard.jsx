@@ -35,7 +35,9 @@ import {
   Shield,
   Key,
   Search,
-  GraduationCap
+  GraduationCap,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -125,6 +127,7 @@ export default function AdminDashboard() {
   const [wardenName, setWardenName] = useState("");
   const [wardenEmail, setWardenEmail] = useState("");
   const [wardenPassword, setWardenPassword] = useState("");
+  const [showWardenPassword, setShowWardenPassword] = useState(false);
   const [wardenLoading, setWardenLoading] = useState(false);
   const [wardenSuccess, setWardenSuccess] = useState("");
   const [wardenError, setWardenError] = useState("");
@@ -132,6 +135,7 @@ export default function AdminDashboard() {
   // Form: Admin Credentials settings
   const [adminEmail, setAdminEmail] = useState(currentUser?.email || "");
   const [adminPassword, setAdminPassword] = useState("");
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [credLoading, setCredLoading] = useState(false);
   const [credSuccess, setCredSuccess] = useState("");
   const [credError, setCredError] = useState("");
@@ -924,13 +928,21 @@ export default function AdminDashboard() {
                     <Lock className="h-4 w-4 text-slate-400" />
                   </div>
                   <input
-                    type="password"
+                    type={showWardenPassword ? "text" : "password"}
                     required
                     placeholder="Min 6 characters"
-                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm"
+                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-10 text-sm"
                     value={wardenPassword}
                     onChange={(e) => setWardenPassword(e.target.value)}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowWardenPassword(!showWardenPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    title={showWardenPassword ? "Hide password" : "Show password"}
+                  >
+                    {showWardenPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -1142,12 +1154,20 @@ export default function AdminDashboard() {
                   <Key className="h-4 w-4 text-slate-400" />
                 </div>
                 <input
-                  type="password"
+                  type={showAdminPassword ? "text" : "password"}
                   placeholder="Min 6 characters"
-                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-10 text-sm focus:border-indigo-500 focus:outline-none"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowAdminPassword(!showAdminPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  title={showAdminPassword ? "Hide password" : "Show password"}
+                >
+                  {showAdminPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
 
