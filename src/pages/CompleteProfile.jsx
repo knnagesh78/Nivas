@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { GraduationCap, Phone, User, Home, UserCheck, ShieldAlert } from "lucide-react";
+import { GraduationCap, Phone, User, Home, UserCheck, ShieldAlert, ArrowLeft } from "lucide-react";
 import CameraCapture from "../components/CameraCapture";
 
 export default function CompleteProfile() {
@@ -76,9 +76,20 @@ export default function CompleteProfile() {
 
       <div className="w-full max-w-xl bg-white p-8 rounded-3xl border border-slate-200 shadow-2xl relative z-10 animate-fadeIn">
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center space-x-2.5">
-            <img src="/logo.svg" className="h-8 w-8 rounded-lg shadow-sm" alt="Nivas Logo" />
-            <span className="font-bold text-slate-800 text-lg">Nivas Onboarding</span>
+          <div className="flex items-center space-x-3">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 text-xs font-semibold transition-all cursor-pointer border border-slate-200"
+              title="Back to Sign In"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back</span>
+            </button>
+            <div className="flex items-center space-x-2">
+              <img src="/logo.svg" className="h-8 w-8 rounded-lg shadow-sm" alt="Nivas Logo" />
+              <span className="font-bold text-slate-800 text-lg">Nivas Onboarding</span>
+            </div>
           </div>
           <button
             onClick={handleLogout}

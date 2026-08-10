@@ -5,7 +5,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth, firebaseConfig, clearFirebaseConfig } from "../firebase";
-import { Mail, Lock, User, GraduationCap, Shield, Wrench, Download } from "lucide-react";
+import { Mail, Lock, User, GraduationCap, Shield, Wrench, Download, ArrowLeft } from "lucide-react";
 import InstallWizardModal from "../components/InstallWizardModal";
 
 export default function Login() {
@@ -213,6 +213,22 @@ export default function Login() {
       )}
 
       <div className="w-full max-w-md space-y-8 bg-slate-850 p-8 rounded-3xl border border-slate-800 shadow-2xl relative z-10 bg-slate-950/60 backdrop-blur-md">
+        {isSignUp && (
+          <div className="flex items-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(false);
+                setError("");
+              }}
+              className="inline-flex items-center space-x-2 text-xs font-semibold text-indigo-400 hover:text-indigo-300 bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to Sign In</span>
+            </button>
+          </div>
+        )}
+
         <div>
           <img src="/logo.svg" className="mx-auto h-16 w-16 rounded-2xl shadow-lg shadow-indigo-500/10 animate-pulse" alt="Nivas Logo" />
           <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-white">
