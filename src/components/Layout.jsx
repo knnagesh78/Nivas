@@ -113,6 +113,39 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
 
   const navItems = getNavItems();
 
+  // Mobile Bottom Tab Items (YouTube style navigation)
+  const getMobileNavItems = () => {
+    const role = userData?.role;
+    if (role === "student") {
+      return [
+        { id: "dashboard", label: "Home", icon: LayoutDashboard },
+        { id: "leave", label: "Leave", icon: FileText },
+        { id: "lostFound", label: "Notice", icon: Megaphone, isCenter: true },
+        { id: "complaints", label: "Complaint", icon: AlertCircle },
+        { id: "profile", label: "You", icon: User, isProfile: true },
+      ];
+    } else if (role === "warden") {
+      return [
+        { id: "dashboard", label: "Home", icon: LayoutDashboard },
+        { id: "leave", label: "Leave", icon: FileText },
+        { id: "notices", label: "Notice", icon: Megaphone, isCenter: true },
+        { id: "complaints", label: "Complaint", icon: AlertCircle },
+        { id: "settings", label: "You", icon: Settings, isProfile: true },
+      ];
+    } else if (role === "admin") {
+      return [
+        { id: "dashboard", label: "Home", icon: LayoutDashboard },
+        { id: "students", label: "Students", icon: GraduationCap },
+        { id: "notices", label: "Notice", icon: Megaphone, isCenter: true },
+        { id: "wardens", label: "Wardens", icon: Users },
+        { id: "settings", label: "You", icon: Settings, isProfile: true },
+      ];
+    }
+    return [];
+  };
+
+  const mobileNavItems = getMobileNavItems();
+
   const getRoleBadge = (role) => {
     switch (role) {
       case "admin":
@@ -283,7 +316,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
         )}
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto bg-slate-50">
+        <main className="flex-1 overflow-y-auto bg-slate-50 pb-20 md:pb-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
             {/* Activity Navigation / Back Button Bar */}
             {activeTab && activeTab !== "dashboard" && (
@@ -318,25 +351,83 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
               </div>
             )}
             {children}
-
-            {/* Standard Footer */}
-            <footer className="mt-8 py-5 border-t border-slate-200 text-center text-xs tracking-wider text-slate-500 font-sans">
-              Developed by{" "}
-              <span className="font-bold text-slate-800 tracking-widest uppercase ml-1">
-                KNNAGESH
-              </span>{" "}
-              <span className="mx-2 text-indigo-400 font-bold">•</span>{" "}
-              <span className="font-semibold text-slate-700 tracking-wide">
-                Diploma CME Student
-              </span>{" "}
-              <span className="mx-2 text-indigo-400 font-bold">•</span>{" "}
-              <span className="font-semibold text-slate-700 tracking-wide">
-                Dharmavaram
-              </span>
-            </footer>
           </div>
         </main>
       </div>
+
+      {/* Fixed Mobile Bottom Navigation Bar (YouTube Style) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 border-t border-slate-800 md:hidden px-2 py-1.5 shadow-2xl">
+        <div className="grid grid-cols-5 items-center max-w-md mx-auto">
+          {mobileNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            const isCenter = item.isCenter;
+            const isProfile = item.isProfile;
+
+            if (isCenter) {
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className="flex flex-col items-center justify-center -mt-4 cursor-pointer"
+                >
+                  <div
+                    className={`h-12 w-12 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                      isActive
+                        ? "bg-indigo-600 text-white ring-4 ring-slate-900 shadow-indigo-500/50 scale-105"
+                        : "bg-slate-800 text-white hover:bg-slate-700 ring-4 ring-slate-900"
+                    }`}
+                  >
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <span
+                    className={`text-[10px] font-bold mt-1 ${
+                      isActive ? "text-indigo-400" : "text-slate-400"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </button>
+              );
+            }
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex flex-col items-center justify-center py-1 transition-all cursor-pointer ${
+                  isActive ? "text-white font-bold" : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                {isProfile ? (
+                  <div
+                    className={`h-6 w-6 rounded-full flex items-center justify-center font-bold text-[10px] uppercase border transition-all ${
+                      isActive
+                        ? "bg-indigo-600 text-white border-white scale-110 shadow-sm shadow-indigo-500/50"
+                        : "bg-slate-700 text-slate-200 border-slate-600"
+                    }`}
+                  >
+                    {userData?.email ? userData.email.slice(0, 2).toUpperCase() : "ME"}
+                  </div>
+                ) : (
+                  <Icon
+                    className={`h-5 w-5 ${
+                      isActive ? "text-indigo-400 scale-110" : "text-slate-400"
+                    }`}
+                  />
+                )}
+                <span
+                  className={`text-[10px] mt-1 tracking-tight ${
+                    isActive ? "text-white font-bold" : "text-slate-400"
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
       <InstallWizardModal
         isOpen={wizardOpen}
         onClose={() => setWizardOpen(false)}
