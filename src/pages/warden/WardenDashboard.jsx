@@ -35,11 +35,15 @@ import {
   DoorOpen,
   ClipboardList,
   Plus,
-  Trash2
+  Trash2,
+  Settings,
+  Lock,
+  Key,
+  Mail
 } from "lucide-react";
 
 export default function WardenDashboard() {
-  const { currentUser } = useAuth();
+  const { currentUser, updatePassword, updateEmail } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";
@@ -109,9 +113,55 @@ export default function WardenDashboard() {
 
   // Notice form
   const [noticeTitle, setNoticeTitle] = useState("");
-  const [noticeMessage, setNoticeMessage] = useState("");
+  const [noticeMsg, setNoticeMsg] = useState("");
+  const [noticeAudience, setNoticeAudience] = useState("all");
   const [noticeLoading, setNoticeLoading] = useState(false);
   const [noticeSuccess, setNoticeSuccess] = useState("");
+
+  // Settings states
+  const [wardenSelfEmail, setWardenSelfEmail] = useState(currentUser?.email || "");
+  const [wardenNewPassword, setWardenNewPassword] = useState("");
+  const [wardenConfirmPassword, setWardenConfirmPassword] = useState("");
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [settingsSuccess, setSettingsSuccess] = useState("");
+  const [settingsError, setSettingsError] = useState("");
+
+  const handleUpdateWardenSettings = async (e) => {
+    e.preventDefault();
+    setSettingsSuccess("");
+    setSettingsError("");
+
+    if (wardenNewPassword && wardenNewPassword !== wardenConfirmPassword) {
+      setSettingsError("Passwords do not match.");
+      return;
+    }
+    if (wardenNewPassword && wardenNewPassword.length < 6) {
+      setSettingsError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setSettingsLoading(true);
+    try {
+      if (wardenSelfEmail && wardenSelfEmail !== currentUser.email) {
+        await updateEmail(wardenSelfEmail);
+      }
+      if (wardenNewPassword) {
+        await updatePassword(wardenNewPassword);
+        setWardenNewPassword("");
+        setWardenConfirmPassword("");
+      }
+      setSettingsSuccess("Account credentials updated successfully!");
+    } catch (err) {
+      console.error(err);
+      if (err.code === "auth/requires-recent-login") {
+        setSettingsError("For security reasons, please sign out and sign back in before changing password/email.");
+      } else {
+        setSettingsError(err.message || "Failed to update settings.");
+      }
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
 
   // Fetch all data
   const fetchData = async () => {
@@ -1327,6 +1377,103 @@ export default function WardenDashboard() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* 8. Settings & Credentials Tab */}
+      {activeTab === "settings" && (
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-xl mx-auto space-y-6 animate-fadeIn">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 flex items-center">
+              <Settings className="h-5 w-5 mr-2 text-indigo-600" />
+              Warden Settings & Security
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">Update your email address or edit your login password.</p>
+          </div>
+
+          {settingsSuccess && (
+            <div className="rounded-xl bg-green-50 border border-green-200 p-4 text-sm text-green-600">
+              {settingsSuccess}
+            </div>
+          )}
+
+          {settingsError && (
+            <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600">
+              {settingsError}
+            </div>
+          )}
+
+          <form onSubmit={handleUpdateWardenSettings} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                Warden Email Address
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <Mail className="h-4 w-4 text-slate-400" />
+                </div>
+                <input
+                  type="email"
+                  required
+                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                  value={wardenSelfEmail}
+                  onChange={(e) => setWardenSelfEmail(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                New Password (Leave blank to keep current)
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <Key className="h-4 w-4 text-slate-400" />
+                </div>
+                <input
+                  type="password"
+                  placeholder="Min 6 characters"
+                  className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                  value={wardenNewPassword}
+                  onChange={(e) => setWardenNewPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {wardenNewPassword && (
+              <div>
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                  Confirm New Password
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Key className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="Repeat new password"
+                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                    value={wardenConfirmPassword}
+                    onChange={(e) => setWardenConfirmPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={settingsLoading}
+                className="w-full sm:w-auto px-6 rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer"
+              >
+                {settingsLoading ? (
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                ) : (
+                  "Update Settings"
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </Layout>

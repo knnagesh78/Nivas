@@ -85,6 +85,7 @@ export default function Layout({ children, activeTab, setActiveTab }) {
         { id: "complaints", label: "Complaints Box", icon: AlertCircle },
         { id: "rooms", label: "Rooms & Beds", icon: DoorOpen },
         { id: "notices", label: "Notice Board", icon: Megaphone },
+        { id: "settings", label: "Settings", icon: Settings },
       ];
     } else if (role === "admin") {
       return [

@@ -31,11 +31,13 @@ import {
   Plus,
   Send,
   BookOpen,
-  Trash2
+  Trash2,
+  Lock,
+  Key
 } from "lucide-react";
 
 export default function StudentDashboard() {
-  const { currentUser, userData, completeStudentProfile } = useAuth();
+  const { currentUser, userData, completeStudentProfile, updatePassword } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";
@@ -95,6 +97,44 @@ export default function StudentDashboard() {
   const [editPhoto, setEditPhoto] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState("");
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPasswordError("");
+    setPasswordSuccess("");
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      await updatePassword(newPassword);
+      setPasswordSuccess("Password updated successfully!");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      console.error(err);
+      if (err.code === "auth/requires-recent-login") {
+        setPasswordError("For security reasons, please log out and log back in before changing your password.");
+      } else {
+        setPasswordError(err.message || "Failed to update password.");
+      }
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   const [loadingData, setLoadingData] = useState(true);
 
@@ -1074,6 +1114,81 @@ export default function StudentDashboard() {
               </button>
             </div>
           </form>
+
+          {/* Change Password Card */}
+          <div className="pt-6 border-t border-slate-200 space-y-4">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 flex items-center">
+                <Lock className="h-4 w-4 mr-2 text-indigo-600" />
+                Change Password
+              </h3>
+              <p className="text-xs text-slate-500">Update your account password securely.</p>
+            </div>
+
+            {passwordSuccess && (
+              <div className="rounded-xl bg-green-50 border border-green-200 p-3 text-xs text-green-600">
+                {passwordSuccess}
+              </div>
+            )}
+
+            {passwordError && (
+              <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-xs text-red-600">
+                {passwordError}
+              </div>
+            )}
+
+            <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+              <div>
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                  New Password
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Key className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Min 6 characters"
+                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
+                  Confirm New Password
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Key className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Repeat new password"
+                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={passwordLoading}
+                className="w-full sm:w-auto px-6 rounded-xl bg-indigo-600 py-2.5 text-center text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer"
+              >
+                {passwordLoading ? (
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                ) : (
+                  "Update Password"
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </Layout>
