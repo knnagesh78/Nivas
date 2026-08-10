@@ -122,7 +122,7 @@ export default function WardenDashboard() {
 
   // Notice form
   const [noticeTitle, setNoticeTitle] = useState("");
-  const [noticeMsg, setNoticeMsg] = useState("");
+  const [noticeMessage, setNoticeMessage] = useState("");
   const [noticeAudience, setNoticeAudience] = useState("all");
   const [noticeLoading, setNoticeLoading] = useState(false);
   const [noticeSuccess, setNoticeSuccess] = useState("");
