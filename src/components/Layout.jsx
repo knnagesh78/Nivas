@@ -24,7 +24,8 @@ import {
   ArrowLeft,
   ArrowUp,
   Sparkles,
-  Heart
+  Heart,
+  MapPin
 } from "lucide-react";
 import InstallWizardModal from "./InstallWizardModal";
 import NotificationCenter from "./NotificationCenter";
@@ -158,7 +159,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex-1 px-3 space-y-1 bg-white">
+          <nav className="flex-1 px-3 space-y-1.5 bg-white">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -166,40 +167,43 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`group flex items-center w-full px-3 py-2.5 text-sm font-semibold rounded-xl transition-all ${
+                  className={`group flex items-center w-full px-3.5 py-3 text-sm font-bold rounded-2xl transition-all duration-200 cursor-pointer ${
                     isActive
-                      ? "bg-slate-900 text-white shadow-sm"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      ? "bg-gradient-to-r from-indigo-600 via-indigo-700 to-slate-900 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]"
+                      : "text-slate-600 hover:bg-indigo-50/70 hover:text-indigo-600 hover:translate-x-1 hover:shadow-xs"
                   }`}
                 >
                   <Icon
-                    className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                      isActive ? "text-white" : "text-slate-400 group-hover:text-slate-600"
+                    className={`mr-3 h-5 w-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                      isActive ? "text-white animate-pulse" : "text-slate-400 group-hover:text-indigo-600"
                     }`}
                   />
-                  {item.label}
+                  <span>{item.label}</span>
+                  {isActive && (
+                    <span className="ml-auto h-2 w-2 rounded-full bg-white animate-ping"></span>
+                  )}
                 </button>
               );
             })}
           </nav>
         </div>
 
-        {/* Footer Sign-out */}
-        <div className="p-4 border-t border-slate-100 space-y-1.5">
+        {/* Footer Sign-out & Download */}
+        <div className="p-4 border-t border-slate-100 space-y-2">
           {canInstall && !isStandaloneMode && (
             <button
               onClick={() => setWizardOpen(true)}
-              className="flex items-center w-full px-3 py-2.5 text-sm font-semibold text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all border border-transparent hover:border-indigo-100 cursor-pointer"
+              className="flex items-center w-full px-3.5 py-2.5 text-xs font-bold text-indigo-600 bg-indigo-50/80 hover:bg-indigo-600 hover:text-white rounded-xl transition-all duration-200 border border-indigo-200/80 hover:border-indigo-600 cursor-pointer shadow-sm hover:shadow-md hover:shadow-indigo-500/20 hover:-translate-y-0.5 active:scale-95 group"
             >
-              <Download className="mr-3 h-5 w-5 text-indigo-500 animate-pulse" />
+              <Download className="mr-2.5 h-4 w-4 text-indigo-500 group-hover:text-white animate-bounce" />
               Download App
             </button>
           )}
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-3 py-2.5 text-sm font-semibold text-red-600 rounded-xl hover:bg-red-50 transition-all cursor-pointer"
+            className="flex items-center w-full px-3.5 py-2.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-600 rounded-xl transition-all duration-200 border border-rose-100 hover:border-rose-600 cursor-pointer shadow-2xs hover:shadow-md hover:shadow-rose-500/20 hover:-translate-y-0.5 active:scale-95 group"
           >
-            <LogOut className="mr-3 h-5 w-5 text-red-500" />
+            <LogOut className="mr-2.5 h-4 w-4 text-rose-500 group-hover:text-white transition-colors" />
             Sign Out
           </button>
         </div>
@@ -283,22 +287,22 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 w-full flex-grow">
             {/* Activity Navigation / Back Button Bar */}
             {activeTab && activeTab !== "dashboard" && (
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200/80 shadow-sm rounded-2xl p-3.5 sm:px-5">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-white via-indigo-50/40 to-purple-50/30 border border-indigo-100 shadow-md shadow-indigo-500/5 rounded-2xl p-3.5 sm:px-5 backdrop-blur-sm">
                 <div className="flex items-center space-x-3">
                   <button
                     onClick={() => {
                       if (setActiveTab) setActiveTab("dashboard");
                     }}
-                    className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-indigo-600 hover:text-white border border-slate-200 hover:border-indigo-600 transition-all cursor-pointer shadow-xs group"
+                    className="inline-flex items-center px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 hover:from-indigo-500 hover:to-purple-600 shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:scale-95 transition-all duration-200 cursor-pointer group"
                     title="Return to Dashboard Overview"
                   >
-                    <ArrowLeft className="mr-2 h-4 w-4 text-slate-500 group-hover:text-white transition-colors group-hover:-translate-x-1 transform" />
+                    <ArrowLeft className="mr-2 h-4 w-4 text-white group-hover:-translate-x-1.5 transition-transform duration-200" />
                     <span>Back to Dashboard</span>
                   </button>
-                  <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
+                  <div className="h-5 w-px bg-slate-200 hidden sm:block"></div>
                   <div className="hidden sm:flex items-center space-x-2 text-xs text-slate-500">
                     <span>Current Activity:</span>
-                    <span className="font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-lg capitalize">
+                    <span className="font-extrabold text-indigo-700 bg-indigo-100/80 border border-indigo-200 px-3 py-1 rounded-xl capitalize shadow-2xs">
                       {navItems.find((n) => n.id === activeTab)?.label || activeTab}
                     </span>
                   </div>
@@ -307,9 +311,10 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                   onClick={() => {
                     if (setActiveTab) setActiveTab("dashboard");
                   }}
-                  className="text-xs font-semibold text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer"
+                  className="inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200 px-3.5 py-1.5 rounded-xl transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95"
                 >
-                  Dashboard Overview →
+                  <span>Dashboard Overview</span>
+                  <span className="ml-1 font-extrabold">→</span>
                 </button>
               </div>
             )}
@@ -319,16 +324,16 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
           {/* Vibrant & Attractive Footer */}
           <footer className="mt-auto border-t border-slate-200 bg-slate-950 text-slate-300 relative overflow-hidden">
             {/* Top Gradient Glow Line */}
-            <div className="h-1 w-full bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 to-emerald-400"></div>
+            <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 to-emerald-400"></div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-slate-800/80">
                 {/* Brand Column */}
                 <div className="md:col-span-2 space-y-3">
                   <div className="flex items-center space-x-3">
-                    <img src="/logo.svg" className="h-8 w-8 rounded-xl shadow-md shadow-indigo-500/20" alt="Nivas Logo" />
-                    <span className="text-xl font-extrabold text-white tracking-tight">Nivas</span>
-                    <span className="px-2.5 py-0.5 text-[10px] font-extrabold text-indigo-400 bg-indigo-950/80 border border-indigo-800/60 rounded-full tracking-wider uppercase">
+                    <img src="/logo.svg" className="h-9 w-9 rounded-xl shadow-lg shadow-indigo-500/30" alt="Nivas Logo" />
+                    <span className="text-2xl font-extrabold text-white tracking-tight">Nivas</span>
+                    <span className="px-3 py-0.5 text-[10px] font-extrabold text-indigo-400 bg-indigo-950/80 border border-indigo-800/60 rounded-full tracking-wider uppercase shadow-xs">
                       v2.0 Stable
                     </span>
                   </div>
@@ -336,12 +341,12 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                     Next-Gen Hostel Operations Platform for students, wardens, and management. Streamlined leave approvals, attendance logging, lost & found, and maintenance dispatch.
                   </p>
                   <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
-                    <span className="flex items-center text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-800/50 px-2.5 py-1 rounded-lg">
+                    <span className="flex items-center text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-800/50 px-3 py-1 rounded-xl">
                       <span className="h-2 w-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
                       System Operational
                     </span>
-                    <span className="flex items-center text-slate-300 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg">
-                      <ShieldCheck className="h-3.5 w-3.5 mr-1 text-indigo-400" />
+                    <span className="flex items-center text-slate-300 bg-slate-900 border border-slate-800 px-3 py-1 rounded-xl">
+                      <ShieldCheck className="h-3.5 w-3.5 mr-1.5 text-indigo-400" />
                       Firebase Protected
                     </span>
                   </div>
@@ -349,7 +354,10 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
 
                 {/* Quick Links Column */}
                 <div>
-                  <h4 className="text-xs font-extrabold text-white uppercase tracking-wider mb-3.5">Quick Activities</h4>
+                  <h4 className="text-xs font-extrabold text-white uppercase tracking-wider mb-3.5 flex items-center">
+                    <Sparkles className="h-3.5 w-3.5 mr-1 text-indigo-400" />
+                    Quick Activities
+                  </h4>
                   <ul className="space-y-2 text-xs">
                     {navItems.slice(0, 5).map((item) => (
                       <li key={item.id}>
@@ -358,7 +366,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                             if (setActiveTab) setActiveTab(item.id);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                           }}
-                          className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center group"
+                          className="text-slate-400 hover:text-white hover:translate-x-1.5 transition-all duration-200 cursor-pointer flex items-center group font-medium"
                         >
                           <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                           {item.label}
@@ -370,17 +378,33 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
 
                 {/* Developer & Credits Column */}
                 <div className="space-y-3">
-                  <h4 className="text-xs font-extrabold text-white uppercase tracking-wider mb-3.5">Platform Info</h4>
-                  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-                    <p className="text-[11px] text-slate-400 font-medium">Lead Developer</p>
-                    <div className="flex items-center space-x-2.5">
-                      <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black text-xs shadow-md">
-                        KN
+                  <h4 className="text-xs font-extrabold text-indigo-400 uppercase tracking-wider mb-3.5 flex items-center">
+                    <Sparkles className="h-3.5 w-3.5 mr-1.5 text-indigo-400 animate-pulse" />
+                    Platform Developer
+                  </h4>
+                  <div className="bg-slate-900/90 border border-indigo-500/30 rounded-2xl p-4 space-y-3 relative overflow-hidden shadow-lg shadow-indigo-500/10 hover:border-indigo-500/60 transition-all duration-300 group">
+                    <div className="flex items-center space-x-3 relative z-10">
+                      <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-md shadow-indigo-500/30 group-hover:scale-105 transition-transform duration-300">
+                        <div className="h-full w-full bg-slate-950 rounded-[14px] flex items-center justify-center text-white font-black text-xs tracking-wider">
+                          KN
+                        </div>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-white leading-tight">K. N. Nagesh</p>
-                        <p className="text-[10px] text-indigo-400 font-medium">Diploma CME</p>
+                        <p className="text-sm font-black text-white tracking-wider group-hover:text-indigo-300 transition-colors">
+                          KNNAGESH
+                        </p>
+                        <p className="text-[11px] text-indigo-400 font-bold">
+                          Diploma CME Student
+                        </p>
                       </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+                      <span className="flex items-center text-amber-400 font-bold bg-amber-950/40 border border-amber-800/50 px-2.5 py-0.5 rounded-lg shadow-2xs">
+                        <MapPin className="h-3 w-3 mr-1 text-amber-400 animate-bounce" />
+                        Dharmavaram
+                      </span>
+                      <span className="text-slate-400 font-semibold text-[10px]">CME Engineering</span>
                     </div>
                   </div>
                 </div>
@@ -389,16 +413,15 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
               {/* Bottom Legal / Copyright Bar */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
                 <div className="flex items-center space-x-2">
-                  <span>© 2026 Nivas Platform. Crafted with</span>
+                  <span>© 2026 Nivas Platform. Developed by <strong className="text-white">KNNAGESH</strong> (Diploma CME, Dharmavaram) with</span>
                   <Heart className="h-3.5 w-3.5 text-rose-500 fill-rose-500 animate-pulse" />
-                  <span>for smart campus living.</span>
                 </div>
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="inline-flex items-center text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 px-3.5 py-1.5 rounded-xl border border-slate-800 transition-all cursor-pointer text-xs font-semibold"
+                    className="inline-flex items-center text-slate-300 hover:text-white bg-slate-900 hover:bg-indigo-600 px-4 py-2 rounded-xl border border-slate-800 hover:border-indigo-500 transition-all duration-200 cursor-pointer text-xs font-bold shadow-sm hover:shadow-md hover:shadow-indigo-500/25 hover:-translate-y-0.5 active:scale-95"
                   >
-                    <ArrowUp className="h-3.5 w-3.5 mr-1 text-indigo-400" />
+                    <ArrowUp className="h-3.5 w-3.5 mr-1.5 text-indigo-400 group-hover:text-white" />
                     Back to Top
                   </button>
                 </div>
