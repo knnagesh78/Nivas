@@ -5,14 +5,15 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth, firebaseConfig, clearFirebaseConfig } from "../firebase";
-import { Mail, Lock, User, GraduationCap, Shield, Wrench, Download, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, GraduationCap, Shield, Wrench, Download, ArrowLeft, Eye, EyeOff, Users } from "lucide-react";
 import InstallWizardModal from "../components/InstallWizardModal";
 
 export default function Login() {
-  const [role, setRole] = useState("student"); // "student" | "warden" | "admin"
+  const [role, setRole] = useState("student"); // "student" | "warden" | "admin" | "parent"
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [pin, setPin] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -49,7 +50,7 @@ export default function Login() {
   }, []);
 
   
-  const { login, signupStudent, logout } = useAuth();
+  const { login, signupStudent, logout, parentLogin } = useAuth();
   const navigate = useNavigate();
 
   const [seedLoading, setSeedLoading] = useState(false);
@@ -123,6 +124,16 @@ export default function Login() {
     setLoading(true);
 
     try {
+      if (role === "parent") {
+        if (!pin) {
+          setError("Please enter the 6-digit Student PIN.");
+          setLoading(false);
+          return;
+        }
+        await loginAsParent(email, pin);
+        return; // handleLoginParent handles redirection
+      }
+
       const cred = await login(email, password);
       const userDoc = await getDoc(doc(db, "users", cred.user.uid));
       
@@ -158,6 +169,22 @@ export default function Login() {
         setError("Invalid email or password.");
       } else {
         setError(err.message || "Failed to log in.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginAsParent = async (studentEmail, pin) => {
+    try {
+      await parentLogin(studentEmail, pin);
+      navigate("/parent");
+    } catch (err) {
+      console.error(err);
+      if (err.message.includes("Incorrect PIN") || err.message.includes("Student not found")) {
+        setError("Invalid Student Email or PIN.");
+      } else {
+        setError(err.message || "Failed to log in as parent.");
       }
     } finally {
       setLoading(false);
@@ -243,7 +270,7 @@ export default function Login() {
 
         {/* Role Selector Tabs (Only show if not signing up) */}
         {!isSignUp && (
-          <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-900 p-1 border border-slate-800">
+          <div className="grid grid-cols-4 gap-2 rounded-xl bg-slate-900 p-1 border border-slate-800">
             <button
               onClick={() => {
                 setRole("student");
@@ -286,6 +313,20 @@ export default function Login() {
               <Shield className="h-4 w-4 mb-1" />
               Admin
             </button>
+            <button
+              onClick={() => {
+                setRole("parent");
+                setError("");
+              }}
+              className={`flex flex-col items-center justify-center rounded-lg py-2.5 text-xs font-bold uppercase transition-all ${
+                role === "parent"
+                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Users className="h-4 w-4 mb-1" />
+              Parent
+            </button>
           </div>
         )}
 
@@ -307,17 +348,35 @@ export default function Login() {
                 type="email"
                 required
                 className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                placeholder="Email address"
+                placeholder={role === "parent" ? "Student's Email address" : "Email address"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                <Lock className="h-5 w-5 text-slate-500" />
+            {role === "parent" ? (
+              <div className="relative animate-fadeIn">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <Lock className="h-5 w-5 text-slate-500" />
+                </div>
+                <input
+                  id="pin"
+                  name="pin"
+                  type="password"
+                  required
+                  maxLength={6}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono tracking-widest"
+                  placeholder="6-Digit Parent PIN"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+                />
               </div>
-              <input
+            ) : (
+              <div className="relative animate-fadeIn">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <Lock className="h-5 w-5 text-slate-500" />
+                </div>
+                <input
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
@@ -336,6 +395,7 @@ export default function Login() {
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
+            )}
 
             {isSignUp && (
               <div className="relative animate-fadeIn">

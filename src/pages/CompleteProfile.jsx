@@ -15,6 +15,7 @@ export default function CompleteProfile() {
   const [parentContact, setParentContact] = useState("");
   const [fatherName, setFatherName] = useState("");
   const [motherName, setMotherName] = useState("");
+  const [pin, setPin] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,9 +31,15 @@ export default function CompleteProfile() {
       !phone.trim() ||
       !parentContact.trim() ||
       !fatherName.trim() ||
-      !motherName.trim()
+      !motherName.trim() ||
+      !pin.trim()
     ) {
       setError("Please fill out all required fields.");
+      return;
+    }
+
+    if (pin.trim().length !== 6 || !/^\d{6}$/.test(pin.trim())) {
+      setError("Parent Access PIN must be exactly 6 digits.");
       return;
     }
 
@@ -47,6 +54,7 @@ export default function CompleteProfile() {
         parentContact: parentContact.trim(),
         fatherName: fatherName.trim(),
         motherName: motherName.trim(),
+        pin: pin.trim(),
         photoUrl: photoUrl.trim() || null,
       });
       // Redirect to student page
@@ -262,6 +270,27 @@ export default function CompleteProfile() {
                   onChange={(e) => setMotherName(e.target.value)}
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">
+                Parent Access PIN (6 digits) <span className="text-rose-400">*</span>
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <ShieldAlert className="h-4 w-4 text-slate-500" />
+                </div>
+                <input
+                  type="password"
+                  required
+                  maxLength={6}
+                  placeholder="e.g. 123456"
+                  className="w-full rounded-2xl border border-slate-800 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-mono tracking-widest"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+                />
+              </div>
+              <p className="mt-1.5 text-[10px] text-slate-400">Parents will use this PIN + your email to log in.</p>
             </div>
 
             <div className="sm:col-span-2">

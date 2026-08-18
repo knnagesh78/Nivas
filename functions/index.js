@@ -4,9 +4,11 @@
 // phone rings even when the app is closed.
 
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
+const { getAuth } = require("firebase-admin/auth");
 
 // Initialize Firebase Admin SDK
 initializeApp();
@@ -88,7 +90,149 @@ exports.onCallCreated = onDocumentCreated("calls/{callId}", async (event) => {
         console.log(`Removed invalid FCM token for ${calleeUid}`);
       } catch (cleanupError) {
         console.error("Error removing invalid token:", cleanupError);
-      }
     }
+  }
+});
+
+// ─── Firebase Cloud Functions: Parent PIN Verification ────────────────────────
+/**
+ * Callable function: verifyParentPin
+ * 
+ * Verifies the provided student email and PIN. If correct, assigns a custom 
+ * claim to the caller's Firebase Auth token granting 'parent' access.
+ */
+exports.verifyParentPin = onCall(async (request) => {
+  const { studentEmail, pin } = request.data;
+  const callerUid = request.auth?.uid;
+
+  if (!callerUid) {
+    throw new HttpsError("unauthenticated", "User must be authenticated (anonymously) to verify PIN.");
+  }
+
+  if (!studentEmail || !pin) {
+    throw new HttpsError("invalid-argument", "Student email and PIN are required.");
+  }
+
+  try {
+    // 1. Find the student by email in the users collection first to get the UID,
+    //    or search directly in the students collection if email is stored there.
+    //    We'll search the users collection since emails are reliably there.
+    const usersQuery = await db.collection("users").where("email", "==", studentEmail).where("role", "==", "student").limit(1).get();
+    
+    if (usersQuery.empty) {
+      throw new HttpsError("not-found", "Student not found with this email.");
+    }
+    
+    const studentUid = usersQuery.docs[0].id;
+
+    // 2. Fetch the student's full profile to check the PIN
+    const studentDoc = await db.collection("students").doc(studentUid).get();
+    
+    if (!studentDoc.exists) {
+      throw new HttpsError("not-found", "Student profile not found.");
+    }
+
+    const studentData = studentDoc.data();
+    
+    if (!studentData.pin) {
+      throw new HttpsError("failed-precondition", "This student has not set up a Parent PIN yet.");
+    }
+
+    if (studentData.pin !== pin) {
+      throw new HttpsError("permission-denied", "Incorrect PIN.");
+    }
+
+    // 3. Set custom user claims for the parent
+    await getAuth().setCustomUserClaims(callerUid, {
+      role: "parent",
+      linkedStudentId: studentUid
+    });
+
+    // 4. Also store a record in the users collection so the frontend can easily read the role
+    await db.collection("users").doc(callerUid).set({
+      email: `parent_${studentUid}@nivas.local`, // Dummy email
+      role: "parent",
+      linkedStudentId: studentUid,
+      createdAt: new Date()
+    });
+
+    return { 
+      success: true, 
+      linkedStudentId: studentUid,
+      studentName: studentData.name || "Student"
+    };
+
+  } catch (error) {
+    console.error("Error verifying parent PIN:", error);
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+    throw new HttpsError("internal", "An error occurred while verifying the PIN.");
+  }
+});
+
+// ─── Firebase Cloud Functions: Emergency PIN Notification ───────────────────
+/**
+ * Callable function: sendEmergencyPinNotification
+ * 
+ * Sends a push notification to all students who have not yet set up their Parent Access PIN.
+ * Restricted to Admins.
+ */
+exports.sendEmergencyPinNotification = onCall(async (request) => {
+  const callerUid = request.auth?.uid;
+
+  if (!callerUid) {
+    throw new HttpsError("unauthenticated", "User must be authenticated.");
+  }
+
+  try {
+    // 1. Verify caller is an Admin
+    const userDoc = await db.collection("users").doc(callerUid).get();
+    if (!userDoc.exists || userDoc.data().role !== "admin") {
+      throw new HttpsError("permission-denied", "Only admins can send emergency notifications.");
+    }
+
+    // 2. Query students who do not have a pin
+    const studentsSnap = await db.collection("students").get();
+    
+    const tokens = [];
+    studentsSnap.forEach(doc => {
+      const data = doc.data();
+      if (!data.pin && data.fcmToken) {
+        tokens.push(data.fcmToken);
+      }
+    });
+
+    if (tokens.length === 0) {
+      return { success: true, count: 0, message: "No eligible students found to notify." };
+    }
+
+    // 3. Send multicast message
+    const message = {
+      tokens: tokens,
+      notification: {
+        title: "🚨 Action Required: Security Update",
+        body: "Please open the Nivas app to set your Parent Access PIN immediately."
+      },
+      data: {
+        type: "system_alert",
+      },
+      android: {
+        priority: "high"
+      }
+    };
+
+    const response = await messaging.sendEachForMulticast(message);
+    
+    return { 
+      success: true, 
+      count: response.successCount, 
+      failed: response.failureCount,
+      message: `Successfully notified ${response.successCount} students.` 
+    };
+
+  } catch (error) {
+    console.error("Error sending emergency notifications:", error);
+    throw new HttpsError("internal", "Failed to send emergency notifications.");
   }
 });

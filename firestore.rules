@@ -23,6 +23,11 @@ service cloud.firestore {
     function isStudent() {
       return isSignedIn() && getUserRole() == 'student';
     }
+
+    function isParentOf(studentUid) {
+      // Parent auth has custom claims set by verifyParentPin cloud function
+      return isSignedIn() && request.auth.token.role == 'parent' && request.auth.token.linkedStudentId == studentUid;
+    }
     
     function isOwner(uid) {
       return isSignedIn() && request.auth.uid == uid;
@@ -42,7 +47,7 @@ service cloud.firestore {
     // students collection
     match /students/{uid} {
       allow read, write: if isAdmin() || isWarden();
-      allow read: if isSignedIn() && (isOwner(uid) || isWarden());
+      allow read: if isSignedIn() && (isOwner(uid) || isWarden() || isParentOf(uid));
       allow create, update: if isSignedIn() && isOwner(uid);
     }
 
@@ -59,7 +64,7 @@ service cloud.firestore {
       allow write: if isAdmin() || isWarden();
       
       match /records/{studentUid} {
-        allow read: if isSignedIn() && (isOwner(studentUid) || isWarden() || isAdmin());
+        allow read: if isSignedIn() && (isOwner(studentUid) || isWarden() || isAdmin() || isParentOf(studentUid));
         allow write: if isAdmin() || isWarden();
       }
     }
@@ -69,6 +74,7 @@ service cloud.firestore {
     match /leaveRequests/{requestId} {
       allow read: if isAdmin() || isWarden();
       allow read: if isStudent() && resource.data.studentUid == request.auth.uid;
+      allow read: if isParentOf(resource.data.studentUid);
       // Allow students to create a request with their own studentUid
       allow create: if isStudent() && request.resource.data.studentUid == request.auth.uid;
       // Allow wardens/admins to update (approve/reject/remark)
@@ -84,6 +90,7 @@ service cloud.firestore {
     match /complaints/{complaintId} {
       allow read: if isAdmin() || isWarden();
       allow read: if isStudent() && resource.data.studentUid == request.auth.uid;
+      allow read: if isParentOf(resource.data.studentUid);
       // Allow students to create a complaint
       allow create: if isStudent() && request.resource.data.studentUid == request.auth.uid;
       // Allow wardens/admins to update

@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getMessaging, isSupported as isMessagingSupported } from "firebase/messaging";
+import { getFunctions } from "firebase/functions";
 
 const getEnvVal = (envValue, defaultValue) => {
   return envValue && envValue !== "your_api_key_here" && envValue.trim() !== ""
@@ -32,6 +33,7 @@ let app = null;
 let auth = null;
 let db = null;
 let messaging = null;
+let functions = null;
 let isFirebaseConfigured = false;
 
 if (isValidConfig(firebaseConfig)) {
@@ -39,6 +41,7 @@ if (isValidConfig(firebaseConfig)) {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
     db = getFirestore(app);
+    functions = getFunctions(app);
     isFirebaseConfigured = true;
     // Initialize FCM (async check — not all browsers support it)
     isMessagingSupported().then((supported) => {
@@ -59,6 +62,7 @@ if (isValidConfig(firebaseConfig)) {
         app = getApps().length === 0 ? initializeApp(parsedConfig) : getApp();
         auth = getAuth(app);
         db = getFirestore(app);
+        functions = getFunctions(app);
         isFirebaseConfigured = true;
         firebaseConfig = parsedConfig;
         // Initialize FCM (async check)
@@ -74,7 +78,7 @@ if (isValidConfig(firebaseConfig)) {
   }
 }
 
-export { app, auth, db, messaging, isFirebaseConfigured, firebaseConfig };
+export { app, auth, db, messaging, functions, isFirebaseConfigured, firebaseConfig };
 
 export const saveFirebaseConfig = (config) => {
   if (isValidConfig(config)) {

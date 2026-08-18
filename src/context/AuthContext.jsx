@@ -5,11 +5,13 @@ import {
   signOut, 
   onAuthStateChanged,
   updatePassword as fbUpdatePassword,
-  updateEmail as fbUpdateEmail
+  updateEmail as fbUpdateEmail,
+  signInAnonymously
 } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { getToken } from "firebase/messaging";
-import { auth, db, messaging, isFirebaseConfigured } from "../firebase";
+import { httpsCallable } from "firebase/functions";
+import { auth, db, messaging, functions, isFirebaseConfigured } from "../firebase";
 
 const AuthContext = createContext();
 
@@ -57,6 +59,42 @@ export function AuthProvider({ children }) {
       setUserData(userDoc.data());
     }
     return userCredential;
+  }
+
+  // Parent Login via PIN
+  async function parentLogin(studentEmail, pin) {
+    if (!isFirebaseConfigured) throw new Error("Firebase is not configured.");
+    
+    // 1. Sign in anonymously
+    const userCredential = await signInAnonymously(auth);
+    const user = userCredential.user;
+
+    // 2. Call Cloud Function to verify PIN and set claims
+    try {
+      const verifyParentPin = httpsCallable(functions, 'verifyParentPin');
+      const result = await verifyParentPin({ studentEmail, pin });
+      
+      // 3. Force token refresh to pick up the new 'parent' custom claim
+      await user.getIdToken(true);
+
+      // 4. Fetch the newly created parent user document
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        setUserData(userDoc.data());
+      } else {
+        // Fallback if doc creation lagged slightly
+        setUserData({
+          role: "parent",
+          linkedStudentId: result.data.linkedStudentId
+        });
+      }
+
+      return result.data;
+    } catch (error) {
+      // If PIN verification fails, clean up the anonymous account
+      await user.delete().catch(() => {});
+      throw error;
+    }
   }
 
   // Logout
@@ -177,6 +215,7 @@ export function AuthProvider({ children }) {
     userData,
     signupStudent,
     login,
+    parentLogin,
     logout,
     completeStudentProfile,
     updatePassword,

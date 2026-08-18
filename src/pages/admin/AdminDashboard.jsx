@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { db, firebaseConfig } from "../../firebase";
+import { db, firebaseConfig, functions } from "../../firebase";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
 import {
   collection,
   query,
@@ -405,6 +406,28 @@ export default function AdminDashboard() {
       console.error("Error posting notice:", err);
     } finally {
       setNoticeLoading(false);
+    }
+  };
+
+  const [emergencyLoading, setEmergencyLoading] = useState(false);
+  
+  const handleEmergencyPush = async () => {
+    if (!window.confirm("Send an emergency push notification to all students asking them to set their Parent Access PIN? This will ring their phones.")) {
+      return;
+    }
+    
+    setEmergencyLoading(true);
+    setNoticeSuccess("");
+
+    try {
+      const sendEmergencyPinNotification = httpsCallable(functions, "sendEmergencyPinNotification");
+      const result = await sendEmergencyPinNotification();
+      setNoticeSuccess(result.data.message || `Emergency notifications sent.`);
+    } catch (err) {
+      console.error("Emergency push error:", err);
+      alert(err.message || "Failed to send emergency notifications.");
+    } finally {
+      setEmergencyLoading(false);
     }
   };
 
@@ -1019,6 +1042,23 @@ export default function AdminDashboard() {
             <div>
               <h2 className="text-lg font-bold text-slate-900">Post Announcement</h2>
               <p className="text-xs text-slate-500">Post notification banners to student feeds.</p>
+            </div>
+
+            <div className="pt-2 pb-4 border-b border-slate-100">
+              <button
+                type="button"
+                onClick={handleEmergencyPush}
+                disabled={emergencyLoading}
+                className="w-full flex items-center justify-center space-x-2 py-2.5 px-4 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 hover:border-rose-300 rounded-xl font-bold text-xs transition-all disabled:opacity-50 cursor-pointer"
+              >
+                <ShieldAlert className="h-4 w-4" />
+                <span>
+                  {emergencyLoading ? "Sending..." : "Emergency Action: Require Parent PIN"}
+                </span>
+              </button>
+              <p className="text-[10px] text-slate-400 mt-1.5 text-center">
+                Sends a push notification to all students who have not set up a PIN.
+              </p>
             </div>
 
             {noticeSuccess && (
