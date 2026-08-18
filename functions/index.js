@@ -226,15 +226,84 @@ exports.sendEmergencyPinNotification = onCall(async (request) => {
 
     const response = await messaging.sendEachForMulticast(message);
     
-    return { 
-      success: true, 
-      count: response.successCount, 
-      failed: response.failureCount,
-      message: `Successfully notified ${response.successCount} students.` 
+    return { success: true, count: response.successCount, message: `Successfully notified ${response.successCount} students.` };
+  } catch (error) {
+    console.error("Error sending emergency ID notification:", error);
+    throw new HttpsError("internal", "Failed to send emergency notification.");
+  }
+});
+
+// ─── Firebase Cloud Functions: Incoming Call Push Notification ──────────────
+/**
+ * Background trigger: onCallCreated
+ * 
+ * Fires when a new document is created in the "calls" collection.
+ * Looks up the callee's FCM token and sends an "Incoming Call" push notification.
+ */
+exports.onCallCreated = onDocumentCreated("calls/{callId}", async (event) => {
+  const callDoc = event.data;
+  if (!callDoc) return;
+
+  const callData = callDoc.data();
+  const calleeUid = callData.calleeUid;
+  const callerName = callData.callerName || "Someone";
+
+  if (!calleeUid) return;
+
+  try {
+    // 1. Fetch callee's fcm token from users or students collection
+    let fcmToken = null;
+
+    // Check users collection first
+    const userDoc = await db.collection("users").doc(calleeUid).get();
+    if (userDoc.exists && userDoc.data().fcmToken) {
+      fcmToken = userDoc.data().fcmToken;
+    } else {
+      // Fallback to students collection
+      const studentDoc = await db.collection("students").doc(calleeUid).get();
+      if (studentDoc.exists && studentDoc.data().fcmToken) {
+        fcmToken = studentDoc.data().fcmToken;
+      }
+    }
+
+    if (!fcmToken) {
+      console.log(`No FCM token found for callee ${calleeUid}. Skipping push notification.`);
+      return;
+    }
+
+    // 2. Send push notification
+    const message = {
+      token: fcmToken,
+      notification: {
+        title: "Incoming Call",
+        body: `${callerName} is calling you. Tap to answer!`
+      },
+      data: {
+        type: "incoming_call",
+        callId: event.params.callId,
+        callerUid: callData.callerUid,
+        callerName: callerName
+      },
+      android: {
+        priority: "high",
+        notification: {
+          channelId: "calls",
+          sound: "default"
+        }
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: "default"
+          }
+        }
+      }
     };
 
+    await getMessaging().send(message);
+    console.log(`Successfully sent incoming call push notification to ${calleeUid}`);
+
   } catch (error) {
-    console.error("Error sending emergency notifications:", error);
-    throw new HttpsError("internal", "Failed to send emergency notifications.");
+    console.error("Error sending incoming call push notification:", error);
   }
 });

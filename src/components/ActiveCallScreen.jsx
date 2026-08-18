@@ -32,6 +32,13 @@ export default function ActiveCallScreen() {
 
   const [isMinimized, setIsMinimized] = useState(false);
 
+  // Automatically minimize when the call connects so they can see the home page
+  React.useEffect(() => {
+    if (callState === "active") {
+      setIsMinimized(true);
+    }
+  }, [callState]);
+
   // The person we are talking to
   const peerName = useMemo(() => {
     // If we initiated, the peer is calleeInfo; if we received, the peer is callerInfo
