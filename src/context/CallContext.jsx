@@ -152,6 +152,10 @@ export function CallProvider({ children }) {
         pc,
         () => {
           // Call answered!
+          if (missedTimerRef.current) {
+            clearTimeout(missedTimerRef.current);
+            missedTimerRef.current = null;
+          }
           setCallState("active");
           startCallTimer();
         },
@@ -179,6 +183,10 @@ export function CallProvider({ children }) {
   // ── Answer Incoming Call (Callee Side) ─────────────────────────────────────
   const handleAnswerCall = useCallback(async (callId) => {
     try {
+      if (missedTimerRef.current) {
+        clearTimeout(missedTimerRef.current);
+        missedTimerRef.current = null;
+      }
       setCallState("active");
 
       const { pc, localStream, remoteStream, unsubCandidates } = await answerCallService(callId);

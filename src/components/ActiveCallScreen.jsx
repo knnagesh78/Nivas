@@ -2,8 +2,8 @@
 // Full-screen overlay during an active WebRTC voice call.
 // Shows call duration, mute/speaker/end controls, and connection quality.
 
-import React, { useMemo } from "react";
-import { Phone, PhoneOff, Mic, MicOff, Volume2, Volume1, User, Wifi } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { Phone, PhoneOff, Mic, MicOff, Volume2, Volume1, User, Wifi, Minimize2, Maximize2 } from "lucide-react";
 import { useCall } from "../context/CallContext";
 
 function formatDuration(seconds) {
@@ -29,6 +29,8 @@ export default function ActiveCallScreen() {
     toggleMute,
     toggleSpeaker,
   } = useCall();
+
+  const [isMinimized, setIsMinimized] = useState(false);
 
   // The person we are talking to
   const peerName = useMemo(() => {
@@ -68,6 +70,53 @@ export default function ActiveCallScreen() {
     );
   }
 
+  // Minimized floating widget
+  if (isMinimized) {
+    return (
+      <div className="fixed bottom-20 right-6 z-[9998] animate-fadeIn">
+        <div className="flex items-center space-x-3 p-3 rounded-full bg-slate-900 border border-slate-700 shadow-2xl">
+          {/* Avatar / Status Indicator */}
+          <div className="relative shrink-0">
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
+              <span className="text-lg font-black text-white">{peerInitial}</span>
+            </div>
+            <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-green-400 ring-2 ring-slate-900 animate-pulse" />
+          </div>
+          
+          {/* Info & Duration */}
+          <div className="flex-1 min-w-0 pr-2 cursor-pointer" onClick={() => setIsMinimized(false)}>
+            <p className="text-xs font-bold text-white truncate w-24">{peerName}</p>
+            <p className="text-[10px] text-green-400 font-mono mt-0.5">
+              {callState === "outgoing" ? "Calling..." : formatDuration(callDuration)}
+            </p>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center space-x-1 shrink-0 border-l border-slate-700 pl-2">
+            <button
+              onClick={toggleMute}
+              className={`p-2 rounded-full transition-all ${isMuted ? "bg-white text-slate-900" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+            >
+              {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={endCall}
+              className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all shadow-md shadow-red-500/20"
+            >
+              <PhoneOff className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setIsMinimized(false)}
+              className="p-2 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all ml-1"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-[9998] flex flex-col bg-gradient-to-br from-slate-950 via-indigo-950/80 to-slate-950">
       {/* Ambient background glow */}
@@ -78,13 +127,21 @@ export default function ActiveCallScreen() {
 
       {/* Top bar */}
       <div className="relative z-10 flex items-center justify-between px-6 py-4 pt-12">
-        <div className="flex items-center space-x-2">
-          <Wifi className="h-4 w-4 text-green-400" />
-          <span className="text-xs font-bold text-green-400">
-            {callState === "outgoing" ? "Connecting..." : "Connected"}
-          </span>
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={() => setIsMinimized(true)}
+            className="p-2 -ml-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all backdrop-blur-sm cursor-pointer"
+          >
+            <Minimize2 className="h-5 w-5" />
+          </button>
+          <div className="flex items-center space-x-2 bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm">
+            <Wifi className="h-4 w-4 text-green-400" />
+            <span className="text-xs font-bold text-green-400">
+              {callState === "outgoing" ? "Connecting..." : "Connected"}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm">
           <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
           <span className="text-xs text-slate-400 font-mono">
             {callState === "outgoing" ? "Ringing..." : "Voice Call"}
