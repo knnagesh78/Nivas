@@ -6,7 +6,7 @@ import {
   onAuthStateChanged,
   updatePassword as fbUpdatePassword,
   updateEmail as fbUpdateEmail,
-  signInAnonymously
+  signInWithCustomToken
 } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { getToken } from "firebase/messaging";
@@ -61,40 +61,28 @@ export function AuthProvider({ children }) {
     return userCredential;
   }
 
-  // Parent Login via ID Number
+  // Parent Login via ID Number using Custom Tokens
   async function parentLogin(idNumber) {
     if (!isFirebaseConfigured) throw new Error("Firebase is not configured.");
     
-    // 1. Sign in anonymously
-    const userCredential = await signInAnonymously(auth);
-    const user = userCredential.user;
-
-    // 2. Call Cloud Function to verify ID Number and set claims
-    try {
-      const verifyParentPin = httpsCallable(functions, 'verifyParentPin');
-      const result = await verifyParentPin({ idNumber });
-      
-      // 3. Force token refresh to pick up the new 'parent' custom claim
-      await user.getIdToken(true);
-
-      // 4. Fetch the newly created parent user document
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        setUserData(userDoc.data());
-      } else {
-        // Fallback if doc creation lagged slightly
-        setUserData({
-          role: "parent",
-          linkedStudentId: result.data.linkedStudentId
-        });
-      }
-
-      return result.data;
-    } catch (error) {
-      // If ID Number verification fails, clean up the anonymous account
-      await user.delete().catch(() => {});
-      throw error;
+    // 1. Call Cloud Function to verify ID Number and get Custom Token
+    const verifyParentPin = httpsCallable(functions, 'verifyParentPin');
+    const result = await verifyParentPin({ idNumber });
+    
+    if (!result.data || !result.data.customToken) {
+      throw new Error("Failed to authenticate parent. Invalid server response.");
     }
+
+    // 2. Sign in with the Custom Token
+    await signInWithCustomToken(auth, result.data.customToken);
+
+    // 3. Force fetch of user document (optional since onAuthStateChanged should catch it, but good for immediate use)
+    const userDoc = await getDoc(doc(db, "users", `parent_${result.data.linkedStudentId}`));
+    if (userDoc.exists()) {
+      setUserData(userDoc.data());
+    }
+
+    return result.data;
   }
 
   // Logout

@@ -103,11 +103,6 @@ exports.onCallCreated = onDocumentCreated("calls/{callId}", async (event) => {
  */
 exports.verifyParentPin = onCall(async (request) => {
   const { idNumber } = request.data;
-  const callerUid = request.auth?.uid;
-
-  if (!callerUid) {
-    throw new HttpsError("unauthenticated", "User must be authenticated (anonymously) to verify ID Number.");
-  }
 
   if (!idNumber) {
     throw new HttpsError("invalid-argument", "Student Identification Number is required.");
@@ -125,15 +120,18 @@ exports.verifyParentPin = onCall(async (request) => {
     const studentUid = studentDoc.id;
     const studentData = studentDoc.data();
 
-    // 3. Set custom user claims for the parent
-    await getAuth().setCustomUserClaims(callerUid, {
+    // 2. Generate a stable UID for the parent of this student
+    const parentUid = `parent_${studentUid}`;
+
+    // 3. Create a Custom Token for the parent with custom claims
+    const customToken = await getAuth().createCustomToken(parentUid, {
       role: "parent",
       linkedStudentId: studentUid
     });
 
     // 4. Also store a record in the users collection so the frontend can easily read the role
-    await db.collection("users").doc(callerUid).set({
-      email: `parent_${studentUid}@nivas.local`, // Dummy email
+    await db.collection("users").doc(parentUid).set({
+      email: `${parentUid}@nivas.local`, // Dummy email
       role: "parent",
       linkedStudentId: studentUid,
       createdAt: new Date()
@@ -141,6 +139,7 @@ exports.verifyParentPin = onCall(async (request) => {
 
     return { 
       success: true, 
+      customToken: customToken,
       linkedStudentId: studentUid,
       studentName: studentData.name || "Student"
     };
