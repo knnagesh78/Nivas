@@ -27,7 +27,8 @@ import {
   Heart,
   MapPin,
   Sun,
-  Moon
+  Moon,
+  PhoneCall
 } from "lucide-react";
 import InstallWizardModal from "./InstallWizardModal";
 import NotificationCenter from "./NotificationCenter";
@@ -94,6 +95,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
       return [
         { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
         { id: "lostFound", label: "Lost & Found", icon: Package },
+        { id: "calls", label: "Call Roommates", icon: PhoneCall },
         { id: "attendance", label: "My Attendance", icon: Calendar },
         { id: "leave", label: "Leave Requests", icon: FileText },
         { id: "complaints", label: "Complaints", icon: AlertCircle },

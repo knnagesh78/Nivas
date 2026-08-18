@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getMessaging, isSupported as isMessagingSupported } from "firebase/messaging";
 
 const getEnvVal = (envValue, defaultValue) => {
   return envValue && envValue !== "your_api_key_here" && envValue.trim() !== ""
@@ -30,6 +31,7 @@ const isValidConfig = (config) => {
 let app = null;
 let auth = null;
 let db = null;
+let messaging = null;
 let isFirebaseConfigured = false;
 
 if (isValidConfig(firebaseConfig)) {
@@ -38,6 +40,12 @@ if (isValidConfig(firebaseConfig)) {
     auth = getAuth(app);
     db = getFirestore(app);
     isFirebaseConfigured = true;
+    // Initialize FCM (async check — not all browsers support it)
+    isMessagingSupported().then((supported) => {
+      if (supported) {
+        messaging = getMessaging(app);
+      }
+    }).catch(() => {});
   } catch (error) {
     console.error("Firebase initialization failed with env config:", error);
   }
@@ -53,6 +61,12 @@ if (isValidConfig(firebaseConfig)) {
         db = getFirestore(app);
         isFirebaseConfigured = true;
         firebaseConfig = parsedConfig;
+        // Initialize FCM (async check)
+        isMessagingSupported().then((supported) => {
+          if (supported) {
+            messaging = getMessaging(app);
+          }
+        }).catch(() => {});
       }
     }
   } catch (error) {
@@ -60,7 +74,7 @@ if (isValidConfig(firebaseConfig)) {
   }
 }
 
-export { app, auth, db, isFirebaseConfigured, firebaseConfig };
+export { app, auth, db, messaging, isFirebaseConfigured, firebaseConfig };
 
 export const saveFirebaseConfig = (config) => {
   if (isValidConfig(config)) {

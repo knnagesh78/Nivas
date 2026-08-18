@@ -123,5 +123,34 @@ service cloud.firestore {
       allow update: if isSignedIn() && resource.data.recipientUid == request.auth.uid;
       allow delete: if isSignedIn() && resource.data.recipientUid == request.auth.uid;
     }
+
+    // calls collection (WebRTC signaling)
+    match /calls/{callId} {
+      // Both caller and callee can read the call document
+      allow read: if isSignedIn() && (
+        resource.data.callerUid == request.auth.uid ||
+        resource.data.calleeUid == request.auth.uid
+      );
+      // Any authenticated user can create a call (they become the caller)
+      allow create: if isSignedIn() && request.resource.data.callerUid == request.auth.uid;
+      // Both participants can update (answer, end, decline)
+      allow update: if isSignedIn() && (
+        resource.data.callerUid == request.auth.uid ||
+        resource.data.calleeUid == request.auth.uid
+      );
+      // Either participant can delete
+      allow delete: if isSignedIn() && (
+        resource.data.callerUid == request.auth.uid ||
+        resource.data.calleeUid == request.auth.uid
+      );
+
+      // ICE candidates subcollection
+      match /iceCandidates/{candidateId} {
+        allow read, write: if isSignedIn() && (
+          get(/databases/$(database)/documents/calls/$(callId)).data.callerUid == request.auth.uid ||
+          get(/databases/$(database)/documents/calls/$(callId)).data.calleeUid == request.auth.uid
+        );
+      }
+    }
   }
 }

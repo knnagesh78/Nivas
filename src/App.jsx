@@ -1,9 +1,12 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { CallProvider } from "./context/CallContext";
 import { isFirebaseConfigured } from "./firebase";
 import ConfigModal from "./components/ConfigModal";
 import ProtectedRoute from "./components/ProtectedRoute";
+import IncomingCallModal from "./components/IncomingCallModal";
+import ActiveCallScreen from "./components/ActiveCallScreen";
 import Login from "./pages/Login";
 import CompleteProfile from "./pages/CompleteProfile";
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -48,54 +51,59 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
+      <CallProvider>
+        <BrowserRouter>
+          {/* Global call overlays — rendered above all routes */}
+          <IncomingCallModal />
+          <ActiveCallScreen />
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Protected Onboarding */}
-          <Route
-            path="/complete-profile"
-            element={
-              <ProtectedRoute allowedRoles={["student"]}>
-                <CompleteProfile />
-              </ProtectedRoute>
-            }
-          />
+            {/* Protected Onboarding */}
+            <Route
+              path="/complete-profile"
+              element={
+                <ProtectedRoute allowedRoles={["student"]}>
+                  <CompleteProfile />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Role-based Dashboards */}
-          <Route
-            path="/student"
-            element={
-              <ProtectedRoute allowedRoles={["student"]}>
-                <StudentDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Role-based Dashboards */}
+            <Route
+              path="/student"
+              element={
+                <ProtectedRoute allowedRoles={["student"]}>
+                  <StudentDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/warden"
-            element={
-              <ProtectedRoute allowedRoles={["warden"]}>
-                <WardenDashboard />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/warden"
+              element={
+                <ProtectedRoute allowedRoles={["warden"]}>
+                  <WardenDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Fallback & Redirects */}
-          <Route path="/" element={<RootRedirect />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+            {/* Fallback & Redirects */}
+            <Route path="/" element={<RootRedirect />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </CallProvider>
     </AuthProvider>
   );
 }

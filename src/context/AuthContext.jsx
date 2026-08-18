@@ -8,7 +8,8 @@ import {
   updateEmail as fbUpdateEmail
 } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db, isFirebaseConfigured } from "../firebase";
+import { getToken } from "firebase/messaging";
+import { auth, db, messaging, isFirebaseConfigured } from "../firebase";
 
 const AuthContext = createContext();
 
@@ -114,6 +115,32 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // ── Request FCM token and save to student document ──────────────────────
+  async function requestAndSaveFCMToken(uid) {
+    try {
+      if (!messaging) return; // FCM not supported in this browser
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") return;
+
+      const token = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY || "",
+        serviceWorkerRegistration: await navigator.serviceWorker.register("/firebase-messaging-sw.js"),
+      });
+
+      if (token) {
+        // Save token to student document
+        await updateDoc(doc(db, "students", uid), {
+          fcmToken: token,
+        }).catch(() => {
+          // Student doc might not exist yet (profile not completed)
+          // That's ok, token will be saved when profile is completed
+        });
+      }
+    } catch (err) {
+      console.warn("FCM token registration skipped:", err.message);
+    }
+  }
+
   useEffect(() => {
     if (!isFirebaseConfigured) {
       setLoading(false);
@@ -127,6 +154,8 @@ export function AuthProvider({ children }) {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           if (userDoc.exists()) {
             setUserData(userDoc.data());
+            // Request FCM token for push notifications (non-blocking)
+            requestAndSaveFCMToken(user.uid);
           } else {
             setUserData(null);
           }

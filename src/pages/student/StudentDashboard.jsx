@@ -19,6 +19,7 @@ import {
 import Layout from "../../components/Layout";
 import CameraCapture from "../../components/CameraCapture";
 import LostFoundFeed from "../../components/LostFoundFeed";
+import CallButton from "../../components/CallButton";
 import {
   Home,
   User,
@@ -49,7 +50,8 @@ import {
   BadgeCheck,
   Camera,
   Bell,
-  Package
+  Package,
+  PhoneCall
 } from "lucide-react";
 
 export default function StudentDashboard() {
@@ -181,6 +183,11 @@ export default function StudentDashboard() {
         if (studentDoc.exists()) {
           const details = studentDoc.data();
           setStudentDetails(details);
+          
+          // Cache student name for call feature
+          if (details.name) {
+            localStorage.setItem("student_name", details.name);
+          }
           
           // Seed edit form states
           setEditName(details.name || "");
@@ -526,6 +533,125 @@ export default function StudentDashboard() {
         />
       )}
 
+      {/* Call Roommates Tab */}
+      {activeTab === "calls" && (
+        <div className="space-y-6 animate-fadeIn">
+          {/* Header */}
+          <div className="relative rounded-3xl bg-gradient-to-br from-slate-950 via-green-950 to-slate-900 p-6 sm:p-8 text-white overflow-hidden shadow-2xl border border-green-500/20">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+
+            <div className="relative z-10">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="p-3 rounded-2xl bg-green-500/20 border border-green-400/20 backdrop-blur-sm">
+                  <PhoneCall className="h-6 w-6 text-green-400" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black tracking-tight">Call Roommates</h2>
+                  <p className="text-xs text-green-300/70 mt-0.5">Free voice calls over data — no SIM needed</p>
+                </div>
+              </div>
+              <p className="text-sm text-slate-300/80 max-w-lg leading-relaxed mt-4">
+                Call your hostel roommates directly from the app using your internet connection.
+                Works on WiFi and mobile data — completely free, no phone number required.
+              </p>
+            </div>
+          </div>
+
+          {/* Roommates List with Call Buttons */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2.5 rounded-xl bg-green-50 dark:bg-green-950/60 border border-green-100 dark:border-green-800/50 text-green-600 dark:text-green-400">
+                  <User className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Your Roommates</h3>
+                  <p className="text-xs text-slate-400">Room {studentDetails?.roomNumber || "N/A"} • {roommates.length} roommate{roommates.length !== 1 ? "s" : ""}</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase bg-green-50 dark:bg-green-950/60 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800/50">
+                Data Call
+              </span>
+            </div>
+
+            {roommates.length === 0 ? (
+              <div className="text-center py-16 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl">
+                <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                  <User className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+                </div>
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400">No roommates found</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-xs mx-auto">
+                  Other students assigned to Room {studentDetails?.roomNumber || "your room"} will appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {roommates.map((rm) => (
+                  <div
+                    key={rm.id}
+                    className="group relative flex items-center space-x-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 hover:border-green-300 dark:hover:border-green-700 transition-all hover:shadow-md"
+                  >
+                    {/* Avatar */}
+                    <div className="relative shrink-0">
+                      <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-indigo-500/20">
+                        {rm.name ? rm.name[0].toUpperCase() : "S"}
+                      </div>
+                      {/* Online indicator */}
+                      <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-green-400 ring-2 ring-white dark:ring-slate-900 flex items-center justify-center">
+                        <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{rm.name || "Student"}</p>
+                      <p className="text-xs text-slate-400 truncate">{rm.course || "Student"} • {rm.year || ""}</p>
+                      <p className="text-[10px] text-slate-400 mt-1 flex items-center space-x-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-400 inline-block" />
+                        <span>Available for voice call</span>
+                      </p>
+                    </div>
+
+                    {/* Call button */}
+                    <CallButton calleeUid={rm.id} calleeName={rm.name || "Roommate"} size="lg" />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* How it works section */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">How Voice Calling Works</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 text-center">
+                <div className="h-10 w-10 mx-auto mb-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-500 flex items-center justify-center">
+                  <PhoneCall className="h-5 w-5" />
+                </div>
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-200">1. Tap Call</p>
+                <p className="text-[10px] text-slate-400 mt-1">Press the call button next to your roommate's name</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 text-center">
+                <div className="h-10 w-10 mx-auto mb-3 rounded-xl bg-green-50 dark:bg-green-950/60 text-green-500 flex items-center justify-center">
+                  <Bell className="h-5 w-5" />
+                </div>
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-200">2. They Get Notified</p>
+                <p className="text-[10px] text-slate-400 mt-1">Your roommate's phone rings — even if the app is closed</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 text-center">
+                <div className="h-10 w-10 mx-auto mb-3 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-500 flex items-center justify-center">
+                  <Activity className="h-5 w-5" />
+                </div>
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-200">3. Talk Free</p>
+                <p className="text-[10px] text-slate-400 mt-1">Voice call connects over WiFi/data — no charges!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 1. Dashboard / Overview */}
       {activeTab === "dashboard" && (
         <div className="space-y-8 animate-fadeIn">
@@ -656,11 +782,7 @@ export default function StudentDashboard() {
                           <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{rm.name}</p>
                           <p className="text-[10px] text-slate-400 truncate">{rm.course || "Student"}</p>
                         </div>
-                        {rm.phone && (
-                          <a href={`tel:${rm.phone}`} className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-all text-xs" title="Call Roommate">
-                            <Phone className="h-3.5 w-3.5" />
-                          </a>
-                        )}
+                        <CallButton calleeUid={rm.id} calleeName={rm.name || "Roommate"} size="sm" />
                       </div>
                     ))}
                   </div>
