@@ -169,7 +169,7 @@ exports.verifyParentPin = onCall(async (request) => {
     if (error instanceof HttpsError) {
       throw error;
     }
-    throw new HttpsError("internal", `An error occurred while verifying the Identification Number: ${error.message}`);
+    throw new HttpsError("unknown", `DEBUG: ${error.message}`);
   }
 });
 
