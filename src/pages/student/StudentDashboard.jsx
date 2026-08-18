@@ -537,7 +537,7 @@ export default function StudentDashboard() {
   };
 
   // Force PIN setup for existing students
-  if (studentDetails && !studentDetails.pin) {
+  if (studentDetails && !studentDetails.idNumber) {
     return <PinSetupModal studentUid={currentUser.uid} onComplete={handlePinSetupComplete} />;
   }
 
