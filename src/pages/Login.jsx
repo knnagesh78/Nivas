@@ -13,7 +13,7 @@ export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [pin, setPin] = useState("");
+  const [idNumber, setIdNumber] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -125,12 +125,12 @@ export default function Login() {
 
     try {
       if (role === "parent") {
-        if (!pin) {
-          setError("Please enter the 6-digit Student PIN.");
+        if (!idNumber) {
+          setError("Please enter the Student Identification Number.");
           setLoading(false);
           return;
         }
-        await loginAsParent(email, pin);
+        await loginAsParent(email, idNumber);
         return; // handleLoginParent handles redirection
       }
 
@@ -175,14 +175,14 @@ export default function Login() {
     }
   };
 
-  const loginAsParent = async (studentEmail, pin) => {
+  const loginAsParent = async (studentEmail, idNumber) => {
     try {
-      await parentLogin(studentEmail, pin);
+      await parentLogin(studentEmail, idNumber);
       navigate("/parent");
     } catch (err) {
       console.error(err);
-      if (err.message.includes("Incorrect PIN") || err.message.includes("Student not found")) {
-        setError("Invalid Student Email or PIN.");
+      if (err.message.includes("Incorrect Identification") || err.message.includes("Student not found")) {
+        setError("Invalid Student Email or Identification Number.");
       } else {
         setError(err.message || "Failed to log in as parent.");
       }
@@ -357,18 +357,17 @@ export default function Login() {
             {role === "parent" ? (
               <div className="relative animate-fadeIn">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                  <Lock className="h-5 w-5 text-slate-500" />
+                  <User className="h-5 w-5 text-slate-500" />
                 </div>
                 <input
-                  id="pin"
-                  name="pin"
-                  type="password"
+                  id="idNumber"
+                  name="idNumber"
+                  type="text"
                   required
-                  maxLength={6}
                   className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono tracking-widest"
-                  placeholder="6-Digit Parent PIN"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+                  placeholder="Student ID (e.g. 24170-cm-028)"
+                  value={idNumber}
+                  onChange={(e) => setIdNumber(e.target.value)}
                 />
               </div>
             ) : (

@@ -61,18 +61,18 @@ export function AuthProvider({ children }) {
     return userCredential;
   }
 
-  // Parent Login via PIN
-  async function parentLogin(studentEmail, pin) {
+  // Parent Login via ID Number
+  async function parentLogin(studentEmail, idNumber) {
     if (!isFirebaseConfigured) throw new Error("Firebase is not configured.");
     
     // 1. Sign in anonymously
     const userCredential = await signInAnonymously(auth);
     const user = userCredential.user;
 
-    // 2. Call Cloud Function to verify PIN and set claims
+    // 2. Call Cloud Function to verify ID Number and set claims
     try {
       const verifyParentPin = httpsCallable(functions, 'verifyParentPin');
-      const result = await verifyParentPin({ studentEmail, pin });
+      const result = await verifyParentPin({ studentEmail, idNumber });
       
       // 3. Force token refresh to pick up the new 'parent' custom claim
       await user.getIdToken(true);
@@ -91,7 +91,7 @@ export function AuthProvider({ children }) {
 
       return result.data;
     } catch (error) {
-      // If PIN verification fails, clean up the anonymous account
+      // If ID Number verification fails, clean up the anonymous account
       await user.delete().catch(() => {});
       throw error;
     }

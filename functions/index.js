@@ -102,15 +102,15 @@ exports.onCallCreated = onDocumentCreated("calls/{callId}", async (event) => {
  * claim to the caller's Firebase Auth token granting 'parent' access.
  */
 exports.verifyParentPin = onCall(async (request) => {
-  const { studentEmail, pin } = request.data;
+  const { studentEmail, idNumber } = request.data;
   const callerUid = request.auth?.uid;
 
   if (!callerUid) {
-    throw new HttpsError("unauthenticated", "User must be authenticated (anonymously) to verify PIN.");
+    throw new HttpsError("unauthenticated", "User must be authenticated (anonymously) to verify ID Number.");
   }
 
-  if (!studentEmail || !pin) {
-    throw new HttpsError("invalid-argument", "Student email and PIN are required.");
+  if (!studentEmail || !idNumber) {
+    throw new HttpsError("invalid-argument", "Student email and Identification Number are required.");
   }
 
   try {
@@ -134,12 +134,12 @@ exports.verifyParentPin = onCall(async (request) => {
 
     const studentData = studentDoc.data();
     
-    if (!studentData.pin) {
-      throw new HttpsError("failed-precondition", "This student has not set up a Parent PIN yet.");
+    if (!studentData.idNumber) {
+      throw new HttpsError("failed-precondition", "This student has not set up their Identification Number yet.");
     }
 
-    if (studentData.pin !== pin) {
-      throw new HttpsError("permission-denied", "Incorrect PIN.");
+    if (studentData.idNumber !== idNumber) {
+      throw new HttpsError("permission-denied", "Incorrect Identification Number.");
     }
 
     // 3. Set custom user claims for the parent
@@ -163,11 +163,11 @@ exports.verifyParentPin = onCall(async (request) => {
     };
 
   } catch (error) {
-    console.error("Error verifying parent PIN:", error);
+    console.error("Error verifying parent ID Number:", error);
     if (error instanceof HttpsError) {
       throw error;
     }
-    throw new HttpsError("internal", "An error occurred while verifying the PIN.");
+    throw new HttpsError("internal", "An error occurred while verifying the Identification Number.");
   }
 });
 
@@ -192,13 +192,13 @@ exports.sendEmergencyPinNotification = onCall(async (request) => {
       throw new HttpsError("permission-denied", "Only admins can send emergency notifications.");
     }
 
-    // 2. Query students who do not have a pin
+    // 2. Query students who do not have an idNumber
     const studentsSnap = await db.collection("students").get();
     
     const tokens = [];
     studentsSnap.forEach(doc => {
       const data = doc.data();
-      if (!data.pin && data.fcmToken) {
+      if (!data.idNumber && data.fcmToken) {
         tokens.push(data.fcmToken);
       }
     });
@@ -211,8 +211,8 @@ exports.sendEmergencyPinNotification = onCall(async (request) => {
     const message = {
       tokens: tokens,
       notification: {
-        title: "🚨 Action Required: Security Update",
-        body: "Please open the Nivas app to set your Parent Access PIN immediately."
+        title: "🚨 Action Required: Identification Number",
+        body: "Please open the Nivas app to update your Student Identification Number immediately."
       },
       data: {
         type: "system_alert",

@@ -128,7 +128,7 @@ export default function StudentDashboard() {
   const [editMother, setEditMother] = useState("");
   const [editCourse, setEditCourse] = useState("");
   const [editYear, setEditYear] = useState("");
-  const [editPin, setEditPin] = useState("");
+  const [editIdNumber, setEditIdNumber] = useState("");
   const [editPhoto, setEditPhoto] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState("");
@@ -199,7 +199,7 @@ export default function StudentDashboard() {
           setEditMother(details.motherName || "");
           setEditCourse(details.course || "");
           setEditYear(details.year || "");
-          setEditPin(details.pin || "");
+          setEditIdNumber(details.idNumber || "");
           setEditPhoto(details.photoUrl || "");
 
           // Fetch Roommates
@@ -443,7 +443,7 @@ export default function StudentDashboard() {
         motherName: editMother.trim(),
         course: editCourse.trim(),
         year: editYear,
-        pin: editPin.trim() || null,
+        idNumber: editIdNumber.trim() || null,
         photoUrl: editPhoto.trim() || null
       });
 
@@ -505,7 +505,7 @@ export default function StudentDashboard() {
       getDoc(doc(db, "students", currentUser.uid)).then(doc => {
         if (doc.exists()) {
           setStudentDetails(doc.data());
-          setEditPin(doc.data().pin || "");
+          setEditIdNumber(doc.data().idNumber || "");
         }
       });
     }
@@ -1497,10 +1497,10 @@ export default function StudentDashboard() {
                   </div>
                 </div>
 
-                {/* Parent Access PIN */}
+                {/* Student Identification Number */}
                 <div>
                   <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-                    Parent Access PIN (6 digits) <span className="text-rose-500">*</span>
+                    Student Identification Number <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
@@ -1509,14 +1509,13 @@ export default function StudentDashboard() {
                     <input
                       type="text"
                       required
-                      maxLength={6}
-                      placeholder="e.g. 123456"
+                      placeholder="e.g. 24170-cm-028"
                       className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all font-mono tracking-widest"
-                      value={editPin}
-                      onChange={(e) => setEditPin(e.target.value.replace(/\D/g, ''))}
+                      value={editIdNumber}
+                      onChange={(e) => setEditIdNumber(e.target.value)}
                     />
                   </div>
-                  <p className="mt-1 text-[10px] text-slate-400">Parents use this PIN + your email to log in.</p>
+                  <p className="mt-1 text-[10px] text-slate-400">Parents use this ID + your email to log in.</p>
                 </div>
 
                 {/* Mother's Name */}
