@@ -120,18 +120,37 @@ exports.verifyParentPin = onCall(async (request) => {
     const studentUid = studentDoc.id;
     const studentData = studentDoc.data();
 
-    // 2. Generate a stable UID for the parent of this student
+    // 2. Generate stable credentials for the parent
     const parentUid = `parent_${studentUid}`;
+    const parentEmail = `parent_${studentUid}@nivas.local`;
+    const parentPassword = `Pass_${idNumber}`;
 
-    // 3. Create a Custom Token for the parent with custom claims
-    const customToken = await getAuth().createCustomToken(parentUid, {
+    // 3. Ensure the parent Auth user exists
+    try {
+      await getAuth().getUser(parentUid);
+      // If it exists, update the password just in case the student changed their ID
+      await getAuth().updateUser(parentUid, { password: parentPassword });
+    } catch (e) {
+      if (e.code === 'auth/user-not-found') {
+        await getAuth().createUser({
+          uid: parentUid,
+          email: parentEmail,
+          password: parentPassword,
+        });
+      } else {
+        throw e;
+      }
+    }
+
+    // 4. Set custom claims for the parent
+    await getAuth().setCustomUserClaims(parentUid, {
       role: "parent",
       linkedStudentId: studentUid
     });
 
-    // 4. Also store a record in the users collection so the frontend can easily read the role
+    // 5. Store a record in the users collection
     await db.collection("users").doc(parentUid).set({
-      email: `${parentUid}@nivas.local`, // Dummy email
+      email: parentEmail,
       role: "parent",
       linkedStudentId: studentUid,
       createdAt: new Date()
@@ -139,7 +158,8 @@ exports.verifyParentPin = onCall(async (request) => {
 
     return { 
       success: true, 
-      customToken: customToken,
+      syntheticEmail: parentEmail,
+      syntheticPassword: parentPassword,
       linkedStudentId: studentUid,
       studentName: studentData.name || "Student"
     };
@@ -149,7 +169,7 @@ exports.verifyParentPin = onCall(async (request) => {
     if (error instanceof HttpsError) {
       throw error;
     }
-    throw new HttpsError("internal", "An error occurred while verifying the Identification Number.");
+    throw new HttpsError("internal", `An error occurred while verifying the Identification Number: ${error.message}`);
   }
 });
 

@@ -61,22 +61,22 @@ export function AuthProvider({ children }) {
     return userCredential;
   }
 
-  // Parent Login via ID Number using Custom Tokens
+  // Parent Login via ID Number using synthetic credentials
   async function parentLogin(idNumber) {
     if (!isFirebaseConfigured) throw new Error("Firebase is not configured.");
     
-    // 1. Call Cloud Function to verify ID Number and get Custom Token
+    // 1. Call Cloud Function to verify ID Number and provision synthetic credentials
     const verifyParentPin = httpsCallable(functions, 'verifyParentPin');
     const result = await verifyParentPin({ idNumber });
     
-    if (!result.data || !result.data.customToken) {
+    if (!result.data || !result.data.syntheticEmail || !result.data.syntheticPassword) {
       throw new Error("Failed to authenticate parent. Invalid server response.");
     }
 
-    // 2. Sign in with the Custom Token
-    await signInWithCustomToken(auth, result.data.customToken);
+    // 2. Sign in with the synthetic credentials
+    await signInWithEmailAndPassword(auth, result.data.syntheticEmail, result.data.syntheticPassword);
 
-    // 3. Force fetch of user document (optional since onAuthStateChanged should catch it, but good for immediate use)
+    // 3. Force fetch of user document
     const userDoc = await getDoc(doc(db, "users", `parent_${result.data.linkedStudentId}`));
     if (userDoc.exists()) {
       setUserData(userDoc.data());
