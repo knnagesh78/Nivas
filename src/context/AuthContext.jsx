@@ -8,10 +8,10 @@ import {
   updateEmail as fbUpdateEmail,
   signInWithCustomToken
 } from "firebase/auth";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { initializeApp, getApp, getApps } from "firebase/app";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, arrayUnion } from "firebase/firestore";
 import { getToken } from "firebase/messaging";
-import { httpsCallable } from "firebase/functions";
-import { auth, db, messaging, functions, isFirebaseConfigured } from "../firebase";
+import { auth, db, messaging, functions, isFirebaseConfigured, firebaseConfig } from "../firebase";
 
 const AuthContext = createContext();
 
@@ -61,28 +61,37 @@ export function AuthProvider({ children }) {
     return userCredential;
   }
 
-  // Parent Login via ID Number using synthetic credentials
+  // Parent Login via ID Number using synthetic credentials locally
   async function parentLogin(idNumber) {
     if (!isFirebaseConfigured) throw new Error("Firebase is not configured.");
     
-    // 1. Call Cloud Function to verify ID Number and provision synthetic credentials
-    const verifyParentPin = httpsCallable(functions, 'verifyParentPin');
-    const result = await verifyParentPin({ idNumber });
-    
-    if (!result.data || !result.data.syntheticEmail || !result.data.syntheticPassword) {
-      throw new Error("Failed to authenticate parent. Invalid server response.");
+    // 1. Get the synthetic credentials
+    const parentEmail = `parent_${idNumber}@nivas.local`;
+    const parentPassword = `Pass_${idNumber}`;
+
+    // 2. Sign in with the synthetic credentials directly
+    const userCredential = await signInWithEmailAndPassword(auth, parentEmail, parentPassword);
+
+    // 3. Find which student this parent belongs to by checking the mapping collection
+    const mapDoc = await getDoc(doc(db, "student_id_map", idNumber));
+    if (!mapDoc.exists()) {
+      // Clean up if something is horribly wrong
+      await signOut(auth);
+      throw new Error("Student mapping not found. Invalid ID Number.");
     }
 
-    // 2. Sign in with the synthetic credentials
-    await signInWithEmailAndPassword(auth, result.data.syntheticEmail, result.data.syntheticPassword);
+    const studentUid = mapDoc.data().studentUid;
 
-    // 3. Force fetch of user document
-    const userDoc = await getDoc(doc(db, "users", `parent_${result.data.linkedStudentId}`));
+    // 4. Force fetch of the parent's user document
+    const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
     if (userDoc.exists()) {
       setUserData(userDoc.data());
     }
 
-    return result.data;
+    return {
+      syntheticEmail: parentEmail,
+      linkedStudentId: studentUid
+    };
   }
 
   // Logout
@@ -93,18 +102,63 @@ export function AuthProvider({ children }) {
     setUserData(null);
   }
 
-  // Complete profile
+  // Complete profile and automatically provision Parent Auth Account
   async function completeStudentProfile(profileDetails) {
     if (!currentUser) throw new Error("No authenticated user.");
     
     const uid = currentUser.uid;
-    // Write student details to students/{uid}
+    const { idNumber, ...otherDetails } = profileDetails;
+    
+    // 1. Use a secondary Firebase App to create the Parent Account so the Student doesn't get logged out!
+    let parentUid = null;
+    const parentEmail = `parent_${idNumber}@nivas.local`;
+    const parentPassword = `Pass_${idNumber}`;
+
+    try {
+      const secondaryApp = getApps().find(app => app.name === "SecondaryParentApp") || initializeApp(firebaseConfig, "SecondaryParentApp");
+      const secondaryAuth = secondaryApp.auth ? secondaryApp.auth() : (await import("firebase/auth")).getAuth(secondaryApp);
+      
+      const parentCred = await createUserWithEmailAndPassword(secondaryAuth, parentEmail, parentPassword);
+      parentUid = parentCred.user.uid;
+      
+      // Immediately sign out the secondary app
+      await signOut(secondaryAuth);
+    } catch (error) {
+      // If the parent account already exists, we can try to log in to get the UID
+      if (error.code === 'auth/email-already-in-use') {
+        const secondaryApp = getApp("SecondaryParentApp");
+        const secondaryAuth = (await import("firebase/auth")).getAuth(secondaryApp);
+        const parentCred = await signInWithEmailAndPassword(secondaryAuth, parentEmail, parentPassword);
+        parentUid = parentCred.user.uid;
+        await signOut(secondaryAuth);
+      } else {
+        console.error("Failed to provision parent account:", error);
+      }
+    }
+
+    // 2. Write student details to students/{uid} and add the parent UID to the parents array!
     await setDoc(doc(db, "students", uid), {
       ...profileDetails,
+      parents: parentUid ? [parentUid] : [],
       createdAt: serverTimestamp()
     });
 
-    // Update users/{uid}
+    // 3. Create the mapping document in student_id_map so the Parent can find this student using just the idNumber
+    await setDoc(doc(db, "student_id_map", idNumber), {
+      studentUid: uid
+    });
+
+    // 4. Create the Parent's user document
+    if (parentUid) {
+      await setDoc(doc(db, "users", parentUid), {
+        email: parentEmail,
+        role: "parent",
+        linkedStudentId: uid,
+        createdAt: serverTimestamp()
+      });
+    }
+
+    // 5. Update the student's own users/{uid} document
     await updateDoc(doc(db, "users", uid), {
       profileComplete: true
     });

@@ -31,11 +31,19 @@ export default function ParentDashboard() {
           setStudentDetails(studentDoc.data());
         }
 
-        // Fetch Attendance
-        const attQuery = query(collection(db, "attendance"), where("studentUid", "==", studentUid));
-        const attSnap = await getDocs(attQuery);
+        // Fetch Attendance via collectionGroup
+        // Note: the rules for collection group queries require uniform rules, so we'll fetch them individually if there are issues,
+        // but for now, we'll use collectionGroup("records"). Make sure the documents have studentUid field!
+        // Wait, WardenDashboard doesn't write studentUid. To fix this without migrating data, 
+        // we can just fetch the dates and then fetch the specific student's record for each date.
+        const datesSnap = await getDocs(collection(db, "attendance"));
         const attList = [];
-        attSnap.forEach(d => attList.push({ id: d.id, ...d.data() }));
+        for (const dateDoc of datesSnap.docs) {
+          const recordDoc = await getDoc(doc(db, "attendance", dateDoc.id, "records", studentUid));
+          if (recordDoc.exists()) {
+            attList.push({ id: dateDoc.id, date: dateDoc.id, ...recordDoc.data() });
+          }
+        }
         attList.sort((a, b) => b.date.localeCompare(a.date));
         setAttendance(attList);
 

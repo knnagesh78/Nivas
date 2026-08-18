@@ -25,8 +25,10 @@ service cloud.firestore {
     }
 
     function isParentOf(studentUid) {
-      // Parent auth has custom claims set by verifyParentPin cloud function
-      return isSignedIn() && request.auth.token.role == 'parent' && request.auth.token.linkedStudentId == studentUid;
+      // Parent auth is verified by checking if their UID is in the student's approved parents array
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/students/$(studentUid)) &&
+             request.auth.uid in get(/databases/$(database)/documents/students/$(studentUid)).data.parents;
     }
     
     function isOwner(uid) {
@@ -38,8 +40,12 @@ service cloud.firestore {
       allow read, write: if isAdmin();
       allow read: if isSignedIn() && (isOwner(uid) || isWarden());
       allow delete: if isWarden();
-      // Students can create their users record during registration, but only for themselves
-      allow create: if isSignedIn() && isOwner(uid);
+      // Students can create their users record during registration, but only for themselves.
+      // They can ALSO create a parent user record for their own ID.
+      allow create: if isSignedIn() && (
+        isOwner(uid) || 
+        (request.resource.data.role == 'parent' && request.resource.data.linkedStudentId == request.auth.uid)
+      );
       // Students can update their own email or profileComplete flag, but NOT their role
       allow update: if isSignedIn() && isOwner(uid) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) || isAdmin());
     }
@@ -47,8 +53,19 @@ service cloud.firestore {
     // students collection
     match /students/{uid} {
       allow read, write: if isAdmin() || isWarden();
-      allow read: if isSignedIn() && (isOwner(uid) || isWarden() || isParentOf(uid));
+      // Allow read if owner, warden, OR if the reader's UID is in the parents array
+      allow read: if isSignedIn() && (isOwner(uid) || isWarden() || (resource.data.parents != null && request.auth.uid in resource.data.parents));
       allow create, update: if isSignedIn() && isOwner(uid);
+    }
+
+    // student_id_map collection
+    // Maps idNumber (document ID) to studentUid
+    match /student_id_map/{idNumber} {
+      // Allow ANYONE to read this mapping IF they know the idNumber
+      allow get: if true;
+      allow list: if false;
+      // Allow students to write their own mapping
+      allow write: if isSignedIn() && request.resource.data.studentUid == request.auth.uid;
     }
 
     // wardens collection
