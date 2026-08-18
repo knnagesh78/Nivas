@@ -102,45 +102,28 @@ exports.onCallCreated = onDocumentCreated("calls/{callId}", async (event) => {
  * claim to the caller's Firebase Auth token granting 'parent' access.
  */
 exports.verifyParentPin = onCall(async (request) => {
-  const { studentEmail, idNumber } = request.data;
+  const { idNumber } = request.data;
   const callerUid = request.auth?.uid;
 
   if (!callerUid) {
     throw new HttpsError("unauthenticated", "User must be authenticated (anonymously) to verify ID Number.");
   }
 
-  if (!studentEmail || !idNumber) {
-    throw new HttpsError("invalid-argument", "Student email and Identification Number are required.");
+  if (!idNumber) {
+    throw new HttpsError("invalid-argument", "Student Identification Number is required.");
   }
 
   try {
-    // 1. Find the student by email in the users collection first to get the UID,
-    //    or search directly in the students collection if email is stored there.
-    //    We'll search the users collection since emails are reliably there.
-    const usersQuery = await db.collection("users").where("email", "==", studentEmail).where("role", "==", "student").limit(1).get();
+    // 1. Query the students collection directly by idNumber
+    const studentsQuery = await db.collection("students").where("idNumber", "==", idNumber).limit(1).get();
     
-    if (usersQuery.empty) {
-      throw new HttpsError("not-found", "Student not found with this email.");
+    if (studentsQuery.empty) {
+      throw new HttpsError("not-found", "No student found with this Identification Number.");
     }
     
-    const studentUid = usersQuery.docs[0].id;
-
-    // 2. Fetch the student's full profile to check the PIN
-    const studentDoc = await db.collection("students").doc(studentUid).get();
-    
-    if (!studentDoc.exists) {
-      throw new HttpsError("not-found", "Student profile not found.");
-    }
-
+    const studentDoc = studentsQuery.docs[0];
+    const studentUid = studentDoc.id;
     const studentData = studentDoc.data();
-    
-    if (!studentData.idNumber) {
-      throw new HttpsError("failed-precondition", "This student has not set up their Identification Number yet.");
-    }
-
-    if (studentData.idNumber !== idNumber) {
-      throw new HttpsError("permission-denied", "Incorrect Identification Number.");
-    }
 
     // 3. Set custom user claims for the parent
     await getAuth().setCustomUserClaims(callerUid, {

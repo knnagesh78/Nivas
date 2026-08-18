@@ -62,7 +62,7 @@ export function AuthProvider({ children }) {
   }
 
   // Parent Login via ID Number
-  async function parentLogin(studentEmail, idNumber) {
+  async function parentLogin(idNumber) {
     if (!isFirebaseConfigured) throw new Error("Firebase is not configured.");
     
     // 1. Sign in anonymously
@@ -72,7 +72,7 @@ export function AuthProvider({ children }) {
     // 2. Call Cloud Function to verify ID Number and set claims
     try {
       const verifyParentPin = httpsCallable(functions, 'verifyParentPin');
-      const result = await verifyParentPin({ studentEmail, idNumber });
+      const result = await verifyParentPin({ idNumber });
       
       // 3. Force token refresh to pick up the new 'parent' custom claim
       await user.getIdToken(true);

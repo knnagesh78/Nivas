@@ -130,7 +130,7 @@ export default function Login() {
           setLoading(false);
           return;
         }
-        await loginAsParent(email, idNumber);
+        await loginAsParent(idNumber);
         return; // handleLoginParent handles redirection
       }
 
@@ -175,14 +175,14 @@ export default function Login() {
     }
   };
 
-  const loginAsParent = async (studentEmail, idNumber) => {
+  const loginAsParent = async (idNumber) => {
     try {
-      await parentLogin(studentEmail, idNumber);
+      await parentLogin(idNumber);
       navigate("/parent");
     } catch (err) {
       console.error(err);
-      if (err.message.includes("Incorrect Identification") || err.message.includes("Student not found")) {
-        setError("Invalid Student Email or Identification Number.");
+      if (err.message.includes("Identification") || err.message.includes("not found")) {
+        setError("Invalid Student Identification Number.");
       } else {
         setError(err.message || "Failed to log in as parent.");
       }
@@ -336,24 +336,8 @@ export default function Login() {
           </div>
         )}
 
-        <form className="mt-8 space-y-5" onSubmit={isSignUp ? handleSignUp : handleLogin}>
-          <div className="space-y-4 rounded-md shadow-sm">
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                <Mail className="h-5 w-5 text-slate-500" />
-              </div>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                required
-                className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                placeholder={role === "parent" ? "Student's Email address" : "Email address"}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
+        <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="mt-8 space-y-6">
+          <div className="space-y-4">
             {role === "parent" ? (
               <div className="relative animate-fadeIn">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
@@ -371,29 +355,47 @@ export default function Login() {
                 />
               </div>
             ) : (
-              <div className="relative animate-fadeIn">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                  <Lock className="h-5 w-5 text-slate-500" />
+              <>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <Mail className="h-5 w-5 text-slate-500" />
+                  </div>
+                  <input
+                    id="email-address"
+                    name="email"
+                    type="email"
+                    required
+                    className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                    placeholder="Email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
-                <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                required
-                className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-11 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
-                title={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
+
+                <div className="relative animate-fadeIn">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <Lock className="h-5 w-5 text-slate-500" />
+                  </div>
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-11 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </>
             )}
 
             {isSignUp && (
