@@ -169,7 +169,7 @@ exports.verifyParentPin = onCall(async (request) => {
     if (error instanceof HttpsError) {
       throw error;
     }
-    throw new HttpsError("unknown", `DEBUG: ${error.message}`);
+    throw new HttpsError("failed-precondition", `DEBUG: ${error.message}`);
   }
 });
 
