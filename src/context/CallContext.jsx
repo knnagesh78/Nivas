@@ -131,6 +131,21 @@ export function CallProvider({ children }) {
         remoteAudioRef.current.srcObject = remoteStream;
       }
 
+      // Monitor connection state
+      pc.onconnectionstatechange = () => {
+        if (pc.connectionState === "disconnected" || pc.connectionState === "failed") {
+          endCallService(callId);
+          resetCallState("disconnected");
+        }
+      };
+
+      pc.oniceconnectionstatechange = () => {
+        if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
+          endCallService(callId);
+          resetCallState("disconnected");
+        }
+      };
+
       // Listen for answer
       const unsub = listenForAnswer(
         callId,
@@ -192,6 +207,13 @@ export function CallProvider({ children }) {
       // Monitor connection state
       pc.onconnectionstatechange = () => {
         if (pc.connectionState === "disconnected" || pc.connectionState === "failed") {
+          endCallService(callId);
+          resetCallState("disconnected");
+        }
+      };
+
+      pc.oniceconnectionstatechange = () => {
+        if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
           endCallService(callId);
           resetCallState("disconnected");
         }

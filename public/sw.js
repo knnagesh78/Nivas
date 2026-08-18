@@ -1,20 +1,9 @@
-// ─── Service Worker Self-Destruct / Clean Up ────────────────────────────────
-// This script will automatically uninstall the service worker from the browser
-// of any user who previously had it installed, restoring normal web behavior.
-
+// Empty service worker to override the old self-destructing one
+// This prevents it from unregistering the firebase-messaging-sw.js
 self.addEventListener('install', (e) => {
-  self.skipWaiting(); // Force the new service worker to activate immediately
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
-  self.registration.unregister()
-    .then(() => self.clients.matchAll())
-    .then((clients) => {
-      // Reload all open pages so they load fresh from the network
-      clients.forEach((client) => {
-        if (client.url && 'navigate' in client) {
-          client.navigate(client.url);
-        }
-      });
-    });
+  e.waitUntil(self.clients.claim());
 });
