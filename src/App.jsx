@@ -12,7 +12,6 @@ import CompleteProfile from "./pages/CompleteProfile";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import WardenDashboard from "./pages/warden/WardenDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import ParentDashboard from "./pages/parent/ParentDashboard";
 
 function RootRedirect() {
   const { currentUser, userData } = useAuth();
@@ -33,7 +32,6 @@ function RootRedirect() {
   // Redirect to correct panel
   if (userData.role === "admin") return <Navigate to="/admin" replace />;
   if (userData.role === "warden") return <Navigate to="/warden" replace />;
-  if (userData.role === "parent") return <Navigate to="/parent" replace />;
   
   if (userData.role === "student") {
     if (!userData.profileComplete) {
@@ -96,15 +94,6 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/parent"
-              element={
-                <ProtectedRoute allowedRoles={["parent"]}>
-                  <ParentDashboard />
                 </ProtectedRoute>
               }
             />

@@ -118,105 +118,46 @@ export default function Login() {
     }
   };
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      if (role === "parent") {
-        if (!idNumber) {
-          setError("Please enter the Student Identification Number.");
+      if (role === "student" && isSignUp) {
+        if (password !== confirmPassword) {
+          setError("Passwords do not match");
           setLoading(false);
           return;
         }
-        await loginAsParent(idNumber);
-        return; // handleLoginParent handles redirection
-      }
-
-      const cred = await login(email, password);
-      const userDoc = await getDoc(doc(db, "users", cred.user.uid));
-      
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        if (data.role !== role) {
-          // Force sign out since role doesn't match the selected tab
-          await logout();
-          setError(
-            `This account is registered as an ${data.role.toUpperCase()}. Please select the correct tab to log in.`
-          );
-          setLoading(false);
-          return;
-        }
-
-        // Redirect based on role
-        if (role === "admin") navigate("/admin");
-        else if (role === "warden") navigate("/warden");
-        else {
-          if (!data.profileComplete) {
-            navigate("/complete-profile");
-          } else {
-            navigate("/student");
+        await signupStudent(email, password);
+        navigate("/complete-profile");
+      } else {
+        const cred = await login(email, password);
+        const userDoc = await getDoc(doc(db, "users", cred.user.uid));
+        
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          if (data.role !== role) {
+            await logout();
+            setError(`This account is registered as an ${data.role.toUpperCase()}. Please select the correct tab.`);
+            setLoading(false);
+            return;
           }
+
+          if (role === "admin") navigate("/admin");
+          else if (role === "warden") navigate("/warden");
+          else {
+            if (!data.profileComplete) navigate("/complete-profile");
+            else navigate("/student");
+          }
+        } else {
+          await logout();
+          setError("Account not found.");
         }
-      } else {
-        await logout();
-        setError("Account not found in user records.");
       }
     } catch (err) {
-      console.error(err);
-      if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
-        setError("Invalid email or password.");
-      } else {
-        setError(err.message || "Failed to log in.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loginAsParent = async (idNumber) => {
-    try {
-      await parentLogin(idNumber);
-      navigate("/parent");
-    } catch (err) {
-      console.error(err);
-      if (err.message.includes("Identification") || err.message.includes("not found")) {
-        setError("Invalid Student Identification Number.");
-      } else {
-        setError(err.message || "Failed to log in as parent.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password should be at least 6 characters.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await signupStudent(email, password);
-      // Auth state will redirect them to complete profile automatically
-      navigate("/complete-profile");
-    } catch (err) {
-      console.error(err);
-      if (err.code === "auth/email-already-in-use") {
-        setError("This email address is already in use.");
-      } else {
-        setError(err.message || "Failed to register.");
-      }
+      setError(err.message || "Authentication failed.");
     } finally {
       setLoading(false);
     }
@@ -224,11 +165,9 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-900 px-4 py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background shapes */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800 opacity-50 blur-3xl"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-slate-800 opacity-50 blur-3xl"></div>
 
-      {/* Floating Download/Install App Badge — visible when install prompt is ready and not in standalone mode */}
       {canInstall && !isStandaloneMode && (
         <div className="absolute top-6 right-6 z-20">
           <button
@@ -263,69 +202,33 @@ export default function Login() {
           <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-white">
             {isSignUp ? "Create Student Account" : "Sign In to Nivas"}
           </h2>
-          <p className="mt-2 text-center text-sm text-indigo-400 font-medium">
-            Every stay, sorted
-          </p>
         </div>
 
-        {/* Role Selector Tabs (Only show if not signing up) */}
         {!isSignUp && (
-          <div className="grid grid-cols-4 gap-2 rounded-xl bg-slate-900 p-1 border border-slate-800">
+          <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-900 p-1 border border-slate-800">
             <button
-              onClick={() => {
-                setRole("student");
-                setError("");
-              }}
+              onClick={() => { setRole("student"); setError(""); }}
               className={`flex flex-col items-center justify-center rounded-lg py-2.5 text-xs font-bold uppercase transition-all ${
-                role === "student"
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
-                  : "text-slate-400 hover:text-white"
+                role === "student" ? "bg-indigo-600 text-white" : "text-slate-400"
               }`}
             >
-              <GraduationCap className="h-4 w-4 mb-1" />
-              Student
+              <GraduationCap className="h-4 w-4 mb-1" /> Student
             </button>
             <button
-              onClick={() => {
-                setRole("warden");
-                setError("");
-              }}
+              onClick={() => { setRole("warden"); setError(""); }}
               className={`flex flex-col items-center justify-center rounded-lg py-2.5 text-xs font-bold uppercase transition-all ${
-                role === "warden"
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
-                  : "text-slate-400 hover:text-white"
+                role === "warden" ? "bg-indigo-600 text-white" : "text-slate-400"
               }`}
             >
-              <User className="h-4 w-4 mb-1" />
-              Warden
+              <User className="h-4 w-4 mb-1" /> Warden
             </button>
             <button
-              onClick={() => {
-                setRole("admin");
-                setError("");
-              }}
+              onClick={() => { setRole("admin"); setError(""); }}
               className={`flex flex-col items-center justify-center rounded-lg py-2.5 text-xs font-bold uppercase transition-all ${
-                role === "admin"
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
-                  : "text-slate-400 hover:text-white"
+                role === "admin" ? "bg-indigo-600 text-white" : "text-slate-400"
               }`}
             >
-              <Shield className="h-4 w-4 mb-1" />
-              Admin
-            </button>
-            <button
-              onClick={() => {
-                setRole("parent");
-                setError("");
-              }}
-              className={`flex flex-col items-center justify-center rounded-lg py-2.5 text-xs font-bold uppercase transition-all ${
-                role === "parent"
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <Users className="h-4 w-4 mb-1" />
-              Parent
+              <Shield className="h-4 w-4 mb-1" /> Admin
             </button>
           </div>
         )}
@@ -336,70 +239,49 @@ export default function Login() {
           </div>
         )}
 
-        <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-            {role === "parent" ? (
-              <div className="relative animate-fadeIn">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                  <User className="h-5 w-5 text-slate-500" />
-                </div>
-                <input
-                  id="idNumber"
-                  name="idNumber"
-                  type="text"
-                  required
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono tracking-widest"
-                  placeholder="Student ID (e.g. 24170-cm-028)"
-                  value={idNumber}
-                  onChange={(e) => setIdNumber(e.target.value)}
-                />
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <Mail className="h-5 w-5 text-slate-500" />
               </div>
-            ) : (
-              <>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <Mail className="h-5 w-5 text-slate-500" />
-                  </div>
-                  <input
-                    id="email-address"
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+              <input
+                id="email-address"
+                name="email"
+                type="email"
+                required
+                className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
-                <div className="relative animate-fadeIn">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <Lock className="h-5 w-5 text-slate-500" />
-                  </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-11 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
-                    title={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-              </>
-            )}
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <Lock className="h-5 w-5 text-slate-500" />
+              </div>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                className="w-full rounded-xl border border-slate-800 bg-slate-900/50 py-3.5 pl-11 pr-11 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500"
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            </div>
 
             {isSignUp && (
-              <div className="relative animate-fadeIn">
+              <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                   <Lock className="h-5 w-5 text-slate-500" />
                 </div>
@@ -416,8 +298,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
-                  title={showConfirmPassword ? "Hide password" : "Show password"}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500"
                 >
                   {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -425,24 +306,15 @@ export default function Login() {
             )}
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative flex w-full justify-center rounded-xl bg-indigo-600 py-3.5 text-sm font-semibold text-white hover:bg-indigo-500 outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all disabled:opacity-50"
-            >
-              {loading ? (
-                <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-              ) : isSignUp ? (
-                "Create Account"
-              ) : (
-                `Sign In as ${role.toUpperCase()}`
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl transition-all disabled:opacity-50"
+          >
+            {loading ? "Please wait..." : isSignUp ? "Create Student Account" : `Sign In as ${role.toUpperCase()}`}
+          </button>
         </form>
 
-        {/* Toggle sign in / sign up link (only for Student role) */}
         {(role === "student" || isSignUp) && (
           <div className="text-center">
             <button

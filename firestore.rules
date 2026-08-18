@@ -24,12 +24,7 @@ service cloud.firestore {
       return isSignedIn() && getUserRole() == 'student';
     }
 
-    function isParentOf(studentUid) {
-      // Parent auth is verified by checking if their UID is in the student's approved parents array
-      return isSignedIn() && 
-             exists(/databases/$(database)/documents/students/$(studentUid)) &&
-             request.auth.uid in get(/databases/$(database)/documents/students/$(studentUid)).data.parents;
-    }
+    // Removed isParentOf as Parent Login was requested to be removed
     
     function isOwner(uid) {
       return isSignedIn() && request.auth.uid == uid;
@@ -53,20 +48,12 @@ service cloud.firestore {
     // students collection
     match /students/{uid} {
       allow read, write: if isAdmin() || isWarden();
-      // Allow read if owner, warden, OR if the reader's UID is in the parents array
-      allow read: if isSignedIn() && (isOwner(uid) || isWarden() || (resource.data.parents != null && request.auth.uid in resource.data.parents));
+      // Allow any authenticated user to read students (required for Roommates feature)
+      allow read: if isSignedIn();
       allow create, update: if isSignedIn() && isOwner(uid);
     }
 
-    // student_id_map collection
-    // Maps idNumber (document ID) to studentUid
-    match /student_id_map/{idNumber} {
-      // Allow ANYONE to read this mapping IF they know the idNumber
-      allow get: if true;
-      allow list: if false;
-      // Allow students to write their own mapping
-      allow write: if isSignedIn() && request.resource.data.studentUid == request.auth.uid;
-    }
+
 
     // wardens collection
     match /wardens/{uid} {
@@ -81,7 +68,8 @@ service cloud.firestore {
       allow write: if isAdmin() || isWarden();
       
       match /records/{studentUid} {
-        allow read: if isSignedIn() && (isOwner(studentUid) || isWarden() || isAdmin() || isParentOf(studentUid));
+        // Only owner, warden, or admin can read attendance records
+        allow read: if isSignedIn() && (isOwner(studentUid) || isWarden() || isAdmin());
         allow write: if isAdmin() || isWarden();
       }
     }
@@ -91,7 +79,6 @@ service cloud.firestore {
     match /leaveRequests/{requestId} {
       allow read: if isAdmin() || isWarden();
       allow read: if isStudent() && resource.data.studentUid == request.auth.uid;
-      allow read: if isParentOf(resource.data.studentUid);
       // Allow students to create a request with their own studentUid
       allow create: if isStudent() && request.resource.data.studentUid == request.auth.uid;
       // Allow wardens/admins to update (approve/reject/remark)
@@ -107,7 +94,6 @@ service cloud.firestore {
     match /complaints/{complaintId} {
       allow read: if isAdmin() || isWarden();
       allow read: if isStudent() && resource.data.studentUid == request.auth.uid;
-      allow read: if isParentOf(resource.data.studentUid);
       // Allow students to create a complaint
       allow create: if isStudent() && request.resource.data.studentUid == request.auth.uid;
       // Allow wardens/admins to update
