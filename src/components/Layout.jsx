@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
   LayoutDashboard,
@@ -14,18 +14,12 @@ import {
   DoorOpen,
   Users,
   Settings,
-  ShieldCheck,
   ClipboardList,
   Download,
   GraduationCap,
   Package,
-  Search,
   PackageCheck,
   ArrowLeft,
-  ArrowUp,
-  Sparkles,
-  Heart,
-  MapPin,
   Sun,
   Moon,
   PhoneCall
@@ -36,7 +30,6 @@ import NotificationCenter from "./NotificationCenter";
 export default function Layout({ children, activeTab, setActiveTab, onSelectNotification }) {
   const { userData, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
 

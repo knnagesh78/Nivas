@@ -4,14 +4,12 @@ import {
   MapPin,
   Calendar,
   User,
-  Tag,
   CheckCircle,
   AlertCircle,
   Clock,
   ShieldCheck,
   Package,
-  Handshake,
-  ExternalLink
+  Handshake
 } from "lucide-react";
 
 export default function ItemDetailModal({
@@ -32,7 +30,6 @@ export default function ItemDetailModal({
 
   const isOwner = item.reporterUid === currentUser?.uid;
   const isWarden = userData?.role === "warden" || userData?.role === "admin";
-  const isFinder = item.finderUid === currentUser?.uid;
 
   const handleFinderSubmit = async (e) => {
     e.preventDefault();

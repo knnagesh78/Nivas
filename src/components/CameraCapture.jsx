@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Camera, RotateCcw, Trash2, Upload, AlertCircle } from "lucide-react";
+import { Camera, Trash2, Upload, AlertCircle } from "lucide-react";
 
 export default function CameraCapture({ photoUrl, onCapture, label = "Profile Picture" }) {
   const [isCameraActive, setIsCameraActive] = useState(false);

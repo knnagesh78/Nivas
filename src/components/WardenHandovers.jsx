@@ -13,12 +13,7 @@ import {
 import {
   ShieldCheck,
   CheckCircle,
-  Package,
-  User,
-  MapPin,
-  Clock,
-  ExternalLink,
-  AlertCircle
+  Package
 } from "lucide-react";
 
 export default function WardenHandovers() {
@@ -90,7 +85,6 @@ export default function WardenHandovers() {
   };
 
   const pendingItems = items.filter((i) => i.status === "PROOF_SUBMITTED");
-  const otherItems = items.filter((i) => i.status !== "PROOF_SUBMITTED");
 
   if (loading) {
     return (

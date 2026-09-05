@@ -40,6 +40,7 @@ export default function ConfigModal() {
           };
         }
       } catch (err) {
+        console.warn("Config parsing error:", err);
         setError("Failed to parse the configuration for download. Please check the format.");
         return;
       }
@@ -119,6 +120,7 @@ VITE_FIREBASE_APP_ID=${finalConfig.appId || ""}
           };
         }
       } catch (err) {
+        console.warn("Config parsing error:", err);
         setError("Failed to parse the configuration. Please check the format or use manual input.");
         return;
       }
@@ -248,6 +250,15 @@ VITE_FIREBASE_APP_ID=${finalConfig.appId || ""}
                   className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm"
                   value={storageBucket}
                   onChange={(e) => setStorageBucket(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 uppercase">Messaging Sender ID</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm"
+                  value={messagingSenderId}
+                  onChange={(e) => setMessagingSenderId(e.target.value)}
                 />
               </div>
               <div>

@@ -5,10 +5,7 @@ import { db } from "../../firebase";
 import {
   collection,
   query,
-  where,
   getDocs,
-  getDoc,
-  setDoc,
   doc,
   addDoc,
   updateDoc,
@@ -22,24 +19,18 @@ import WardenHandovers from "../../components/WardenHandovers";
 import StudentAttendanceModal from "../../components/StudentAttendanceModal";
 import {
   Users,
-  Calendar,
   FileText,
   AlertCircle,
   Megaphone,
-  CheckCircle,
-  XCircle,
   Search,
   Check,
   X,
   Edit2,
   Download,
-  AlertTriangle,
   DoorOpen,
   ClipboardList,
-  Plus,
   Trash2,
   Settings,
-  Lock,
   Key,
   Mail,
   Eye,
@@ -125,7 +116,6 @@ export default function WardenDashboard() {
   // Notice form
   const [noticeTitle, setNoticeTitle] = useState("");
   const [noticeMessage, setNoticeMessage] = useState("");
-  const [noticeAudience, setNoticeAudience] = useState("all");
   const [noticeLoading, setNoticeLoading] = useState(false);
   const [noticeSuccess, setNoticeSuccess] = useState("");
 

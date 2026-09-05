@@ -8,7 +8,6 @@ import {
   collection,
   query,
   getDocs,
-  getDoc,
   setDoc,
   doc,
   addDoc,
@@ -35,7 +34,6 @@ import {
   Shield,
   Key,
   Search,
-  GraduationCap,
   Eye,
   EyeOff
 } from "lucide-react";

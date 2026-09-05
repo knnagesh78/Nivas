@@ -1,6 +1,6 @@
 // Empty service worker to override the old self-destructing one
 // This prevents it from unregistering the firebase-messaging-sw.js
-self.addEventListener('install', (e) => {
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 

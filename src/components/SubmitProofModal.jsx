@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Upload, ShieldCheck, Camera, FileText } from "lucide-react";
+import { X, Upload, ShieldCheck, Camera } from "lucide-react";
 import CameraCapture from "./CameraCapture";
 
 export default function SubmitProofModal({ isOpen, onClose, item, onSubmit, isSubmitting }) {

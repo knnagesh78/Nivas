@@ -5,15 +5,14 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth, firebaseConfig, clearFirebaseConfig } from "../firebase";
-import { Mail, Lock, User, GraduationCap, Shield, Wrench, Download, ArrowLeft, Eye, EyeOff, Users } from "lucide-react";
+import { Mail, Lock, User, GraduationCap, Shield, Wrench, Download, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import InstallWizardModal from "../components/InstallWizardModal";
 
 export default function Login() {
-  const [role, setRole] = useState("student"); // "student" | "warden" | "admin" | "parent"
+  const [role, setRole] = useState("student"); // "student" | "warden" | "admin"
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [idNumber, setIdNumber] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -50,7 +49,7 @@ export default function Login() {
   }, []);
 
   
-  const { login, signupStudent, logout, parentLogin } = useAuth();
+  const { login, signupStudent, logout } = useAuth();
   const navigate = useNavigate();
 
   const [seedLoading, setSeedLoading] = useState(false);

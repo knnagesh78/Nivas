@@ -5,7 +5,7 @@ import { GraduationCap, Phone, User, Home, UserCheck, ShieldAlert, ArrowLeft } f
 import CameraCapture from "../components/CameraCapture";
 
 export default function CompleteProfile() {
-  const { completeStudentProfile, logout, userData } = useAuth();
+  const { completeStudentProfile, logout } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [roomNumber, setRoomNumber] = useState("");

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Upload, Package, MapPin, Tag, FileText, Camera } from "lucide-react";
+import { X, Upload, Package, MapPin, Tag, Camera } from "lucide-react";
 import CameraCapture from "./CameraCapture";
 
 export default function ReportItemModal({ isOpen, onClose, onSubmit, isSubmitting }) {

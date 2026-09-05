@@ -3,7 +3,7 @@
 // Shows call duration, mute/speaker/end controls, and connection quality.
 
 import React, { useState, useMemo } from "react";
-import { Phone, PhoneOff, Mic, MicOff, Volume2, Volume1, User, Wifi, Minimize2, Maximize2 } from "lucide-react";
+import { Phone, PhoneOff, Mic, MicOff, Volume2, Volume1, Wifi, Minimize2, Maximize2 } from "lucide-react";
 import { useCall } from "../context/CallContext";
 
 function formatDuration(seconds) {

@@ -22,18 +22,11 @@ import LostFoundFeed from "../../components/LostFoundFeed";
 import CallButton from "../../components/CallButton";
 import PinSetupModal from "../../components/PinSetupModal";
 import {
-  Home,
   User,
   Calendar,
-  FileText,
-  AlertCircle,
   Megaphone,
-  CheckCircle,
-  XCircle,
-  Clock,
   Plus,
   Send,
-  BookOpen,
   Trash2,
   Lock,
   Key,
@@ -49,14 +42,13 @@ import {
   Check,
   UserCheck,
   BadgeCheck,
-  Camera,
   Bell,
   Package,
   PhoneCall
 } from "lucide-react";
 
 export default function StudentDashboard() {
-  const { currentUser, userData, completeStudentProfile, updatePassword } = useAuth();
+  const { currentUser, updatePassword } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dashboard";

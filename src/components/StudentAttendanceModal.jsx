@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { X, Calendar, User, Clock, AlertCircle } from "lucide-react";
+import { X, Calendar, AlertCircle } from "lucide-react";
 
 export default function StudentAttendanceModal({ student, onClose }) {
   const [attendance, setAttendance] = useState([]);

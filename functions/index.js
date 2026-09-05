@@ -90,6 +90,7 @@ exports.onCallCreated = onDocumentCreated("calls/{callId}", async (event) => {
         console.log(`Removed invalid FCM token for ${calleeUid}`);
       } catch (cleanupError) {
         console.error("Error removing invalid token:", cleanupError);
+      }
     }
   }
 });

@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   Share2,
   PlusSquare,
-  HelpCircle,
   Zap,
   CloudOff,
   Download,

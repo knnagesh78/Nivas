@@ -13,14 +13,9 @@ import {
 import {
   Search,
   Plus,
-  Filter,
   Package,
   MapPin,
   Calendar,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  ShieldCheck,
   Tag
 } from "lucide-react";
 

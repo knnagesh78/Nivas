@@ -5,12 +5,11 @@ import {
   signOut, 
   onAuthStateChanged,
   updatePassword as fbUpdatePassword,
-  updateEmail as fbUpdateEmail,
-  signInWithCustomToken
+  updateEmail as fbUpdateEmail
 } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { getToken } from "firebase/messaging";
-import { auth, db, messaging, functions, isFirebaseConfigured, firebaseConfig } from "../firebase";
+import { auth, db, messaging, isFirebaseConfigured } from "../firebase";
 
 const AuthContext = createContext();
 
