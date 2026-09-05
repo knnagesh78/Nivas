@@ -4,22 +4,28 @@
   "description": "Every stay, sorted. Beautiful, efficient hostel management and tracking.",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/icon-192.png?v=2",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon-512.png?v=2",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png?v=2",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
   "start_url": "/",
   "scope": "/",
   "background_color": "#0f172a",
-  "theme_color": "#4f46e5",
+  "theme_color": "#05483f",
   "display": "standalone",
   "orientation": "portrait",
   "lang": "en-IN",
