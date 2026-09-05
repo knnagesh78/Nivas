@@ -19,6 +19,7 @@ import {
 } from "firebase/firestore";
 import Layout from "../../components/Layout";
 import WardenHandovers from "../../components/WardenHandovers";
+import StudentAttendanceModal from "../../components/StudentAttendanceModal";
 import {
   Users,
   Calendar,
@@ -89,6 +90,7 @@ export default function WardenDashboard() {
   const [complaints, setComplaints] = useState([]);
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [viewAttendanceStudent, setViewAttendanceStudent] = useState(null);
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -793,6 +795,14 @@ export default function WardenDashboard() {
                         >
                           <Edit2 className="h-3.5 w-3.5" />
                           <span className="text-xs font-semibold">Assign Room</span>
+                        </button>
+                        <button
+                          onClick={() => setViewAttendanceStudent(s)}
+                          className="p-2 border border-indigo-200 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-lg transition-all flex items-center space-x-1 cursor-pointer"
+                          title="View Attendance"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          <span className="text-xs font-semibold">Attendance</span>
                         </button>
                         <button
                           onClick={() => handleRemoveStudent(s.id, s.name)}
@@ -1519,6 +1529,13 @@ export default function WardenDashboard() {
             </div>
           </form>
         </div>
+      )}
+      
+      {viewAttendanceStudent && (
+        <StudentAttendanceModal 
+          student={viewAttendanceStudent} 
+          onClose={() => setViewAttendanceStudent(null)} 
+        />
       )}
     </Layout>
   );

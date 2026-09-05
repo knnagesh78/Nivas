@@ -19,6 +19,7 @@ import {
   serverTimestamp
 } from "firebase/firestore";
 import Layout from "../../components/Layout";
+import StudentAttendanceModal from "../../components/StudentAttendanceModal";
 import {
   ShieldAlert,
   Users,
@@ -92,6 +93,7 @@ export default function AdminDashboard() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewAttendanceStudent, setViewAttendanceStudent] = useState(null);
 
   const handleRemoveStudent = async (studentId, studentName) => {
     if (!window.confirm(`Are you sure you want to remove student "${studentName || "this student"}"? This will delete their student profile and user record.`)) {
@@ -772,7 +774,15 @@ export default function AdminDashboard() {
                       <p><span className="font-semibold text-slate-600">Self:</span> {s.phone || "N/A"}</p>
                       <p><span className="font-semibold text-slate-600">Parent:</span> {s.parentContact || "N/A"}</p>
                     </td>
-                    <td className="py-3.5 text-right">
+                    <td className="py-3.5 text-right space-x-2">
+                      <button
+                        onClick={() => setViewAttendanceStudent(s)}
+                        className="p-2 border border-indigo-200 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-lg transition-all inline-flex items-center space-x-1 cursor-pointer"
+                        title="View Attendance"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        <span className="text-xs font-semibold">Attendance</span>
+                      </button>
                       <button
                         onClick={() => handleRemoveStudent(s.id, s.name)}
                         className="p-2 border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-all inline-flex items-center space-x-1 cursor-pointer"
@@ -1232,6 +1242,13 @@ export default function AdminDashboard() {
             </div>
           </form>
         </div>
+      )}
+      
+      {viewAttendanceStudent && (
+        <StudentAttendanceModal 
+          student={viewAttendanceStudent} 
+          onClose={() => setViewAttendanceStudent(null)} 
+        />
       )}
     </Layout>
   );
