@@ -128,7 +128,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
       return [
         { id: "dashboard", label: "Home", icon: LayoutDashboard },
         { id: "leave", label: "Leave", icon: FileText },
-        { id: "lostFound", label: "Notice", icon: Megaphone, isCenter: true },
+        { id: "lostFound", label: "Lost & Found", icon: Package, isCenter: true },
         { id: "complaints", label: "Complaint", icon: AlertCircle },
         { id: "profile", label: "You", icon: User, isProfile: true },
       ];
@@ -443,7 +443,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                     <Icon className="h-6 w-6" />
                   </div>
                   <span
-                    className={`text-[10px] font-bold mt-1 ${
+                    className={`text-[10px] font-bold mt-1 whitespace-nowrap ${
                       isActive ? "text-indigo-400" : "text-slate-400"
                     }`}
                   >
