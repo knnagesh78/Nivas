@@ -23,8 +23,13 @@ function RootRedirect() {
   if (!userData) {
     // If auth state loaded but Firestore user doc isn't loaded yet
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-slate-50">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-300 border-t-indigo-600"></div>
+      <div className="flex h-screen w-screen flex-col items-center justify-center bg-[#060914] text-white">
+        <div className="relative flex items-center justify-center mb-4">
+          <div className="h-16 w-16 rounded-2xl bg-indigo-600/20 animate-ping absolute" />
+          <img src="/logo.svg" className="h-14 w-14 rounded-2xl shadow-xl shadow-indigo-500/20 relative z-10 border border-indigo-500/30" alt="Nivas" />
+        </div>
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-indigo-500 mb-3" />
+        <p className="text-xs font-semibold text-slate-400 tracking-wider uppercase">Loading Nivas Portal...</p>
       </div>
     );
   }
