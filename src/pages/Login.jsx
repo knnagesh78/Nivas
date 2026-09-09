@@ -14,7 +14,7 @@ import useMotionPreference from "../hooks/useMotionPreference";
 import ResetPasswordDialog from "../components/ResetPasswordDialog";
 import InstallWizardModal from "../components/InstallWizardModal";
 import SplashScreen3D from "../components/3d/SplashScreen3D";
-import Hostel3DCanvas from "../components/3d/Hostel3DCanvas";
+import InteractiveLoginWorld from "../components/3d/login/InteractiveLoginWorld";
 
 export default function Login() {
   const { motion, toggleMotion } = useMotionPreference();
@@ -28,6 +28,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [focusField, setFocusField] = useState('idle');
 
   // Forgot password modal state
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
@@ -230,17 +231,39 @@ export default function Login() {
     setConfirmPassword("");
     setShowPassword(false);
     setShowConfirmPassword(false);
+    setFocusField('idle');
+  };
+  const lightCard = (event) => {
+    const card = event.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+    card.style.setProperty('--light-x', `${x * 100}%`);
+    card.style.setProperty('--light-y', `${y * 100}%`);
+    return { card, x, y };
   };
   const handleTilt = (event) => {
     if (!motion || event.pointerType !== 'mouse') return;
-    const card = event.currentTarget;
-    const rect = card.getBoundingClientRect();
-    card.style.setProperty('--tilt-x', `${-(event.clientY - rect.top - rect.height / 2) / rect.height * 2}deg`);
-    card.style.setProperty('--tilt-y', `${(event.clientX - rect.left - rect.width / 2) / rect.width * 2}deg`);
+    const { card, x, y } = lightCard(event);
+    // Keep the typing surface still while a field has focus.
+    if (card.contains(document.activeElement) && document.activeElement?.tagName === 'INPUT') return;
+    card.style.setProperty('--tilt-x', `${-(y - 0.5) * 7}deg`);
+    card.style.setProperty('--tilt-y', `${(x - 0.5) * 7}deg`);
   };
   const resetTilt = (event) => {
     event.currentTarget.style.setProperty('--tilt-x', '0deg');
     event.currentTarget.style.setProperty('--tilt-y', '0deg');
+    event.currentTarget.dataset.touch = 'idle';
+  };
+  const handleCardPress = (event) => {
+    if (!motion) return;
+    lightCard(event);
+    if (event.pointerType !== 'mouse') event.currentTarget.dataset.touch = 'active';
+  };
+  const handleFormFocus = (event) => {
+    resetTilt(event);
+    const name = event.target.closest('.nivas-field')?.querySelector('input')?.name;
+    setFocusField(name === 'email' ? 'email' : name === 'password' || name === 'confirmPassword' ? 'password' : 'idle');
   };
 
   return (
@@ -260,6 +283,12 @@ export default function Login() {
       </header>
 
       <main className="nivas-entry" inert={showSplash || undefined}>
+        <div className="nivas-mobile-portals" role="group" aria-label="Choose your login portal">
+          {Object.entries(portals).map(([key, value]) => {
+            const Icon = value.icon;
+            return <button key={key} type="button" aria-pressed={role === key} disabled={loading} onClick={() => chooseRole(key)}><Icon size={17} />{value.label}</button>;
+          })}
+        </div>
         <section className="nivas-world" aria-label={`${portal.label} portal illustration`}>
           <div className="nivas-world-grid" aria-hidden="true" />
           <div className="nivas-world-heading" key={role}>
@@ -267,7 +296,7 @@ export default function Login() {
             <h1>{portal.sceneTitle}</h1>
           </div>
           <div className="nivas-world-stage">
-            {!showSplash && <Hostel3DCanvas activeRole={role} motion={motion} />}
+            {!showSplash && <InteractiveLoginWorld role={role} motion={motion} formState={loading ? 'loading' : focusField} />}
           </div>
           <div className="nivas-world-bottom">
             <div className="nivas-features" key={`features-${role}`}>
@@ -278,7 +307,7 @@ export default function Login() {
         </section>
 
         <section className="nivas-form-side" aria-label="Sign in">
-          <div className="nivas-form-card" onPointerMove={handleTilt} onPointerLeave={resetTilt}>
+          <div className="nivas-form-card" data-field={focusField} data-loading={loading} onPointerMove={handleTilt} onPointerDown={handleCardPress} onPointerUp={resetTilt} onPointerCancel={resetTilt} onPointerLeave={resetTilt} onFocusCapture={handleFormFocus} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocusField('idle'); }}>
             <div className="nivas-portal-switch" role="group" aria-label="Choose your login portal">
               {Object.entries(portals).map(([key, value]) => {
                 const Icon = value.icon;
