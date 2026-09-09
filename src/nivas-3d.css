@@ -1,0 +1,134 @@
+/* Nivas: midnight architecture, luminous accents, crisp working surfaces. */
+.nivas-login, .nivas-app {
+  --portal-accent: #73c5ff; --portal-rgb: 115,197,255; --portal-ink: #1455a0;
+  --portal-button: #165eb6; --portal-soft: #eaf4ff;
+}
+[data-portal="warden"] { --portal-accent:#65e4be; --portal-rgb:101,228,190; --portal-ink:#08735c; --portal-button:#087760; --portal-soft:#e7f8f1; }
+[data-portal="admin"] { --portal-accent:#ffd084; --portal-rgb:255,208,132; --portal-ink:#885006; --portal-button:#815113; --portal-soft:#fff4dd; }
+.nivas-login { min-height:100svh; background:#080f1c; color:#e9f0fa; font-family:Inter,"Segoe UI",Arial,sans-serif; padding:0 40px; overflow-x:clip; }
+.nivas-login *, .nivas-login *::before, .nivas-login *::after { box-sizing:border-box; }
+.nivas-login button { cursor:pointer; }
+.nivas-login button:disabled { cursor:wait; opacity:.6; }
+.nivas-login :focus-visible, .nivas-app :focus-visible { outline:3px solid var(--portal-accent); outline-offset:4px; }
+.nivas-topbar { max-width:1240px; margin:0 auto; min-height:104px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.nivas-brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:#fff; }
+.nivas-brand img { width:38px; height:38px; border-radius:12px; }
+.nivas-brand > span:first-of-type { font-size:32px; font-weight:800; letter-spacing:-1.5px; }
+.nivas-brand-period { color:var(--portal-accent); }
+.nivas-brand-caption { margin-left:12px; padding-left:24px; border-left:1px solid #344053; font-size:12px; letter-spacing:1.8px; color:#a4b2c6; }
+.nivas-top-actions { display:flex; align-items:center; gap:10px; }
+.nivas-quiet-button, .nivas-install { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:42px; padding:10px 14px; font-size:14px; border:1px solid #334157; border-radius:12px; color:#d5dfed; background:transparent; transition:background .2s,transform .2s; }
+.nivas-install { background:#eaf2ff; color:#162a42; border-color:#eaf2ff; font-weight:600; }
+.nivas-quiet-button:hover { background:#17263c; }
+.nivas-install:hover { transform:translateY(-2px); }
+.nivas-entry { max-width:1240px; margin:8px auto 0; display:grid; grid-template-columns:1.08fr 1fr; border-radius:30px; box-shadow:0 36px 80px #0005,0 0 0 1px #ffffff13; overflow:hidden; min-height:700px; }
+.nivas-world { isolation:isolate; position:relative; background:radial-gradient(ellipse at 50% 50%,rgba(var(--portal-rgb),.16),transparent 65%),linear-gradient(155deg,#172b44,#101e33 60%,#0c192d); display:flex; flex-direction:column; min-width:0; overflow:hidden; transition:background .6s; }
+.nivas-world-grid { position:absolute; inset:0; pointer-events:none; z-index:-1; opacity:.09; background-image:linear-gradient(#98bad6 1px,transparent 1px),linear-gradient(90deg,#98bad6 1px,transparent 1px); background-size:54px 54px; mask-image:linear-gradient(transparent,#000 35%,transparent); }
+.nivas-world-heading { position:relative; padding:40px 42px 0; animation:nivas-copy-in .55s both; }
+.nivas-eyebrow { display:block; color:#d1dfee; font-size:12px; font-weight:600; letter-spacing:2.4px; }
+.nivas-eyebrow > span { color:var(--portal-accent); margin-right:8px; }
+.nivas-world h1 { margin:24px 0 0; font-size:clamp(30px,3.3vw,46px); font-weight:650; line-height:1.13; letter-spacing:-1.8px; }
+.nivas-world h1 em { font-style:normal; color:var(--portal-accent); transition:color .6s; }
+.nivas-world-stage { width:100%; height:390px; flex:1 0 320px; position:relative; }
+.nivas-world-stage::after { content:""; position:absolute; left:20%; right:20%; bottom:5%; height:8%; border-radius:50%; background:rgba(var(--portal-rgb),.16); filter:blur(24px); z-index:-1; }
+.nivas-canvas, .nivas-canvas-mount { position:relative; width:100%; height:100%; min-height:0; }
+.nivas-canvas canvas { display:block; width:100%; height:100%; }
+.nivas-scene-fallback { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:18px; text-transform:capitalize; color:#e8f2ff; }
+.nivas-scene-fallback img { width:100px; border-radius:24px; box-shadow:0 24px 60px #0006; }
+.nivas-world-bottom { padding:0 34px 27px; }
+.nivas-features { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; animation:nivas-copy-in .55s both; }
+.nivas-features > span { display:flex; align-items:center; gap:7px; border:1px solid #bdd8ff26; background:#ffffff06; padding:10px 12px; border-radius:11px; font-size:13px; color:#dfeafa; }
+.nivas-features svg { color:var(--portal-accent); }
+.nivas-world-meta { margin-top:26px; padding-top:20px; border-top:1px solid #bfd7f220; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; font-size:12px; color:#a4b6ca; }
+.nivas-world-meta button { display:flex; align-items:center; gap:7px; color:#c7d7e9; background:none; border:none; font-size:12px; }
+.nivas-form-side { min-width:0; background:#fff; color:#10223c; display:flex; align-items:center; justify-content:center; padding:44px; perspective:1600px; }
+.nivas-form-card { width:100%; max-width:408px; transform:rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)); transition:transform .25s ease-out; }
+.nivas-portal-switch { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border:1px solid #e2e8f0; background:#f2f5f9; border-radius:14px; padding:5px; gap:4px; }
+.nivas-portal-switch button { display:flex; gap:7px; min-height:46px; align-items:center; justify-content:center; border:0; border-radius:10px; font-size:14px; font-weight:600; color:#61718a; background:transparent; transition:color .25s,box-shadow .25s,background .25s,transform .25s; }
+.nivas-portal-switch button[aria-pressed="true"] { background:#fff; color:var(--portal-ink); box-shadow:0 3px 8px #10223c13; transform:translateY(-1px); }
+.nivas-form-heading { margin:28px 0 27px; animation:nivas-copy-in .48s both; }
+.nivas-role-mark { width:50px; height:50px; display:grid; place-items:center; color:var(--portal-ink); background:var(--portal-soft); border:1px solid #10223c0a; border-radius:15px; box-shadow:0 5px 0 #10223c08; transform:rotate(-6deg); margin-bottom:26px; }
+.nivas-role-mark svg { transform:rotate(6deg); }
+.nivas-form-kicker { font-size:12px!important; letter-spacing:1.7px; font-weight:650; color:var(--portal-ink)!important; margin:0 0 9px!important; }
+.nivas-form-heading h2 { margin:0 0 11px; font-size:clamp(26px,2.4vw,33px); line-height:1.15; letter-spacing:-1.1px; font-weight:750; color:#11243f; }
+.nivas-form-heading p { margin:0; color:#637087; font-size:16px; line-height:1.6; }
+.nivas-login-form label, .nivas-reset label { display:block; font-size:14px; line-height:1.5; font-weight:650; margin-bottom:8px; color:#283d56; }
+.nivas-field { display:flex; align-items:center; border:1px solid #d9e1eb; border-radius:12px; background:#f9fbfd; min-height:53px; padding:0 15px; gap:11px; margin-bottom:20px; color:#8090a3; transition:box-shadow .2s,border-color .2s,background .2s; }
+.nivas-field:focus-within { border-color:var(--portal-ink); background:#fff; box-shadow:0 0 0 3px var(--portal-soft); color:var(--portal-ink); }
+.nivas-field input { width:100%; min-width:0; padding:14px 0; outline:none!important; background:transparent; border:0; color:#132e4b; font-size:16px; }
+.nivas-field input::placeholder { color:#7a899b; }
+.nivas-field button { flex-shrink:0; display:grid; place-items:center; align-self:stretch; min-width:30px; background:transparent; border:0; color:#697b91; }
+.nivas-label-row { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+.nivas-label-row button { border:0; background:none; color:var(--portal-ink); font-size:13px; font-weight:600; }
+.nivas-submit { width:100%; display:flex; align-items:center; justify-content:center; gap:12px; min-height:54px; border:0; border-radius:12px; background:var(--portal-button,#165eb6); color:#fff; font-size:15px; font-weight:650; padding:15px 20px; margin-top:6px; box-shadow:0 5px 0 color-mix(in srgb,var(--portal-button,#165eb6),#000 25%),0 10px 20px #10223c1a; transition:transform .2s,box-shadow .2s,background .5s; }
+.nivas-submit:hover:not(:disabled) { transform:translateY(-2px); }
+.nivas-submit:active:not(:disabled) { transform:translateY(3px); box-shadow:0 1px 0 #122943; }
+.nivas-submit > svg { transition:transform .2s; }
+.nivas-submit:hover > svg { transform:translateX(3px); }
+.nivas-register { font-size:14px; color:#68788b; text-align:center; margin:26px 0 0; line-height:1.7; }
+.nivas-register button { color:var(--portal-ink); font-weight:650; border:0; background:none; }
+.nivas-form-footer { display:flex; align-items:center; justify-content:center; gap:8px; font-size:12px; color:#69798d; border-top:1px solid #e8edf4; padding-top:20px; margin-top:26px; }
+.nivas-page-footer { max-width:1240px; margin:0 auto; display:flex; justify-content:space-between; gap:12px; padding:27px 2px; color:#7e90a7; font-size:12px; letter-spacing:.6px; }
+.nivas-error { color:#9b253b; background:#fff0f2; border:1px solid #f6c8d0; padding:12px 15px; font-size:14px; line-height:1.5; border-radius:10px; margin-bottom:20px; }
+.nivas-success { color:#0d6549!important; background:#e9f8f1; padding:12px; border-radius:10px; }
+.nivas-spinner { width:17px; height:17px; border:2px solid #ffffff60; border-top-color:white; border-radius:50%; animation:nivas-spin .8s linear infinite; }
+.nivas-reset { position:fixed; inset:0; margin:auto; width:min(440px,calc(100vw - 32px)); border:1px solid #dbe5f3; border-radius:22px; padding:34px; color:#152940; background:white; box-shadow:0 35px 100px #0005; }
+.nivas-reset::backdrop { background:#071224bb; backdrop-filter:blur(8px); }
+.nivas-reset h2 { font-size:26px; font-weight:700; margin:20px 0 10px; }
+.nivas-reset p { font-size:16px; line-height:1.6; color:#65758a; margin-bottom:22px; }
+.nivas-reset input { padding:13px; border:1px solid #bccada; border-radius:10px; width:100%; margin-bottom:22px; font-size:16px; }
+.nivas-dialog-close { position:absolute; right:15px; top:15px; background:none; border:0; padding:8px; color:#66758a; cursor:pointer; }
+.nivas-splash { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; flex-direction:column; background:radial-gradient(ellipse at center,#183655,#080f1c 70%); color:white; }
+.nivas-splash-brand { display:flex; align-items:center; gap:13px; font-size:34px; font-weight:750; letter-spacing:-1px; }
+.nivas-splash-brand img { width:44px; border-radius:12px; }
+.nivas-splash-scene { width:min(620px,100%); height:min(48svh,410px); animation:nivas-scene-enter 1.1s both; }
+.nivas-splash p { font-size:20px; font-weight:550; margin:12px 0 25px; }
+.nivas-splash button { display:flex; align-items:center; gap:12px; border:1px solid #7596bb; border-radius:12px; color:#e1efff; padding:13px 20px; background:#142944; font-size:14px; }
+.nivas-splash-progress { position:absolute; bottom:0; width:100%; height:3px; background:#16304d; }
+.nivas-splash-progress span { display:block; width:100%; height:100%; background:#73c5ff; transform-origin:left; animation:nivas-progress 2s linear both; }
+.nivas-dev-tools { max-width:1240px; margin:0 auto; padding-bottom:20px; font-size:12px; color:#8e9db0; }
+.nivas-dev-tools button { display:inline-flex; align-items:center; gap:8px; margin:10px; }
+@keyframes nivas-spin { to { transform:rotate(360deg); } }
+@keyframes nivas-copy-in { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes nivas-scene-enter { from { opacity:0; transform:translateY(35px) scale(.85); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes nivas-progress { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+@keyframes nivas-panel-in { from { opacity:0; transform:perspective(1200px) translateY(14px) rotateX(1.5deg); } to { opacity:1; transform:perspective(1200px) translateY(0) rotateX(0); } }
+.nivas-app main { background-image:radial-gradient(ellipse at 70% 0%,rgba(var(--portal-rgb),.08),transparent 65%); }
+.nivas-app .nivas-content { animation:nivas-panel-in .5s both; }
+.nivas-app .card-hover { transition:transform .25s,box-shadow .25s; transform-style:preserve-3d; }
+.nivas-app .card-hover:hover { transform:perspective(1000px) translateY(-5px) rotateX(1deg); box-shadow:0 20px 35px -18px rgba(var(--portal-rgb),.5),0 10px 18px -14px #142f55; }
+.nivas-app nav button { transition:background .2s,box-shadow .2s,transform .2s; }
+.nivas-app nav button:active { transform:scale(.97); }
+.nivas-sidebar-world { flex-shrink:0; margin:8px 16px 18px; border-radius:18px; overflow:hidden; background:radial-gradient(ellipse at center,rgba(var(--portal-rgb),.15),transparent 80%),#102139; border:1px solid #385273; }
+.nivas-sidebar-world > div { height:156px; }
+.nivas-sidebar-world footer { display:flex; align-items:center; justify-content:space-between; gap:5px; padding:0 12px 12px; color:#dce9f7; font-size:12px; text-transform:capitalize; }
+.nivas-sidebar-world button { display:grid; place-items:center; border-radius:7px; border:1px solid #58728e; min-height:30px; min-width:30px; color:#dce9f7; cursor:pointer; }
+@media (max-width:1100px) { .nivas-login { padding:0 24px; } .nivas-form-side { padding:34px 28px; } .nivas-world-heading { padding:36px 30px 0; } .nivas-brand-caption { display:none; } .nivas-features { gap:6px; } .nivas-features > span { padding:9px; font-size:12px; } }
+@media (max-width:800px) {
+  .nivas-login { padding:0 16px; } .nivas-topbar { min-height:82px; } .nivas-brand > span:first-of-type { font-size:28px; } .nivas-brand img { width:32px; height:32px; }
+  .nivas-entry { grid-template-columns:1fr; min-height:0; border-radius:24px; margin-top:4px; }
+  .nivas-world { min-height:210px; display:grid; grid-template-columns:1fr 1fr; align-items:center; }
+  .nivas-world-heading { padding:26px 0 26px 28px; z-index:1; }
+  .nivas-world h1 { font-size:clamp(23px,4vw,34px); line-height:1.16; letter-spacing:-.8px; margin-top:16px; }
+  .nivas-eyebrow { font-size:12px; letter-spacing:1px; }
+  .nivas-world-stage { height:230px; min-width:0; }
+  .nivas-world-bottom { display:none; }
+  .nivas-form-side { padding:30px; } .nivas-form-card { max-width:520px; transform:none; }
+  .nivas-role-mark { display:none; } .nivas-form-heading { margin:24px 0; }
+  .nivas-form-heading h2 { font-size:30px; } .nivas-form-footer { margin-top:20px; padding-top:18px; }
+  .nivas-page-footer { padding:22px 2px; font-size:12px; flex-wrap:wrap; }
+}
+@media (max-width:430px) {
+  .nivas-login { padding:0 12px; } .nivas-topbar { gap:8px; }
+  .nivas-top-actions { gap:6px; } .nivas-quiet-button { padding:10px; } .nivas-quiet-button span { display:none; }
+  .nivas-install { padding:10px; font-size:12px; gap:6px; }
+  .nivas-form-side { padding:25px 20px; } .nivas-world-heading { padding-left:22px; } .nivas-world h1 { font-size:25px; }
+  .nivas-world { min-height:192px; grid-template-columns:1.05fr 1fr; } .nivas-world-stage { height:200px; }
+  .nivas-portal-switch button { font-size:13px; gap:5px; } .nivas-portal-switch svg { width:16px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .nivas-login *, .nivas-app * { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+  .nivas-form-card, .nivas-app .card-hover:hover { transform:none!important; }
+}
+html[data-nivas-motion="off"] .nivas-login *, html[data-nivas-motion="off"] .nivas-app * { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+html[data-nivas-motion="off"] .nivas-form-card, html[data-nivas-motion="off"] .nivas-app .card-hover:hover { transform:none!important; }

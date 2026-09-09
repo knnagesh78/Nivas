@@ -26,9 +26,13 @@ import {
 } from "lucide-react";
 import InstallWizardModal from "./InstallWizardModal";
 import NotificationCenter from "./NotificationCenter";
+import Hostel3DCanvas from "./3d/Hostel3DCanvas";
+import useMotionPreference from "../hooks/useMotionPreference";
+import { Pause, Play } from "lucide-react";
 
 export default function Layout({ children, activeTab, setActiveTab, onSelectNotification }) {
   const { userData, logout } = useAuth();
+  const { motion, toggleMotion } = useMotionPreference();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -166,7 +170,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
   };
 
   return (
-    <div className={`flex h-screen overflow-hidden font-sans transition-colors duration-300 ${
+    <div data-portal={userData?.role || "student"} className={`nivas-app flex h-screen overflow-hidden font-sans transition-colors duration-300 ${
       theme === "dark" ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"
     }`}>
       {/* Desktop Sidebar */}
@@ -259,6 +263,10 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
               );
             })}
           </nav>
+          <section className="nivas-sidebar-world" aria-label="Your portal">
+            <div><Hostel3DCanvas activeRole={userData?.role || 'student'} motion={motion} /></div>
+            <footer><span>{userData?.role || 'student'} workspace</span><button type="button" onClick={toggleMotion} aria-label={motion ? 'Pause animations' : 'Enable animations'} aria-pressed={motion}>{motion ? <Pause size={14} /> : <Play size={14} />}</button></footer>
+          </section>
         </div>
 
         {/* Footer Sign-out & Download */}
@@ -351,6 +359,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
                 );
               })}
               <div className="pt-2 mt-2 border-t border-slate-100 space-y-1">
+                <button type="button" onClick={toggleMotion} aria-pressed={motion} className="flex items-center w-full px-3 py-2 text-sm rounded-lg gap-3">{motion ? <Pause size={18} /> : <Play size={18} />}Animations {motion ? 'on' : 'off'}</button>
                 {canInstall && !isStandaloneMode && (
                   <button
                     onClick={() => {
@@ -379,7 +388,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectNoti
         <main className={`flex-1 overflow-y-auto pb-20 md:pb-6 ${
           theme === "dark" ? "bg-slate-950" : "bg-slate-50"
         }`}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+          <div className="nivas-content max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6" key={activeTab}>
             {/* Activity Navigation / Back Button Bar */}
             {activeTab && activeTab !== "dashboard" && (
               <div className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 shadow-sm rounded-2xl p-3.5 sm:px-5">

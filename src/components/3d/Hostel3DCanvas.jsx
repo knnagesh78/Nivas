@@ -1,279 +1,189 @@
-import React, { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
-import { createStudentScene } from "../scenes/StudentScene";
-import { createWardenScene } from "../scenes/WardenScene";
-import { createAdminScene } from "../scenes/AdminScene";
+import { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { createStudentScene } from '../scenes/StudentScene';
+import { createWardenScene } from '../scenes/WardenScene';
+import { createAdminScene } from '../scenes/AdminScene';
 
-/**
- * Master 3D WebGL Canvas for the Nivas Login Page
- * Coordinates:
- * - Student, Warden, and Admin 3D environments
- * - Smooth 600ms animated transitions between scenes
- * - Camera motion, ambient lighting shift, and mouse parallax
- * - High-efficiency resource management & mobile optimization
- */
-export default function Hostel3DCanvas({ activeRole = "student" }) {
+const palettes = { student: 0x67bcff, warden: 0x48dfb4, admin: 0xffc76b };
+
+// One renderer, interruptible transitions, and complete GPU resource cleanup.
+export default function Hostel3DCanvas({ activeRole = 'student', motion = true }) {
   const mountRef = useRef(null);
-  const [webGLSupported, setWebGLSupported] = useState(true);
-
-  // Keep ref of activeRole so the animation loop always knows the target
-  const targetRoleRef = useRef(activeRole);
-  const currentTransitionRef = useRef({
-    fromRole: activeRole,
-    toRole: activeRole,
-    startTime: performance.now(),
-    duration: 650, // 650ms smooth transition
-    isTransitioning: false
-  });
+  const roleRef = useRef(activeRole);
+  const motionRef = useRef(motion);
+  const controller = useRef(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (activeRole !== targetRoleRef.current) {
-      currentTransitionRef.current = {
-        fromRole: targetRoleRef.current,
-        toRole: activeRole,
-        startTime: performance.now(),
-        duration: 650,
-        isTransitioning: true
-      };
-      targetRoleRef.current = activeRole;
-    }
+    roleRef.current = activeRole;
+    controller.current?.draw();
   }, [activeRole]);
+  useEffect(() => {
+    motionRef.current = motion;
+    controller.current?.draw();
+  }, [motion]);
 
   useEffect(() => {
-    let animId;
     const container = mountRef.current;
     if (!container) return;
-
-    let width = container.clientWidth || 450;
-    let height = container.clientHeight || 500;
-
-    // 1. Scene & Camera Setup
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x070d1e, 0.035);
-
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 50);
-    camera.position.set(0, 1.2, 8.5);
-
-    // 2. WebGL Renderer
     let renderer;
-    try {
-      renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true,
-        powerPreference: "high-performance"
+    let disposed = false;
+    let frame = 0;
+    let visible = true;
+    let lastTime = 0;
+    let elapsed = 0;
+    let lastPaint = 0;
+    const pointer = new THREE.Vector2();
+    const cameraOffset = new THREE.Vector2();
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 80);
+    let fit = 1;
+    const environments = {};
+    const weights = { student: 0, warden: 0, admin: 0 };
+    weights[roleRef.current] = 1;
+
+    function disposeScene() {
+      const geometries = new Set();
+      const materials = new Set();
+      const textures = new Set();
+      scene.traverse(object => {
+        if (object.geometry) geometries.add(object.geometry);
+        for (const material of (Array.isArray(object.material) ? object.material : [object.material])) {
+          if (!material) continue;
+          materials.add(material);
+          for (const value of Object.values(material)) if (value?.isTexture) textures.add(value);
+        }
       });
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      textures.forEach(texture => texture.dispose());
+      materials.forEach(material => material.dispose());
+      geometries.forEach(geometry => geometry.dispose());
+    }
+
+    try {
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.6));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.45;
       container.appendChild(renderer.domElement);
-    } catch (err) {
-      console.warn("WebGL initialization failed:", err);
-      setWebGLSupported(false);
+      scene.add(new THREE.HemisphereLight(0xe7f2ff, 0x22334c, 2.8));
+      const key = new THREE.DirectionalLight(0xffffff, 3.8);
+      key.position.set(4, 8, 8);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x7fcfff, 2.2);
+      rim.position.set(-5, 4, -2);
+      scene.add(rim);
+      for (const [role, factory] of Object.entries({ student: createStudentScene, warden: createWardenScene, admin: createAdminScene })) {
+        const environment = factory();
+        const pivot = new THREE.Group();
+        pivot.add(environment.group);
+        scene.add(pivot);
+        environments[role] = { ...environment, pivot };
+      }
+    } catch (error) {
+      console.warn('The decorative 3D scene could not start.', error);
+      disposeScene();
+      renderer?.dispose();
+      renderer?.domElement.remove();
+      setFailed(true);
       return;
     }
 
-    // 3. Dynamic Ambient & Directional Lighting
-    const ambientLight = new THREE.AmbientLight(0x0f3b46, 1.8);
-    scene.add(ambientLight);
-
-    const keyLight = new THREE.DirectionalLight(0xa7f3d0, 1.6);
-    keyLight.position.set(6, 10, 8);
-    keyLight.castShadow = true;
-    scene.add(keyLight);
-
-    const accentLight = new THREE.PointLight(0x8b5cf6, 2.4, 18);
-    accentLight.position.set(-5, 4, 5);
-    scene.add(accentLight);
-
-    const rimLight = new THREE.PointLight(0x10b981, 2.0, 16);
-    rimLight.position.set(4, -2, -4);
-    scene.add(rimLight);
-
-    // 4. Build the Three Environments
-    const studentEnv = createStudentScene();
-    const wardenEnv = createWardenScene();
-    const adminEnv = createAdminScene();
-
-    scene.add(studentEnv.group);
-    scene.add(wardenEnv.group);
-    scene.add(adminEnv.group);
-
-    // Initialize visibility & scale based on activeRole
-    const envs = {
-      student: studentEnv,
-      warden: wardenEnv,
-      admin: adminEnv
+    const accent = new THREE.PointLight(palettes[roleRef.current], 12, 20);
+    accent.position.set(-4, 3, 5);
+    scene.add(accent);
+    const targetColor = new THREE.Color();
+    const onContextLost = event => {
+      event.preventDefault();
+      cancelAnimationFrame(frame);
+      frame = 0;
+      disposed = true;
+      setFailed(true);
     };
+    renderer.domElement.addEventListener('webglcontextlost', onContextLost);
 
-    Object.keys(envs).forEach((roleKey) => {
-      const isCurrent = roleKey === targetRoleRef.current;
-      envs[roleKey].group.visible = isCurrent;
-      envs[roleKey].group.scale.setScalar(isCurrent ? 1.0 : 0.01);
-      envs[roleKey].group.position.y = isCurrent ? 0 : -2.0;
-    });
-
-    // 5. Mouse / Touch Parallax Tracking
-    let mouseX = 0;
-    let mouseY = 0;
-    let targetMouseX = 0;
-    let targetMouseY = 0;
-
-    const handlePointerMove = (e) => {
-      const rect = container.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-      targetMouseX = x * 0.45;
-      targetMouseY = y * 0.25;
-    };
-    window.addEventListener("pointermove", handlePointerMove);
-
-    // 6. Animation & Scene Transition Loop
-    let startTime = performance.now();
-
-    const animate = (time) => {
-      animId = requestAnimationFrame(animate);
-      const elapsed = time - startTime;
-
-      // Parallax smooth damping
-      mouseX += (targetMouseX - mouseX) * 0.06;
-      mouseY += (targetMouseY - mouseY) * 0.06;
-      camera.position.x = mouseX;
-      camera.position.y = 1.2 + mouseY;
-      camera.lookAt(0, 0, 0);
-
-      // Handle Smooth 650ms Transition Between Scenes
-      const transition = currentTransitionRef.current;
-      const transElapsed = time - transition.startTime;
-      const progress = Math.min(transElapsed / transition.duration, 1.0);
-
-      // Cubic Ease-In-Out
-      const ease =
-        progress < 0.5
-          ? 4 * progress * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-      if (transition.isTransitioning) {
-        const fromEnv = envs[transition.fromRole];
-        const toEnv = envs[transition.toRole];
-
-        if (fromEnv && toEnv) {
-          // Outgoing scene smoothly scales down and slides down
-          fromEnv.group.visible = true;
-          const outScale = Math.max(1.0 - ease, 0.01);
-          fromEnv.group.scale.setScalar(outScale);
-          fromEnv.group.position.y = -ease * 2.0;
-
-          // Incoming scene smoothly scales up from bottom
-          toEnv.group.visible = true;
-          const inScale = Math.max(ease, 0.01);
-          toEnv.group.scale.setScalar(inScale);
-          toEnv.group.position.y = -(1.0 - ease) * 2.0;
-
-          // Transition lighting color subtly
-          if (transition.toRole === "student") {
-            accentLight.color.setHex(0x8b5cf6);
-            rimLight.color.setHex(0xa7f3d0);
-          } else if (transition.toRole === "warden") {
-            accentLight.color.setHex(0xf59e0b);
-            rimLight.color.setHex(0x10b981);
-          } else if (transition.toRole === "admin") {
-            accentLight.color.setHex(0x6366f1);
-            rimLight.color.setHex(0x34d399);
-          }
-        }
-
-        if (progress >= 1.0) {
-          transition.isTransitioning = false;
-          // Clean up visibility of non-active scenes
-          Object.keys(envs).forEach((roleKey) => {
-            const isTarget = roleKey === transition.toRole;
-            envs[roleKey].group.visible = isTarget;
-            envs[roleKey].group.scale.setScalar(isTarget ? 1.0 : 0.01);
-            envs[roleKey].group.position.y = isTarget ? 0 : -2.0;
-          });
-        }
+    function paint(time) {
+      frame = 0;
+      if (disposed || document.hidden || !visible) return;
+      if (motionRef.current && time - lastPaint < 32) { requestDraw(); return; }
+      const delta = Math.min(lastTime ? (time - lastTime) / 1000 : 1 / 30, 0.05);
+      lastTime = time;
+      lastPaint = time;
+      if (motionRef.current) elapsed += delta * 1000;
+      const damping = 1 - Math.exp(-delta * 9);
+      const active = roleRef.current;
+      for (const [role, environment] of Object.entries(environments)) {
+        const target = role === active ? 1 : 0;
+        weights[role] = motionRef.current ? THREE.MathUtils.lerp(weights[role], target, damping) : target;
+        if (Math.abs(weights[role] - target) < 0.002) weights[role] = target;
+        const weight = weights[role];
+        environment.pivot.visible = weight > 0.002;
+        environment.pivot.scale.setScalar(0.7 + weight * 0.3);
+        environment.pivot.position.set((1 - weight) * (role === active ? 2.2 : -2.2), -(1 - weight) * 1.7, -(1 - weight) * 3);
+        environment.pivot.rotation.y = (1 - weight) * -0.45;
+        if (environment.pivot.visible) environment.update(motionRef.current ? elapsed : 1800);
       }
-
-      // Update the active environment's internal animation loop
-      const activeEnv = envs[targetRoleRef.current];
-      if (activeEnv && activeEnv.update) {
-        activeEnv.update(elapsed);
-      }
-
+      cameraOffset.lerp(motionRef.current ? pointer : new THREE.Vector2(), damping);
+      camera.position.set((3.6 + cameraOffset.x) * fit, (2.8 + cameraOffset.y) * fit, 9.8 * fit);
+      camera.lookAt(0, 0.1, 0);
+      targetColor.setHex(palettes[active]);
+      accent.color.lerp(targetColor, motionRef.current ? damping : 1);
       renderer.render(scene, camera);
-    };
-
-    animId = requestAnimationFrame(animate);
-
-    // Resize handler
-    const handleResize = () => {
-      if (!container || !renderer || !camera) return;
-      const w = container.clientWidth || 450;
-      const h = container.clientHeight || 500;
-      camera.aspect = w / h;
+      if (motionRef.current) requestDraw();
+    }
+    function requestDraw() {
+      if (!frame && !disposed && visible && !document.hidden) frame = requestAnimationFrame(paint);
+    }
+    controller.current = { draw: requestDraw };
+    const resize = () => {
+      const width = Math.max(1, container.clientWidth);
+      const height = Math.max(1, container.clientHeight);
+      camera.aspect = width / height;
+      fit = Math.max(1, 1.05 / camera.aspect);
       camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      renderer.setSize(width, height);
+      requestDraw();
     };
-    window.addEventListener("resize", handleResize);
-
+    const observer = new ResizeObserver(resize);
+    observer.observe(container);
+    const intersection = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (!visible) { cancelAnimationFrame(frame); frame = 0; }
+      else { lastTime = 0; requestDraw(); }
+    });
+    intersection.observe(container);
+    const visibility = () => {
+      if (document.hidden) { cancelAnimationFrame(frame); frame = 0; }
+      else { lastTime = 0; requestDraw(); }
+    };
+    const move = event => {
+      if (event.pointerType !== 'mouse' || !motionRef.current) return;
+      const bounds = container.getBoundingClientRect();
+      pointer.set(((event.clientX - bounds.left) / bounds.width - 0.5) * 0.65, -((event.clientY - bounds.top) / bounds.height - 0.5) * 0.4);
+    };
+    const leave = () => pointer.set(0, 0);
+    container.addEventListener('pointermove', move);
+    container.addEventListener('pointerleave', leave);
+    document.addEventListener('visibilitychange', visibility);
+    resize();
     return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("resize", handleResize);
-      if (renderer && renderer.domElement && container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement);
-      }
-      renderer?.dispose();
+      disposed = true;
+      cancelAnimationFrame(frame);
+      controller.current = null;
+      observer.disconnect();
+      intersection.disconnect();
+      container.removeEventListener('pointermove', move);
+      container.removeEventListener('pointerleave', leave);
+      document.removeEventListener('visibilitychange', visibility);
+      renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
+      disposeScene();
+      renderer.dispose();
+      renderer.domElement.remove();
     };
   }, []);
 
-  return (
-    <div className="relative w-full h-full min-h-[300px] flex items-center justify-center select-none overflow-hidden">
-      {/* Dynamic Ambient Glow Behind 3D Elements */}
-      <div
-        className={`absolute inset-0 transition-opacity duration-700 pointer-events-none ${
-          activeRole === "student"
-            ? "bg-[radial-gradient(circle_at_45%_50%,rgba(99,102,241,0.22)_0%,transparent_70%)] opacity-100"
-            : activeRole === "warden"
-            ? "bg-[radial-gradient(circle_at_45%_50%,rgba(16,185,129,0.20)_0%,transparent_70%)] opacity-100"
-            : "bg-[radial-gradient(circle_at_45%_50%,rgba(139,92,246,0.22)_0%,transparent_70%)] opacity-100"
-        }`}
-      />
-
-      {/* WebGL Canvas Container */}
-      <div ref={mountRef} className="w-full h-full min-h-[300px] flex items-center justify-center cursor-grab active:cursor-grabbing" />
-
-      {/* Fallback for devices without WebGL */}
-      {!webGLSupported && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-slate-900/90 backdrop-blur-md">
-          <div className="h-16 w-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-3xl mb-3">
-            {activeRole === "student" ? "🎓" : activeRole === "warden" ? "📋" : "🛡️"}
-          </div>
-          <h4 className="text-base font-bold text-white capitalize">{activeRole} Portal 3D Hub</h4>
-          <p className="text-xs text-slate-400 mt-1 max-w-xs">
-            Interactive hostel environment active. WebGL hardware acceleration disabled.
-          </p>
-        </div>
-      )}
-
-      {/* Role State Indicator Pill at Bottom */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-slate-900/85 border border-slate-700/60 backdrop-blur-md text-[11px] font-semibold text-slate-200 flex items-center space-x-2 shadow-2xl pointer-events-none">
-        <span
-          className={`h-2 w-2 rounded-full animate-ping ${
-            activeRole === "student"
-              ? "bg-indigo-400"
-              : activeRole === "warden"
-              ? "bg-emerald-400"
-              : "bg-violet-400"
-          }`}
-        />
-        <span className="tracking-wide">
-          {activeRole === "student" && "Hostel Student Life & Academic Deck"}
-          {activeRole === "warden" && "Supervisory Office & Leave Approvals"}
-          {activeRole === "admin" && "Hostel System Grid & Network Control"}
-        </span>
-      </div>
-    </div>
-  );
+  return <div className="nivas-canvas" aria-hidden="true">
+    <div ref={mountRef} className="nivas-canvas-mount" />
+    {failed && <div className="nivas-scene-fallback"><img src="/logo.svg" alt="" /><span>{activeRole} portal</span></div>}
+  </div>;
 }
