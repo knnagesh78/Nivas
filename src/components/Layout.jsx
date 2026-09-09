@@ -65,7 +65,11 @@ export default function Layout({ children, activeTab = 'dashboard', setActiveTab
   });
   const drawer = useRef(null);
   const scrollArea = useRef(null);
-  useEffect(() => { try { localStorage.setItem('app_theme', theme); } catch { /* Theme still works locally. */ } }, [theme]);
+  useEffect(() => {
+    try { localStorage.setItem('app_theme', theme); } catch { /* Theme still works locally. */ }
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
   useEffect(() => {
     const element = drawer.current;
     if (mobileMenuOpen && !element.open) element.showModal();

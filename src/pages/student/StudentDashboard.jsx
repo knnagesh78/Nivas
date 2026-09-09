@@ -579,7 +579,7 @@ export default function StudentDashboard() {
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
-                <div className="p-2.5 rounded-xl bg-green-50 dark:bg-green-950/60 border border-green-100 dark:border-green-800/50 text-green-600 dark:text-green-400">
+                <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 border border-emerald-400/30">
                   <User className="h-5 w-5" />
                 </div>
                 <div>
@@ -587,7 +587,7 @@ export default function StudentDashboard() {
                   <p className="text-xs text-slate-400">Room {studentDetails?.roomNumber || "N/A"} • {roommates.length} roommate{roommates.length !== 1 ? "s" : ""}</p>
                 </div>
               </div>
-              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase bg-green-50 dark:bg-green-950/60 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800/50">
+              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-700/60 shadow-xs">
                 Data Call
               </span>
             </div>
@@ -643,21 +643,21 @@ export default function StudentDashboard() {
             <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">How Voice Calling Works</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 text-center">
-                <div className="h-10 w-10 mx-auto mb-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-500 flex items-center justify-center">
+                <div className="h-10 w-10 mx-auto mb-3 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white shadow-md shadow-indigo-500/20 flex items-center justify-center">
                   <PhoneCall className="h-5 w-5" />
                 </div>
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-200">1. Tap Call</p>
                 <p className="text-[10px] text-slate-400 mt-1">Press the call button next to your roommate's name</p>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 text-center">
-                <div className="h-10 w-10 mx-auto mb-3 rounded-xl bg-green-50 dark:bg-green-950/60 text-green-500 flex items-center justify-center">
+                <div className="h-10 w-10 mx-auto mb-3 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 flex items-center justify-center">
                   <Bell className="h-5 w-5" />
                 </div>
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-200">2. They Get Notified</p>
                 <p className="text-[10px] text-slate-400 mt-1">Your roommate's phone rings — even if the app is closed</p>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 text-center">
-                <div className="h-10 w-10 mx-auto mb-3 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-500 flex items-center justify-center">
+                <div className="h-10 w-10 mx-auto mb-3 rounded-xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/20 flex items-center justify-center">
                   <Activity className="h-5 w-5" />
                 </div>
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-200">3. Talk Free</p>
@@ -677,7 +677,7 @@ export default function StudentDashboard() {
             <div data-depth data-color="blue" className="nv-student-card nv-surface bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
-                  <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+                  <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-indigo-500/25 border border-indigo-400/30">
                     <DoorOpen className="h-5 w-5" />
                   </div>
                   <div>
@@ -685,17 +685,17 @@ export default function StudentDashboard() {
                     <p className="text-sm font-bold text-slate-900 dark:text-white">Hostel Accommodation</p>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase bg-indigo-50 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-700/60 shadow-xs">
                   {studentDetails?.roomNumber ? `Room ${studentDetails.roomNumber}` : "Unassigned"}
                 </span>
               </div>
 
-              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/60 p-4 rounded-2xl">
+              <div className="flex justify-between items-center bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-purple-50/40 dark:bg-slate-800/60 border border-blue-100/80 dark:border-slate-800 p-4 rounded-2xl">
                 <div>
-                  <span className="text-xs font-medium text-slate-400">Room Number</span>
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Room Number</span>
                   <p className="text-3xl font-black text-slate-900 dark:text-white">{studentDetails?.roomNumber || "N/A"}</p>
                 </div>
-                <div className="h-12 w-12 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-base shadow-lg shadow-indigo-500/20">
+                <div className="h-12 w-12 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-base shadow-lg shadow-indigo-500/25">
                   {studentDetails?.roomNumber || "?"}
                 </div>
               </div>
@@ -708,18 +708,28 @@ export default function StudentDashboard() {
                   <p className="text-xs text-slate-400 italic py-2">No roommates currently registered in this room.</p>
                 ) : (
                   <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
-                    {roommates.map((rm) => (
-                      <div key={rm.id} className="flex items-center space-x-3 p-2.5 bg-slate-50 dark:bg-slate-950/40 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all border border-slate-150 dark:border-slate-800">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                          {rm.name ? rm.name[0].toUpperCase() : "S"}
+                    {roommates.map((rm, idx) => {
+                      const avatarGradients = [
+                        "from-indigo-500 to-purple-600",
+                        "from-emerald-500 to-teal-600",
+                        "from-amber-500 to-orange-600",
+                        "from-rose-500 to-pink-600",
+                        "from-sky-500 to-blue-600",
+                      ];
+                      const grad = avatarGradients[idx % avatarGradients.length];
+                      return (
+                        <div key={rm.id} className="flex items-center space-x-3 p-2.5 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all border border-slate-100 dark:border-slate-800">
+                          <div className={`h-8 w-8 rounded-full bg-gradient-to-tr ${grad} text-white flex items-center justify-center font-bold text-xs shadow-xs`}>
+                            {rm.name ? rm.name[0].toUpperCase() : "S"}
+                          </div>
+                          <div className="flex-1 overflow-hidden">
+                            <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{rm.name}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{rm.course || "Student"}</p>
+                          </div>
+                          <CallButton calleeUid={rm.id} calleeName={rm.name || "Roommate"} size="sm" />
                         </div>
-                        <div className="flex-1 overflow-hidden">
-                          <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{rm.name}</p>
-                          <p className="text-[10px] text-slate-400 truncate">{rm.course || "Student"}</p>
-                        </div>
-                        <CallButton calleeUid={rm.id} calleeName={rm.name || "Roommate"} size="sm" />
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -729,7 +739,7 @@ export default function StudentDashboard() {
             <div data-depth data-color="teal" className="nv-student-card nv-surface bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
-                  <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/50 text-emerald-600 dark:text-emerald-400">
+                  <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 border border-emerald-400/30">
                     <Calendar className="h-5 w-5" />
                   </div>
                   <div>
@@ -747,24 +757,24 @@ export default function StudentDashboard() {
 
                 return (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 p-4 rounded-2xl">
+                    <div className="flex items-center justify-between bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-cyan-500/10 dark:bg-slate-800/60 border border-emerald-200/80 dark:border-emerald-800/50 p-4 rounded-2xl">
                       <div>
-                        <span className="text-xs font-semibold text-slate-400">Monthly Average</span>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Monthly Average</span>
                         <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{rate}%</p>
                       </div>
-                      <div className="h-14 w-14 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 flex items-center justify-center font-extrabold text-emerald-600 dark:text-emerald-400 text-sm shadow-inner">
+                      <div className="h-14 w-14 rounded-full border-4 border-emerald-200 dark:border-emerald-800 border-t-emerald-500 bg-white dark:bg-slate-900 flex items-center justify-center font-black text-emerald-600 dark:text-emerald-400 text-sm shadow-sm">
                         {present}/{total}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 text-center">
-                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800">
+                      <div className="p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Present</span>
                         <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">{present} Days</span>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800">
+                      <div className="p-2.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-800/50">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Absent</span>
-                        <span className="text-sm font-black text-rose-500">{absent} Days</span>
+                        <span className="text-sm font-black text-rose-500 dark:text-rose-400">{absent} Days</span>
                       </div>
                     </div>
                   </div>
@@ -774,7 +784,7 @@ export default function StudentDashboard() {
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={() => setActiveTab("attendance")}
-                  className="w-full text-center text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline transition-all py-1 cursor-pointer flex items-center justify-center space-x-1"
+                  className="w-full text-center text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-all py-1 cursor-pointer flex items-center justify-center space-x-1"
                 >
                   <span>View detailed attendance records</span>
                   <span>&rarr;</span>
@@ -786,7 +796,7 @@ export default function StudentDashboard() {
             <div data-depth data-color="purple" className="nv-student-card nv-surface bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
-                  <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-100 dark:border-purple-800/50 text-purple-600 dark:text-purple-400">
+                  <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/25 border border-purple-400/30">
                     <Activity className="h-5 w-5" />
                   </div>
                   <div>
@@ -800,7 +810,7 @@ export default function StudentDashboard() {
                 <div className="space-y-1.5">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Latest Leave Request</span>
                   {leaves.length > 0 ? (
-                    <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-purple-50/40 dark:bg-slate-800/50 border border-purple-100/80 dark:border-slate-700/60">
                       <div className="overflow-hidden pr-2">
                         <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{leaves[0].reason}</p>
                         <p className="text-[10px] text-slate-400">{leaves[0].fromDate} to {leaves[0].toDate}</p>
@@ -810,14 +820,14 @@ export default function StudentDashboard() {
                       </span>
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-400 italic bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-xl text-center">No leave requests submitted yet.</p>
+                    <p className="text-xs text-slate-400 italic bg-purple-50/20 dark:bg-slate-800/40 border border-purple-100/40 dark:border-slate-800 p-2.5 rounded-xl text-center">No leave requests submitted yet.</p>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Latest Complaint</span>
                   {complaints.length > 0 ? (
-                    <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-amber-50/40 dark:bg-slate-800/50 border border-amber-100/80 dark:border-slate-700/60">
                       <div className="overflow-hidden pr-2">
                         <p className="text-xs font-bold text-slate-800 dark:text-slate-200 capitalize truncate">{complaints[0].category} Issue</p>
                         <p className="text-[10px] text-slate-400 truncate max-w-44">{complaints[0].description}</p>
@@ -827,7 +837,7 @@ export default function StudentDashboard() {
                       </span>
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-400 italic bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-xl text-center">No complaints submitted yet.</p>
+                    <p className="text-xs text-slate-400 italic bg-amber-50/20 dark:bg-slate-800/40 border border-amber-100/40 dark:border-slate-800 p-2.5 rounded-xl text-center">No complaints submitted yet.</p>
                   )}
                 </div>
               </div>
@@ -838,7 +848,7 @@ export default function StudentDashboard() {
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+                <div className="p-3 rounded-2xl bg-gradient-to-tr from-indigo-500 to-sky-500 text-white shadow-md shadow-indigo-500/25 border border-indigo-400/30">
                   <Megaphone className="h-6 w-6" />
                 </div>
                 <div>
@@ -846,15 +856,17 @@ export default function StudentDashboard() {
                   <p className="text-xs text-slate-400">Official announcements from the Warden & Hostel Administration</p>
                 </div>
               </div>
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-700/60 shadow-xs">
                 {notices.length} Active {notices.length === 1 ? "Notice" : "Notices"}
               </span>
             </div>
 
             {notices.length === 0 ? (
-              <div className="text-center py-10 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl">
-                <Bell className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-slate-500">No active notices posted right now.</p>
+              <div className="text-center py-10 border-2 border-dashed border-indigo-100 dark:border-indigo-950/60 rounded-2xl bg-indigo-50/20 dark:bg-slate-800/20">
+                <div className="h-12 w-12 mx-auto mb-2 rounded-2xl bg-gradient-to-tr from-indigo-100 to-purple-100 dark:bg-indigo-950/50 text-indigo-500 flex items-center justify-center">
+                  <Bell className="h-6 w-6" />
+                </div>
+                <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">No active notices posted right now.</p>
                 <p className="text-xs text-slate-400 mt-1">Check back later for hostel updates, curfew times, and maintenance schedules.</p>
               </div>
             ) : (

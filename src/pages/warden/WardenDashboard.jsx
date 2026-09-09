@@ -587,7 +587,7 @@ export default function WardenDashboard() {
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Students</span>
                 <p className="text-3xl font-black text-slate-900 dark:text-white mt-1">{totalStudents}</p>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-xs">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
                 <Users className="h-6 w-6" />
               </div>
             </div>
@@ -597,7 +597,7 @@ export default function WardenDashboard() {
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Pending Leaves</span>
                 <p className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-1">{pendingLeavesCount}</p>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-800/50 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-xs">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-amber-500/25">
                 <FileText className="h-6 w-6" />
               </div>
             </div>
@@ -607,7 +607,7 @@ export default function WardenDashboard() {
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Open Complaints</span>
                 <p className="text-3xl font-black text-rose-600 dark:text-rose-400 mt-1">{openComplaintsCount}</p>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-100 dark:border-rose-800/50 flex items-center justify-center text-rose-600 dark:text-rose-400 shadow-xs">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white flex items-center justify-center shadow-md shadow-rose-500/25">
                 <AlertCircle className="h-6 w-6" />
               </div>
             </div>
@@ -619,7 +619,7 @@ export default function WardenDashboard() {
                   {Object.values(occupancyMap).reduce((a, b) => a + b, 0)}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-xs">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/25">
                 <DoorOpen className="h-6 w-6" />
               </div>
             </div>
@@ -637,7 +637,7 @@ export default function WardenDashboard() {
                   onClick={() => setTab("attendance")}
                   className="p-4 bg-slate-50 dark:bg-slate-950/60 hover:bg-indigo-50/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-indigo-200 rounded-2xl text-left transition-all duration-200 group cursor-pointer"
                 >
-                  <div className="h-10 w-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-blue-600 text-white flex items-center justify-center mb-3 shadow-md shadow-indigo-500/20 group-hover:scale-110 transition-transform">
                     <ClipboardList className="h-5 w-5" />
                   </div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600">Mark Attendance</p>
@@ -648,7 +648,7 @@ export default function WardenDashboard() {
                   onClick={() => setTab("leave")}
                   className="p-4 bg-slate-50 dark:bg-slate-950/60 hover:bg-amber-50/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-amber-200 rounded-2xl text-left transition-all duration-200 group cursor-pointer"
                 >
-                  <div className="h-10 w-10 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center mb-3 shadow-md shadow-amber-500/20 group-hover:scale-110 transition-transform">
                     <FileText className="h-5 w-5" />
                   </div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-amber-600">Approve Leaves</p>
@@ -659,7 +659,7 @@ export default function WardenDashboard() {
                   onClick={() => setTab("complaints")}
                   className="p-4 bg-slate-50 dark:bg-slate-950/60 hover:bg-rose-50/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-rose-200 rounded-2xl text-left transition-all duration-200 group cursor-pointer"
                 >
-                  <div className="h-10 w-10 rounded-xl bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white flex items-center justify-center mb-3 shadow-md shadow-rose-500/20 group-hover:scale-110 transition-transform">
                     <AlertCircle className="h-5 w-5" />
                   </div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-rose-600">Resolve Complaints</p>
@@ -670,7 +670,7 @@ export default function WardenDashboard() {
                   onClick={() => setTab("notices")}
                   className="p-4 bg-slate-50 dark:bg-slate-950/60 hover:bg-emerald-50/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-emerald-200 rounded-2xl text-left transition-all duration-200 group cursor-pointer"
                 >
-                  <div className="h-10 w-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center mb-3 shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform">
                     <Megaphone className="h-5 w-5" />
                   </div>
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600">Post Notice</p>

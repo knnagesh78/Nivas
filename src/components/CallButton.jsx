@@ -43,12 +43,13 @@ export default function CallButton({ calleeUid, calleeName, size = "sm", classNa
   if (size === "lg") {
     return (
       <button
+        data-plain="true"
         onClick={handleCall}
         disabled={isDisabled}
         className={`group relative inline-flex items-center justify-center px-5 py-3 rounded-2xl font-bold text-sm transition-all duration-300 cursor-pointer overflow-hidden ${
           isDisabled
             ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-            : "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98]"
+            : "bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/35 hover:scale-[1.02] active:scale-[0.98]"
         } ${className}`}
         title={`Call ${calleeName}`}
       >
@@ -73,12 +74,13 @@ export default function CallButton({ calleeUid, calleeName, size = "sm", classNa
   // Small (icon-only) variant — used in roommate cards
   return (
     <button
+      data-plain="true"
       onClick={handleCall}
       disabled={isDisabled}
-      className={`group relative p-2 rounded-xl transition-all duration-200 cursor-pointer ${
+      className={`group relative p-2.5 rounded-xl transition-all duration-200 cursor-pointer ${
         isDisabled
           ? "bg-slate-100 text-slate-300 cursor-not-allowed"
-          : "bg-green-50 dark:bg-green-950/60 text-green-600 dark:text-green-400 hover:bg-green-500 hover:text-white border border-green-200 dark:border-green-800/50 hover:border-green-500 hover:shadow-md hover:shadow-green-500/20 active:scale-90"
+          : "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 hover:bg-gradient-to-tr hover:from-emerald-500 hover:to-teal-500 hover:text-white border border-emerald-200 dark:border-emerald-800/50 hover:border-emerald-400 shadow-xs hover:shadow-md hover:shadow-emerald-500/25 active:scale-95"
       } ${className}`}
       title={`Voice call ${calleeName}`}
     >
@@ -89,7 +91,7 @@ export default function CallButton({ calleeUid, calleeName, size = "sm", classNa
       )}
       {/* Pulse indicator when idle */}
       {!isDisabled && !isInitiating && (
-        <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-green-400 animate-pulse ring-2 ring-white dark:ring-slate-900" />
+        <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 animate-pulse ring-2 ring-white dark:ring-slate-900" />
       )}
     </button>
   );
