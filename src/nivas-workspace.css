@@ -174,5 +174,85 @@
 }
 @media (max-width:390px) { .nv-toolbar { padding:12px; } .nv-toolbar-title { gap:7px; } .nv-toolbar-actions { gap:5px; } .nv-toolbar-title strong { font-size:14px; } .nv-shell main.nv-main { padding-left:12px; padding-right:12px; } .nv-welcome h1 { font-size:24px; } .nv-welcome-copy { padding-left:18px; } .nv-welcome p { font-size:12px; } .nv-shortcut { padding:12px 10px; gap:8px; } .nv-shortcut-label { font-size:12px; } .nv-bottom-nav small { font-size:10px; } }
 @media (prefers-reduced-motion:reduce) { .nv-shell *, .nv-shell *::before, .nv-shell *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } .nv-shell .nv-stat-card:hover,.nv-shell .nv-shortcut:hover,.nv-shell .nv-activity-body button:hover { transform:none; } }
-html[data-nivas-motion="off"] .nv-shell *,html[data-nivas-motion="off"] .nv-shell *::before,html[data-nivas-motion="off"] .nv-shell *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
 html[data-nivas-motion="off"] .nv-shell .nv-stat-card:hover,html[data-nivas-motion="off"] .nv-shell .nv-shortcut:hover { transform:none; }
+
+/* Dedicated Attendance Toggle Segmented Buttons */
+.att-toggle-group {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  background-color: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 16px !important;
+}
+.nv-shell[data-theme="dark"] .att-toggle-group {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+.att-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+  border: 1px solid transparent !important;
+  cursor: pointer !important;
+  min-height: 32px !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: all 0.18s ease-in-out !important;
+  background-color: transparent !important;
+  color: #64748b !important;
+}
+.att-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: #1e293b !important;
+  transform: translateY(-1px) !important;
+}
+.nv-shell[data-theme="dark"] .att-btn {
+  color: #94a3b8 !important;
+}
+.nv-shell[data-theme="dark"] .att-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f1f5f9 !important;
+}
+
+/* Selected Present: Emerald Green */
+.att-btn.is-present {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+  border-color: #047857 !important;
+  box-shadow: 0 3px 10px rgba(5, 150, 105, 0.45) !important;
+}
+.att-btn.is-present:hover {
+  background-color: #047857 !important;
+  color: #ffffff !important;
+}
+
+/* Selected Absent: Vibrant Rose Red */
+.att-btn.is-absent {
+  background-color: #e11d48 !important;
+  color: #ffffff !important;
+  border-color: #be123c !important;
+  box-shadow: 0 3px 10px rgba(225, 29, 72, 0.45) !important;
+}
+.att-btn.is-absent:hover {
+  background-color: #be123c !important;
+  color: #ffffff !important;
+}
+
+/* Selected Leave: Rich Amber / Gold */
+.att-btn.is-leave {
+  background-color: #d97706 !important;
+  color: #ffffff !important;
+  border-color: #b45309 !important;
+  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.45) !important;
+}
+.att-btn.is-leave:hover {
+  background-color: #b45309 !important;
+  color: #ffffff !important;
+}
+

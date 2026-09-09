@@ -197,8 +197,15 @@ export default function AdminDashboard() {
       setNotices(noticesList);
 
       // 7. Today's Attendance summary
-      const todayStr = new Date().toISOString().split("T")[0];
-      const attSnap = await getDocs(collection(db, "attendance", todayStr, "records"));
+      const now = new Date();
+      const localDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      let attSnap = await getDocs(collection(db, "attendance", localDateStr, "records"));
+      if (attSnap.empty) {
+        const isoDateStr = now.toISOString().split("T")[0];
+        if (isoDateStr !== localDateStr) {
+          attSnap = await getDocs(collection(db, "attendance", isoDateStr, "records"));
+        }
+      }
       let presentTodayCount = 0;
       attSnap.forEach((doc) => {
         if (doc.data().status === "present") presentTodayCount++;
@@ -705,7 +712,7 @@ export default function AdminDashboard() {
                   <tr key={s.id} className="text-sm">
                     <td className="py-3.5">
                       <div className="flex items-center space-x-3">
-                        <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">
+                        <div className="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 overflow-hidden shrink-0">
                           {s.photoUrl ? (
                             <img src={s.photoUrl} className="h-full w-full rounded-full object-cover" onError={(e) => e.target.style.display='none'} />
                           ) : (
@@ -713,7 +720,14 @@ export default function AdminDashboard() {
                           )}
                         </div>
                         <div>
-                          <p className="font-bold text-slate-800">{s.name || "Incomplete Profile"}</p>
+                          <div className="flex items-center space-x-2">
+                            <p className="font-bold text-slate-800 dark:text-slate-200">{s.name || "Incomplete Profile"}</p>
+                            {s.idNumber && (
+                              <span className="px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 text-indigo-700 dark:text-indigo-300 text-[10px] font-extrabold">
+                                #{s.idNumber}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-[10px] text-slate-400">UID: {s.id.substring(0, 8)}...</p>
                         </div>
                       </div>
