@@ -529,7 +529,7 @@ export default function AdminDashboard() {
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Students</span>
                 <p className="text-3xl font-black text-slate-900 dark:text-white mt-1">{stats.totalStudents}</p>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-xs">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
                 <Users className="h-6 w-6" />
               </div>
             </div>
@@ -539,7 +539,7 @@ export default function AdminDashboard() {
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Active Wardens</span>
                 <p className="text-3xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{stats.totalWardens}</p>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-100 dark:border-purple-800/50 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-xs">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md shadow-purple-500/25">
                 <Shield className="h-6 w-6" />
               </div>
             </div>
@@ -549,7 +549,7 @@ export default function AdminDashboard() {
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Rooms Configured</span>
                 <p className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-1">{stats.totalRooms}</p>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-800/50 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-xs">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-amber-500/25">
                 <DoorOpen className="h-6 w-6" />
               </div>
             </div>
@@ -561,7 +561,7 @@ export default function AdminDashboard() {
                   {stats.occupiedBeds} / {stats.totalBeds}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-xs">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/25">
                 <DoorOpen className="h-6 w-6" />
               </div>
             </div>
@@ -807,7 +807,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={roomLoading}
-                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center"
+                className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 py-3 text-center text-sm font-semibold text-white shadow-md shadow-amber-500/20 disabled:opacity-50 flex items-center justify-center cursor-pointer transition-all active:scale-98"
               >
                 {roomLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -945,7 +945,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={wardenLoading}
-                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center"
+                className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 py-3 text-center text-sm font-semibold text-white shadow-md shadow-purple-500/20 disabled:opacity-50 flex items-center justify-center cursor-pointer transition-all active:scale-98"
               >
                 {wardenLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1049,7 +1049,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={noticeLoading}
-                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center transition-all"
+                className="w-full rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 py-3 text-center text-sm font-semibold text-white shadow-md shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer active:scale-98"
               >
                 {noticeLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1171,7 +1171,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={credLoading}
-                className="w-full sm:w-auto px-6 rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center"
+                className="w-full sm:w-auto px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 py-3 text-center text-sm font-semibold text-white shadow-md shadow-purple-500/20 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer active:scale-98"
               >
                 {credLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>

@@ -261,14 +261,14 @@ export default function LostFoundFeed({ initialSelectedItem = null, onClearSelec
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Top Banner & Header CTA */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 border border-indigo-900/40 rounded-3xl p-6 sm:p-7 shadow-xl text-white relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 border border-white/20 rounded-3xl p-6 sm:p-7 shadow-xl text-white relative overflow-hidden">
         <div className="flex items-center space-x-4 relative z-10">
-          <div className="h-12 w-12 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shadow-xs flex-shrink-0">
+          <div className="h-12 w-12 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-xs flex-shrink-0 backdrop-blur-md">
             <Package className="h-6 w-6" />
           </div>
           <div>
             <h2 className="text-2xl font-black tracking-tight text-white">Lost & Found Portal</h2>
-            <p className="text-xs text-indigo-200 mt-1">
+            <p className="text-xs text-indigo-100 mt-1">
               Report lost items, declare found belongings, and securely verify ownership.
             </p>
           </div>
@@ -276,7 +276,7 @@ export default function LostFoundFeed({ initialSelectedItem = null, onClearSelec
 
         <button
           onClick={() => setReportModalOpen(true)}
-          className="flex items-center justify-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm px-5 py-3 rounded-2xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all cursor-pointer relative z-10 active:scale-95"
+          className="flex items-center justify-center space-x-2 bg-white text-indigo-700 hover:bg-white/90 font-extrabold text-sm px-5 py-3 rounded-2xl shadow-lg transition-all cursor-pointer relative z-10 active:scale-95"
         >
           <Plus className="h-5 w-5" />
           <span>Report Lost Item</span>

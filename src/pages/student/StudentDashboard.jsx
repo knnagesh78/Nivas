@@ -1233,16 +1233,16 @@ export default function StudentDashboard() {
       {activeTab === "profile" && (
         <div className="space-y-8 animate-fadeIn max-w-4xl mx-auto">
           {/* Digital Hostel Student ID Card Header */}
-          <div className="relative rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-6 sm:p-8 text-white overflow-hidden shadow-2xl border border-indigo-500/30">
+          <div className="relative rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-6 sm:p-8 text-white overflow-hidden shadow-2xl border border-white/20">
             {/* Ambient Lighting */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
             <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
               {/* Avatar Box */}
               <div className="relative shrink-0">
-                <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-1 shadow-xl">
-                  <div className="h-full w-full rounded-[14px] bg-slate-900 overflow-hidden flex items-center justify-center">
+                <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-2xl bg-white/20 p-1 shadow-xl border border-white/30 backdrop-blur-md">
+                  <div className="h-full w-full rounded-[14px] bg-gradient-to-tr from-indigo-700 to-purple-800 overflow-hidden flex items-center justify-center">
                     {editPhoto || studentDetails?.photoUrl ? (
                       <img src={editPhoto || studentDetails.photoUrl} alt="Profile" className="h-full w-full object-cover" />
                     ) : (
@@ -1252,7 +1252,7 @@ export default function StudentDashboard() {
                     )}
                   </div>
                 </div>
-                <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-slate-950 p-1.5 rounded-full shadow-lg border-2 border-slate-900" title="Active Verified Resident">
+                <div className="absolute -bottom-2 -right-2 bg-emerald-400 text-emerald-950 p-1.5 rounded-full shadow-lg border-2 border-white" title="Active Verified Resident">
                   <BadgeCheck className="h-4 w-4" />
                 </div>
               </div>
@@ -1260,12 +1260,12 @@ export default function StudentDashboard() {
               {/* Student Identification Details */}
               <div className="flex-1 text-center md:text-left space-y-3">
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300">
-                    <ShieldCheck className="h-3.5 w-3.5 mr-1.5 text-indigo-400" />
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-white/20 border border-white/30 text-white backdrop-blur-md">
+                    <ShieldCheck className="h-3.5 w-3.5 mr-1.5 text-white" />
                     Digital Hostel ID Card
                   </span>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 border border-emerald-400/30 text-emerald-300">
-                    <Check className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-400/30 border border-emerald-300/40 text-emerald-100 backdrop-blur-md">
+                    <Check className="h-3.5 w-3.5 mr-1.5 text-emerald-200" />
                     Verified Resident
                   </span>
                 </div>
@@ -1274,31 +1274,31 @@ export default function StudentDashboard() {
                   <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                     {studentDetails?.name || "Student Name"}
                   </h2>
-                  <p className="text-sm font-semibold text-indigo-300">
+                  <p className="text-sm font-semibold text-indigo-100">
                     {studentDetails?.course || "Course Unset"} &bull; {studentDetails?.year || "Year Unset"}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 text-xs">
-                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Room Assigned</span>
+                  <div className="p-2.5 rounded-xl bg-white/15 border border-white/20 backdrop-blur-md shadow-xs">
+                    <span className="text-[10px] text-indigo-100 uppercase tracking-wider block font-bold">Room Assigned</span>
                     <span className="font-extrabold text-white">{studentDetails?.roomNumber || "Unassigned"}</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Mobile Phone</span>
+                  <div className="p-2.5 rounded-xl bg-white/15 border border-white/20 backdrop-blur-md shadow-xs">
+                    <span className="text-[10px] text-indigo-100 uppercase tracking-wider block font-bold">Mobile Phone</span>
                     <span className="font-extrabold text-white truncate block">{studentDetails?.phone || "Not set"}</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm col-span-2 sm:col-span-1">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Parent Contact</span>
+                  <div className="p-2.5 rounded-xl bg-white/15 border border-white/20 backdrop-blur-md shadow-xs col-span-2 sm:col-span-1">
+                    <span className="text-[10px] text-indigo-100 uppercase tracking-wider block font-bold">Parent Contact</span>
                     <span className="font-extrabold text-white truncate block">{studentDetails?.parentContact || "Not set"}</span>
                   </div>
                 </div>
               </div>
 
               {/* QR Badge graphic stamp */}
-              <div className="hidden lg:flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 shrink-0">
-                <QrCode className="h-16 w-16 text-indigo-300" />
-                <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mt-1">NIVAS PASS</span>
+              <div className="hidden lg:flex flex-col items-center justify-center p-3 rounded-2xl bg-white/15 border border-white/25 backdrop-blur-md shrink-0 shadow-sm">
+                <QrCode className="h-16 w-16 text-white" />
+                <span className="text-[9px] font-extrabold text-indigo-100 uppercase tracking-widest mt-1">NIVAS PASS</span>
               </div>
             </div>
           </div>
@@ -1306,7 +1306,7 @@ export default function StudentDashboard() {
           {/* Profile Form Card */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
             <div className="flex items-center space-x-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+              <div className="p-3 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white shadow-md shadow-indigo-500/20">
                 <User className="h-6 w-6" />
               </div>
               <div>
@@ -1511,7 +1511,7 @@ export default function StudentDashboard() {
                 <button
                   type="submit"
                   disabled={profileLoading}
-                  className="px-8 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25 transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center justify-center space-x-2"
+                  className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center justify-center space-x-2"
                 >
                   {profileLoading ? (
                     <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1529,7 +1529,7 @@ export default function StudentDashboard() {
           {/* Change Password Security Card */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
             <div className="flex items-center space-x-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400">
+              <div className="p-3 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-600 text-white shadow-md shadow-purple-500/20">
                 <Lock className="h-6 w-6" />
               </div>
               <div>
@@ -1558,7 +1558,7 @@ export default function StudentDashboard() {
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <Key className="h-4 w-4 text-slate-400" />
+                    <Key className="h-4 w-4 text-purple-500" />
                   </div>
                   <input
                     type={showNewPassword ? "text" : "password"}
@@ -1585,7 +1585,7 @@ export default function StudentDashboard() {
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <Key className="h-4 w-4 text-slate-400" />
+                    <Key className="h-4 w-4 text-purple-500" />
                   </div>
                   <input
                     type={showConfirmPassword ? "text" : "password"}
@@ -1610,7 +1610,7 @@ export default function StudentDashboard() {
                 <button
                   type="submit"
                   disabled={passwordLoading}
-                  className="px-6 py-3 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center justify-center space-x-2"
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-purple-500/25 transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center justify-center space-x-2"
                 >
                   {passwordLoading ? (
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>

@@ -81,9 +81,9 @@ export default function StudentAttendanceModal({ student, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 shrink-0">
+        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 shrink-0">
           <div className="flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xl">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-indigo-500/20">
               {student.photoUrl ? (
                 <img src={student.photoUrl} alt="Avatar" className="h-full w-full rounded-full object-cover" onError={(e) => e.target.style.display='none'} />
               ) : (
@@ -101,7 +101,7 @@ export default function StudentAttendanceModal({ student, onClose }) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full bg-slate-200/50 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 transition-colors cursor-pointer"
+            className="p-2 rounded-full bg-slate-200/60 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -117,22 +117,22 @@ export default function StudentAttendanceModal({ student, onClose }) {
             <>
               {/* Summary Metrics */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 p-5 rounded-2xl flex flex-col justify-center">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Attendance Rate</span>
+                <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 p-5 rounded-2xl flex flex-col justify-center">
+                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Attendance Rate</span>
                   <div className="flex items-baseline space-x-2 mt-1">
                     <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{rate}%</span>
                     <span className="text-xs text-slate-400">Last 30 Days</span>
                   </div>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-center items-center text-center">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Present</span>
+                <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-center items-center text-center">
+                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Present</span>
                   <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{present}</span>
                   <span className="text-[10px] text-slate-400 mt-0.5">Days Marked</span>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-center items-center text-center">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Absent</span>
+                <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-center items-center text-center">
+                  <span className="text-xs font-bold text-rose-700 dark:text-rose-300 uppercase tracking-wider">Absent</span>
                   <span className="text-3xl font-black text-rose-500 mt-1">{absent}</span>
                   <span className="text-[10px] text-slate-400 mt-0.5">Days Missed</span>
                 </div>
@@ -140,8 +140,8 @@ export default function StudentAttendanceModal({ student, onClose }) {
 
               {/* Attendance Log Table */}
               <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
-                <div className="bg-slate-50 dark:bg-slate-950/60 p-4 border-b border-slate-200 dark:border-slate-800 flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-slate-400" />
+                <div className="bg-slate-50 dark:bg-slate-800/30 p-4 border-b border-slate-200 dark:border-slate-800 flex items-center space-x-2">
+                  <Calendar className="h-4 w-4 text-indigo-500" />
                   <h3 className="text-sm font-bold text-slate-800 dark:text-white">Detailed Log (Last 30 Days)</h3>
                 </div>
                 

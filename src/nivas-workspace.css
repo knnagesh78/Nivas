@@ -7,8 +7,8 @@
   --nv-shadow:0 4px 0 #dce4f080,0 12px 28px #2447740a;
   display:flex; height:100svh; overflow:hidden; color:var(--nv-ink); background:var(--nv-page); font-family:Inter,'Segoe UI',Arial,sans-serif;
 }
-.nivas-app.nv-shell[data-portal="warden"] { --nv-primary:#087e71; --nv-primary-deep:#075b53; --nv-accent:#91f4d5; --nv-hero-a:#084b51; --nv-hero-b:#119a83; --nv-tint:#e6f7f2; }
-.nivas-app.nv-shell[data-portal="admin"] { --nv-primary:#a85b13; --nv-primary-deep:#78420f; --nv-accent:#ffdb94; --nv-hero-a:#452871; --nv-hero-b:#ac6730; --nv-tint:#fff3dc; }
+.nivas-app.nv-shell[data-portal="warden"] { --nv-primary:#0d9488; --nv-primary-deep:#0f766e; --nv-accent:#5eead4; --nv-hero-a:#0f766e; --nv-hero-b:#059669; --nv-tint:#f0fdf4; }
+.nivas-app.nv-shell[data-portal="admin"] { --nv-primary:#7c3aed; --nv-primary-deep:#6d28d9; --nv-accent:#c084fc; --nv-hero-a:#6d28d9; --nv-hero-b:#4f46e5; --nv-tint:#f5f3ff; }
 .nivas-app.nv-shell[data-theme="dark"] { --nv-ink:#e4edfc; --nv-muted:#abbcd5; --nv-faint:#9baec9; --nv-page:#0a1426; --nv-panel:#13223a; --nv-inset:#0e1b30; --nv-border:#2c3f5e; --nv-shadow:0 4px 0 #06112080,0 12px 28px #0002; --nv-tint:#243852; color-scheme:dark; }
 .nv-shell * { box-sizing:border-box; }
 .nv-shell button { cursor:pointer; -webkit-tap-highlight-color:transparent; }

@@ -815,9 +815,9 @@ export default function WardenDashboard() {
           {selectedStudent && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-50 p-4 backdrop-blur-xs">
               <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden animate-fadeIn">
-                <div className="bg-slate-800 p-4 text-white">
+                <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-4 text-white">
                   <h3 className="font-bold text-base">Reassign Room</h3>
-                  <p className="text-xs text-slate-300">Set room for {selectedStudent.name}</p>
+                  <p className="text-xs text-teal-100">Set room for {selectedStudent.name}</p>
                 </div>
                 <form onSubmit={handleAssignRoom} className="p-4 space-y-4">
                   <div>
@@ -838,13 +838,13 @@ export default function WardenDashboard() {
                     <button
                       type="button"
                       onClick={() => setSelectedStudent(null)}
-                      className="flex-1 border border-slate-200 rounded-xl py-2 text-center text-xs font-bold text-slate-500 hover:bg-slate-50"
+                      className="flex-1 border border-slate-200 rounded-xl py-2 text-center text-xs font-bold text-slate-500 hover:bg-slate-50 cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 bg-slate-900 rounded-xl py-2 text-center text-xs font-bold text-white hover:bg-slate-800"
+                      className="flex-1 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 rounded-xl py-2 text-center text-xs font-bold text-white shadow-md shadow-teal-600/20 cursor-pointer transition-all active:scale-98"
                     >
                       Save Room
                     </button>
@@ -948,7 +948,7 @@ export default function WardenDashboard() {
                 <button
                   onClick={handleSaveAttendance}
                   disabled={attendanceLoading}
-                  className="px-6 rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center"
+                  className="px-6 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 py-3 text-center text-sm font-semibold text-white shadow-md shadow-teal-600/20 disabled:opacity-50 transition-all flex items-center cursor-pointer active:scale-98"
                 >
                   {attendanceLoading ? (
                     <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></span>
@@ -1222,7 +1222,7 @@ export default function WardenDashboard() {
                       <div className="flex items-end">
                         <button
                           onClick={() => handleActionComplaint(item.id)}
-                          className="w-full bg-slate-900 text-white rounded-lg py-2.5 text-center text-xs font-bold hover:bg-slate-800"
+                          className="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-md shadow-rose-500/20 rounded-lg py-2.5 text-center text-xs font-bold transition-all active:scale-98 cursor-pointer"
                         >
                           Update Complaint
                         </button>
@@ -1361,7 +1361,7 @@ export default function WardenDashboard() {
               <button
                 type="submit"
                 disabled={noticeLoading}
-                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center transition-all"
+                className="w-full rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-teal-500 py-3 text-center text-sm font-semibold text-white shadow-md shadow-emerald-500/20 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer active:scale-98"
               >
                 {noticeLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1509,7 +1509,7 @@ export default function WardenDashboard() {
               <button
                 type="submit"
                 disabled={settingsLoading}
-                className="w-full sm:w-auto px-6 rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer"
+                className="w-full sm:w-auto px-6 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 py-3 text-center text-sm font-semibold text-white shadow-md shadow-teal-600/20 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer active:scale-98"
               >
                 {settingsLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
