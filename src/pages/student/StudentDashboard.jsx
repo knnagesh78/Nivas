@@ -535,6 +535,8 @@ export default function StudentDashboard() {
 
   return (
     <Layout
+      displayName={studentDetails?.name}
+      portalMeta={studentDetails}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
       onSelectNotification={handleSelectNotification}
@@ -669,87 +671,6 @@ export default function StudentDashboard() {
       {/* 1. Dashboard / Overview */}
       {activeTab === "dashboard" && (
         <div className="space-y-8 animate-fadeIn">
-          {/* Hero Banner with Glassmorphism & Action Hub */}
-          <div className="relative rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-6 sm:p-10 text-white overflow-hidden shadow-2xl border border-indigo-500/20">
-            {/* Ambient Background Glows */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute -bottom-10 -left-10 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div className="relative z-10 space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 backdrop-blur-md">
-                    <Sparkles className="h-3.5 w-3.5 mr-1.5 text-indigo-400 animate-pulse" />
-                    Student Dashboard
-                  </span>
-                  {studentDetails?.roomNumber && (
-                    <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 backdrop-blur-md">
-                      <DoorOpen className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
-                      Room {studentDetails.roomNumber}
-                    </span>
-                  )}
-                  {studentDetails?.course && (
-                    <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-purple-500/20 border border-purple-400/30 text-purple-300 backdrop-blur-md">
-                      <GraduationCap className="h-3.5 w-3.5 mr-1.5 text-purple-400" />
-                      {studentDetails.course} ({studentDetails.year || "1st Year"})
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                  <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Active Resident</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-2">
-                <div className="space-y-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
-                    Welcome, <span className="bg-gradient-to-r from-indigo-300 via-white to-purple-300 bg-clip-text text-transparent">{studentDetails?.name || "Student"}</span>
-                  </h2>
-                  <p className="text-slate-300 text-sm max-w-xl leading-relaxed">
-                    Your central portal for hostel life. Track attendance, manage leave requests, monitor complaint resolutions, and view official notice board updates in real-time.
-                  </p>
-                </div>
-
-                {/* Quick Action Pills */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:flex md:flex-col gap-2.5 shrink-0">
-                  <button
-                    onClick={() => setActiveTab("leave")}
-                    className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/25 transition-all cursor-pointer hover:scale-105 active:scale-95"
-                  >
-                    <Send className="h-4 w-4" />
-                    <span>Apply Leave</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab("complaints")}
-                    className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold text-xs backdrop-blur-md transition-all cursor-pointer hover:scale-105 active:scale-95"
-                  >
-                    <Plus className="h-4 w-4 text-amber-400" />
-                    <span>File Complaint</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab("profile")}
-                    className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold text-xs backdrop-blur-md transition-all cursor-pointer hover:scale-105 active:scale-95"
-                  >
-                    <User className="h-4 w-4 text-emerald-400" />
-                    <span>Edit Profile</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab("lostFound")}
-                    className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-white font-bold text-xs backdrop-blur-md transition-all cursor-pointer hover:scale-105 active:scale-95"
-                  >
-                    <Package className="h-4 w-4 text-indigo-400" />
-                    <span>Lost & Found</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Quick Metrics Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* My Room & Roommates Card */}

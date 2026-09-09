@@ -26,7 +26,7 @@ export function createStudentScene() {
   const teal = 0x0f3b46;
   const emerald = 0x10b981;
   const violet = 0x8b5cf6;
-  const indigo = 0x6366f1;
+  const indigo = 0x3289de;
   const mint = 0xa7f3d0;
   const wood = 0x1e293b;
   const offWhite = 0xf8fafc;

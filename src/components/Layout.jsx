@@ -1,509 +1,141 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import {
-  LayoutDashboard,
-  Calendar,
-  FileText,
-  AlertCircle,
-  Megaphone,
-  User,
-  LogOut,
-  Menu,
-  X,
-  DoorOpen,
-  Users,
-  Settings,
-  ClipboardList,
-  Download,
-  GraduationCap,
-  Package,
-  PackageCheck,
-  ArrowLeft,
-  Sun,
-  Moon,
-  PhoneCall
-} from "lucide-react";
-import InstallWizardModal from "./InstallWizardModal";
-import NotificationCenter from "./NotificationCenter";
-import Hostel3DCanvas from "./3d/Hostel3DCanvas";
-import useMotionPreference from "../hooks/useMotionPreference";
-import { Pause, Play } from "lucide-react";
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { LayoutDashboard, Calendar, FileText, AlertCircle, Megaphone, User, LogOut, Menu, X, DoorOpen, Users, Settings, ClipboardList, Download, GraduationCap, Package, PackageCheck, ArrowLeft, Sun, Moon, PhoneCall, Pause, Play, ChevronRight, ShieldCheck } from 'lucide-react';
+import InstallWizardModal from './InstallWizardModal';
+import NotificationCenter from './NotificationCenter';
+import PortalDashboardHeader from './PortalDashboardHeader';
+import useMotionPreference from '../hooks/useMotionPreference';
 
-export default function Layout({ children, activeTab, setActiveTab, onSelectNotification }) {
+const navigation = {
+  student: [
+    { id: 'dashboard', label: 'Home', icon: LayoutDashboard, color: 'blue' },
+    { id: 'lostFound', label: 'Lost & Found', icon: Package, color: 'purple', hint: 'Find belongings and report lost items.' },
+    { id: 'calls', label: 'Call Roommates', icon: PhoneCall, color: 'teal', hint: 'Stay in touch with your roommates.' },
+    { id: 'attendance', label: 'My Attendance', icon: Calendar, color: 'blue', hint: 'Keep track of your daily attendance.' },
+    { id: 'leave', label: 'Leave Requests', shortcut: 'Apply for leave', icon: FileText, color: 'amber', hint: 'Request leave and follow its approval.' },
+    { id: 'complaints', label: 'Complaints', icon: AlertCircle, color: 'rose', hint: 'Report an issue and track its progress.' },
+    { id: 'profile', label: 'My Profile', icon: User, color: 'teal', hint: 'Your details, room, and account settings.' },
+  ],
+  warden: [
+    { id: 'dashboard', label: 'Overview', icon: LayoutDashboard, color: 'teal' },
+    { id: 'handovers', label: 'Lost & Found Handovers', icon: PackageCheck, color: 'purple', hint: 'Verify ownership and return belongings.' },
+    { id: 'students', label: 'Students', icon: Users, color: 'blue', hint: 'View students and manage room assignments.' },
+    { id: 'attendance', label: 'Attendance', shortcut: 'Mark attendance', icon: ClipboardList, color: 'teal', hint: 'Record attendance and review daily logs.' },
+    { id: 'leave', label: 'Leave Approvals', shortcut: 'Review leaves', icon: FileText, color: 'amber', hint: 'Review and respond to leave applications.' },
+    { id: 'complaints', label: 'Complaints', icon: AlertCircle, color: 'rose', hint: 'Review student concerns and track resolutions.' },
+    { id: 'rooms', label: 'Rooms & Beds', icon: DoorOpen, color: 'blue', hint: 'Check room occupancy and available capacity.' },
+    { id: 'notices', label: 'Notice Board', shortcut: 'Post a notice', icon: Megaphone, color: 'purple', hint: 'Share announcements with your hostel.' },
+    { id: 'settings', label: 'Settings', icon: Settings, color: 'teal', hint: 'Manage your account details.' },
+  ],
+  admin: [
+    { id: 'dashboard', label: 'Control Panel', icon: LayoutDashboard, color: 'amber' },
+    { id: 'students', label: 'Student Manager', shortcut: 'Students', icon: GraduationCap, color: 'blue', hint: 'Manage student records and review attendance.' },
+    { id: 'wardens', label: 'Warden Manager', shortcut: 'Wardens', icon: ShieldCheck, color: 'purple', hint: 'Create and manage warden accounts.' },
+    { id: 'rooms', label: 'Room Configuration', shortcut: 'Rooms & beds', icon: DoorOpen, color: 'teal', hint: 'Configure rooms and hostel capacity.' },
+    { id: 'notices', label: 'Hostel Notices', shortcut: 'Notices', icon: Megaphone, color: 'amber', hint: 'Publish and manage hostel announcements.' },
+    { id: 'settings', label: 'Admin Settings', icon: Settings, color: 'rose', hint: 'Manage your administrator account.' },
+  ],
+};
+const mobileIds = {
+  student: ['dashboard', 'attendance', 'lostFound', 'leave', 'profile'],
+  warden: ['dashboard', 'attendance', 'leave', 'notices', 'settings'],
+  admin: ['dashboard', 'students', 'wardens', 'rooms', 'settings'],
+};
+const shortLabels = { dashboard: 'Home', attendance: 'Attendance', lostFound: 'Lost & Found', leave: 'Leave', profile: 'Profile', notices: 'Notices', settings: 'Settings', students: 'Students', wardens: 'Wardens', rooms: 'Rooms' };
+
+export default function Layout({ children, activeTab = 'dashboard', setActiveTab, onSelectNotification, displayName, portalMeta }) {
   const { userData, logout } = useAuth();
   const { motion, toggleMotion } = useMotionPreference();
   const navigate = useNavigate();
+  const role = navigation[userData?.role] ? userData.role : 'student';
+  const items = navigation[role];
+  const activeItem = items.find(item => item.id === activeTab) || items[0];
+  const ActiveIcon = activeItem.icon;
+  const mobileItems = mobileIds[role].map(id => items.find(item => item.id === id));
+  const name = displayName || userData?.name || '';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
-
-  // True when the browser has a deferred install prompt ready
   const [canInstall, setCanInstall] = useState(() => !!window.deferredPrompt);
-
-  // True only when running as installed standalone PWA
-  const isStandaloneMode =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    !!window.navigator.standalone;
-
-  // Theme state: "light" (white) or "dark" (black)
-  const [theme, setTheme] = useState(() => localStorage.getItem("app_theme") || "light");
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
-
+  const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone;
+  const [theme, setTheme] = useState(() => {
+    try { return localStorage.getItem('app_theme') || 'light'; } catch { return 'light'; }
+  });
+  const drawer = useRef(null);
+  const scrollArea = useRef(null);
+  useEffect(() => { try { localStorage.setItem('app_theme', theme); } catch { /* Theme still works locally. */ } }, [theme]);
   useEffect(() => {
-    localStorage.setItem("app_theme", theme);
-  }, [theme]);
-
+    const element = drawer.current;
+    if (mobileMenuOpen && !element.open) element.showModal();
+    if (!mobileMenuOpen && element.open) element.close();
+  }, [mobileMenuOpen]);
+  useEffect(() => { if (scrollArea.current) scrollArea.current.scrollTop = 0; }, [activeTab]);
   useEffect(() => {
     const handleInstallable = () => setCanInstall(true);
     const handleInstalled = () => { setCanInstall(false); setWizardOpen(false); };
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
-      window.deferredPrompt = e;
-      setCanInstall(true);
-    };
-
-    window.addEventListener("pwa:installable", handleInstallable);
-    window.addEventListener("pwa:installed", handleInstalled);
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-
+    const handleBeforeInstallPrompt = event => { event.preventDefault(); window.deferredPrompt = event; setCanInstall(true); };
+    window.addEventListener('pwa:installable', handleInstallable);
+    window.addEventListener('pwa:installed', handleInstalled);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     return () => {
-      window.removeEventListener("pwa:installable", handleInstallable);
-      window.removeEventListener("pwa:installed", handleInstalled);
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener('pwa:installable', handleInstallable);
+      window.removeEventListener('pwa:installed', handleInstalled);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/login");
-    } catch (error) {
-      console.error("Failed to log out:", error);
-    }
-  };
-
-  // Define navigation items based on role
-  const getNavItems = () => {
-    const role = userData?.role;
-    if (role === "student") {
-      return [
-        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-        { id: "lostFound", label: "Lost & Found", icon: Package },
-        { id: "calls", label: "Call Roommates", icon: PhoneCall },
-        { id: "attendance", label: "My Attendance", icon: Calendar },
-        { id: "leave", label: "Leave Requests", icon: FileText },
-        { id: "complaints", label: "Complaints", icon: AlertCircle },
-        { id: "profile", label: "Profile", icon: User },
-      ];
-    } else if (role === "warden") {
-      return [
-        { id: "dashboard", label: "Overview", icon: LayoutDashboard },
-        { id: "handovers", label: "Lost & Found Handovers", icon: PackageCheck },
-        { id: "students", label: "Students", icon: Users },
-        { id: "attendance", label: "Attendance Log", icon: ClipboardList },
-        { id: "leave", label: "Leave Approvals", icon: FileText },
-        { id: "complaints", label: "Complaints Box", icon: AlertCircle },
-        { id: "rooms", label: "Rooms & Beds", icon: DoorOpen },
-        { id: "notices", label: "Notice Board", icon: Megaphone },
-        { id: "settings", label: "Settings", icon: Settings },
-      ];
-    } else if (role === "admin") {
-      return [
-        { id: "dashboard", label: "Control Panel", icon: LayoutDashboard },
-        { id: "students", label: "Student Manager", icon: GraduationCap },
-        { id: "wardens", label: "Warden Manager", icon: Users },
-        { id: "rooms", label: "Room Config", icon: DoorOpen },
-        { id: "notices", label: "Hostel Notices", icon: Megaphone },
-        { id: "settings", label: "Admin Settings", icon: Settings },
-      ];
-    }
-    return [];
-  };
-
-  const navItems = getNavItems();
-
-  // Mobile Bottom Tab Items (YouTube style navigation)
-  const getMobileNavItems = () => {
-    const role = userData?.role;
-    if (role === "student") {
-      return [
-        { id: "dashboard", label: "Home", icon: LayoutDashboard },
-        { id: "leave", label: "Leave", icon: FileText },
-        { id: "lostFound", label: "Lost & Found", icon: Package, isCenter: true },
-        { id: "complaints", label: "Complaint", icon: AlertCircle },
-        { id: "profile", label: "You", icon: User, isProfile: true },
-      ];
-    } else if (role === "warden") {
-      return [
-        { id: "dashboard", label: "Home", icon: LayoutDashboard },
-        { id: "leave", label: "Leave", icon: FileText },
-        { id: "notices", label: "Notice", icon: Megaphone, isCenter: true },
-        { id: "complaints", label: "Complaint", icon: AlertCircle },
-        { id: "settings", label: "You", icon: Settings, isProfile: true },
-      ];
-    } else if (role === "admin") {
-      return [
-        { id: "dashboard", label: "Home", icon: LayoutDashboard },
-        { id: "students", label: "Students", icon: GraduationCap },
-        { id: "notices", label: "Notice", icon: Megaphone, isCenter: true },
-        { id: "wardens", label: "Wardens", icon: Users },
-        { id: "settings", label: "You", icon: Settings, isProfile: true },
-      ];
-    }
-    return [];
-  };
-
-  const mobileNavItems = getMobileNavItems();
-
-  const getRoleBadge = (role) => {
-    switch (role) {
-      case "admin":
-        return "bg-rose-50 text-rose-700 border-rose-200";
-      case "warden":
-        return "bg-amber-50 text-amber-700 border-amber-200";
-      default:
-        return "bg-indigo-50 text-indigo-700 border-indigo-200";
-    }
-  };
-
-  return (
-    <div data-portal={userData?.role || "student"} className={`nivas-app flex h-screen overflow-hidden font-sans transition-colors duration-300 ${
-      theme === "dark" ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"
-    }`}>
-      {/* Desktop Sidebar */}
-      <aside className={`hidden md:flex md:w-64 md:flex-col border-r transition-colors duration-300 ${
-        theme === "dark" ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
-      }`}>
-        <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
-          {/* Brand header */}
-          <div className="flex items-center justify-between px-6 mb-6">
-            <div className="flex items-center">
-              <img src="/logo.svg" className="h-9 w-9 rounded-xl shadow-sm animate-pulse" alt="Nivas Logo" />
-              <div className="ml-3">
-                <h1 className={`text-lg font-bold tracking-tight leading-none ${
-                  theme === "dark" ? "text-white" : "text-slate-900"
-                }`}>Nivas</h1>
-                <span className="text-[10px] text-indigo-500 font-semibold uppercase tracking-wider">Every stay, sorted</span>
-              </div>
-            </div>
-            {/* Theme Toggle Button (White / Black theme) */}
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-xl border transition-all cursor-pointer shadow-xs ${
-                theme === "dark"
-                  ? "bg-slate-800 border-slate-700 text-amber-400 hover:bg-slate-700"
-                  : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"
-              }`}
-              title={theme === "dark" ? "Switch to White Theme" : "Switch to Black Theme"}
-            >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-          </div>
-
-          {/* User profile brief */}
-          <div className="px-4 mb-4">
-            <div className={`border rounded-xl p-3.5 flex items-center justify-between ${
-              theme === "dark" ? "bg-slate-950/60 border-slate-800" : "bg-slate-50 border-slate-100"
-            }`}>
-              <div className="flex items-center space-x-3 overflow-hidden">
-                <div className={`h-10 w-10 rounded-full border flex items-center justify-center font-bold flex-shrink-0 ${
-                  theme === "dark" ? "bg-slate-800 border-slate-700 text-white" : "bg-slate-200 border-slate-300 text-slate-700"
-                }`}>
-                  {userData?.email ? userData.email[0].toUpperCase() : "U"}
-                </div>
-                <div className="overflow-hidden">
-                  <p className={`text-sm font-semibold truncate ${
-                    theme === "dark" ? "text-slate-200" : "text-slate-800"
-                  }`}>
-                    {userData?.email?.split("@")[0]}
-                  </p>
-                  <span className={`inline-block px-2 py-0.5 mt-1 text-[10px] font-bold tracking-wide uppercase border rounded-full ${getRoleBadge(userData?.role)}`}>
-                    {userData?.role}
-                  </span>
-                </div>
-              </div>
-              <NotificationCenter onSelectNotification={onSelectNotification} />
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="flex-1 px-3 space-y-1.5">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`group flex items-center w-full px-3.5 py-3 text-sm font-bold rounded-2xl transition-all duration-200 cursor-pointer ${
-                    isActive
-                      ? "bg-gradient-to-r from-indigo-600 via-indigo-700 to-slate-900 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]"
-                      : theme === "dark"
-                      ? "text-slate-400 hover:bg-slate-800 hover:text-white"
-                      : "text-slate-600 hover:bg-indigo-50/70 hover:text-indigo-600 hover:translate-x-1 hover:shadow-xs"
-                  }`}
-                >
-                  <div className={`p-2 rounded-xl mr-3 flex items-center justify-center transition-all ${
-                    isActive
-                      ? "bg-white/20 text-white shadow-xs"
-                      : theme === "dark"
-                      ? "bg-slate-800 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white"
-                      : "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white"
-                  }`}>
-                    <Icon className="h-4 w-4 transition-transform group-hover:scale-110" />
-                  </div>
-                  <span>{item.label}</span>
-                  {isActive && (
-                    <span className="ml-auto h-2 w-2 rounded-full bg-white animate-ping"></span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-          <section className="nivas-sidebar-world" aria-label="Your portal">
-            <div><Hostel3DCanvas activeRole={userData?.role || 'student'} motion={motion} /></div>
-            <footer><span>{userData?.role || 'student'} workspace</span><button type="button" onClick={toggleMotion} aria-label={motion ? 'Pause animations' : 'Enable animations'} aria-pressed={motion}>{motion ? <Pause size={14} /> : <Play size={14} />}</button></footer>
-          </section>
-        </div>
-
-        {/* Footer Sign-out & Download */}
-        <div className={`p-4 border-t space-y-2 ${theme === "dark" ? "border-slate-800" : "border-slate-100"}`}>
-          {canInstall && !isStandaloneMode && (
-            <button
-              onClick={() => setWizardOpen(true)}
-              className="flex items-center w-full px-3.5 py-2.5 text-xs font-bold text-indigo-600 bg-indigo-50/80 hover:bg-indigo-600 hover:text-white rounded-xl transition-all duration-200 border border-indigo-200/80 hover:border-indigo-600 cursor-pointer shadow-sm hover:shadow-md hover:shadow-indigo-500/20 hover:-translate-y-0.5 active:scale-95 group"
-            >
-              <Download className="mr-2.5 h-4 w-4 text-indigo-500 group-hover:text-white animate-bounce" />
-              Download App
-            </button>
-          )}
-          <button
-            onClick={handleLogout}
-            className="flex items-center w-full px-3.5 py-2.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-600 rounded-xl transition-all duration-200 border border-rose-100 hover:border-rose-600 cursor-pointer shadow-2xs hover:shadow-md hover:shadow-rose-500/20 hover:-translate-y-0.5 active:scale-95 group"
-          >
-            <LogOut className="mr-2.5 h-4 w-4 text-rose-500 group-hover:text-white transition-colors" />
-            Sign Out
-          </button>
-        </div>
-      </aside>
-
-      {/* Mobile Top Header & Navigation */}
-      <div className="flex flex-col flex-1 w-full md:w-auto overflow-hidden">
-        <header className={`flex items-center justify-between px-4 py-3 border-b md:hidden ${
-          theme === "dark" ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200"
-        }`}>
-          <div className="flex items-center">
-            <img src="/logo.svg" className="h-8 w-8 rounded-lg shadow-sm" alt="Nivas Logo" />
-            <span className={`ml-2.5 font-bold text-base font-sans tracking-tight ${
-              theme === "dark" ? "text-white" : "text-slate-800"
-            }`}>Nivas</span>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            {/* Theme Toggle Button Mobile */}
-            <button
-              onClick={toggleTheme}
-              className={`p-1.5 rounded-xl border transition-all cursor-pointer ${
-                theme === "dark"
-                  ? "bg-slate-800 border-slate-700 text-amber-400"
-                  : "bg-slate-100 border-slate-200 text-slate-700"
-              }`}
-              title={theme === "dark" ? "Switch to White Theme" : "Switch to Black Theme"}
-            >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-            <NotificationCenter onSelectNotification={onSelectNotification} />
-            <span className={`inline-block px-2.5 py-0.5 text-[9px] font-bold tracking-wide uppercase border rounded-full ${getRoleBadge(userData?.role)}`}>
-              {userData?.role}
-            </span>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`p-1 rounded-lg focus:outline-none ${
-                theme === "dark" ? "text-slate-300 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-        </header>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="fixed inset-0 z-40 bg-slate-900 bg-opacity-50 md:hidden" onClick={() => setMobileMenuOpen(false)}>
-            <nav
-              className={`fixed top-14 left-0 right-0 border-b shadow-xl px-4 py-3 space-y-1 ${
-                theme === "dark" ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
-              }`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActiveTab(item.id);
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`flex items-center w-full px-3 py-2 text-sm font-semibold rounded-lg ${
-                      isActive ? "bg-slate-900 text-white" : theme === "dark" ? "text-slate-300 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    <Icon className="mr-3 h-5 w-5 text-slate-400" />
-                    {item.label}
-                  </button>
-                );
-              })}
-              <div className="pt-2 mt-2 border-t border-slate-100 space-y-1">
-                <button type="button" onClick={toggleMotion} aria-pressed={motion} className="flex items-center w-full px-3 py-2 text-sm rounded-lg gap-3">{motion ? <Pause size={18} /> : <Play size={18} />}Animations {motion ? 'on' : 'off'}</button>
-                {canInstall && !isStandaloneMode && (
-                  <button
-                    onClick={() => {
-                      setWizardOpen(true);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="flex items-center w-full px-3 py-2 text-sm font-semibold text-indigo-600 rounded-lg hover:bg-indigo-50 cursor-pointer"
-                  >
-                    <Download className="mr-3 h-5 w-5 text-indigo-500" />
-                    Download App
-                  </button>
-                )}
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center w-full px-3 py-2 text-sm font-semibold text-red-600 rounded-lg hover:bg-red-50 cursor-pointer"
-                >
-                  <LogOut className="mr-3 h-5 w-5 text-red-500" />
-                  Sign Out
-                </button>
-              </div>
-            </nav>
-          </div>
-        )}
-
-        {/* Content Area */}
-        <main className={`flex-1 overflow-y-auto pb-20 md:pb-6 ${
-          theme === "dark" ? "bg-slate-950" : "bg-slate-50"
-        }`}>
-          <div className="nivas-content max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6" key={activeTab}>
-            {/* Activity Navigation / Back Button Bar */}
-            {activeTab && activeTab !== "dashboard" && (
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 shadow-sm rounded-2xl p-3.5 sm:px-5">
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => {
-                      if (setActiveTab) setActiveTab("dashboard");
-                    }}
-                    className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-indigo-600 hover:text-white border border-slate-200 hover:border-indigo-600 transition-all cursor-pointer shadow-xs group"
-                    title="Return to Dashboard Overview"
-                  >
-                    <ArrowLeft className="mr-2 h-4 w-4 text-slate-500 group-hover:text-white transition-colors group-hover:-translate-x-1 transform" />
-                    <span>Back to Dashboard</span>
-                  </button>
-                  <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
-                  <div className="hidden sm:flex items-center space-x-2 text-xs text-slate-500">
-                    <span>Current Activity:</span>
-                    <span className="font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-lg capitalize">
-                      {navItems.find((n) => n.id === activeTab)?.label || activeTab}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    if (setActiveTab) setActiveTab("dashboard");
-                  }}
-                  className="text-xs font-semibold text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer"
-                >
-                  Dashboard Overview →
-                </button>
-              </div>
-            )}
-            {children}
-          </div>
-        </main>
+  const handleLogout = async () => { try { await logout(); navigate('/login'); } catch (error) { console.error('Failed to log out:', error); } };
+  const openActivity = id => { setActiveTab?.(id); setMobileMenuOpen(false); };
+  const toggleTheme = () => setTheme(value => value === 'light' ? 'dark' : 'light');
+  const renderNavigation = () => items.map(item => {
+    const Icon = item.icon;
+    return <button key={item.id} type="button" className="nv-nav-item" data-color={item.color} aria-current={activeTab === item.id ? 'page' : undefined} onClick={() => openActivity(item.id)}>
+      <span className="nv-nav-icon"><Icon size={19} /></span><span>{item.label}</span><ChevronRight size={15} className="nv-nav-chevron" />
+    </button>;
+  });
+  const brand = <div className="nv-brand"><img src="/logo.svg" alt="" /><div><strong>nivas<span>.</span></strong><small>HOSTEL WORKSPACE</small></div></div>;
+  return <div className="nivas-app nv-shell" data-portal={role} data-theme={theme}>
+    <a className="nv-skip-link" href="#nivas-main">Skip to content</a>
+    <aside className="nv-sidebar" aria-label="Main navigation">
+      {brand}
+      <div className="nv-role-tag"><span>{role} portal</span></div>
+      <nav className="nv-navigation" aria-label="Activities">{renderNavigation()}</nav>
+      <div className="nv-sidebar-account">
+        <div className="nv-account-avatar">{(name || userData?.email || role).slice(0, 1).toUpperCase()}</div>
+        <div><strong>{name || `${role[0].toUpperCase()}${role.slice(1)} account`}</strong><span>{userData?.email}</span></div>
       </div>
-
-      {/* Fixed Mobile Bottom Navigation Bar (YouTube Style) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 border-t border-slate-800 md:hidden px-2 py-1.5 shadow-2xl">
-        <div className="grid grid-cols-5 items-center max-w-md mx-auto">
-          {mobileNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            const isCenter = item.isCenter;
-            const isProfile = item.isProfile;
-
-            if (isCenter) {
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className="flex flex-col items-center justify-center -mt-4 cursor-pointer"
-                >
-                  <div
-                    className={`h-12 w-12 rounded-full flex items-center justify-center shadow-lg transition-all ${
-                      isActive
-                        ? "bg-indigo-600 text-white ring-4 ring-slate-900 shadow-indigo-500/50 scale-105"
-                        : "bg-slate-800 text-white hover:bg-slate-700 ring-4 ring-slate-900"
-                    }`}
-                  >
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <span
-                    className={`text-[10px] font-bold mt-1 whitespace-nowrap ${
-                      isActive ? "text-indigo-400" : "text-slate-400"
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                </button>
-              );
-            }
-
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center justify-center py-1 transition-all cursor-pointer ${
-                  isActive ? "text-white font-bold" : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                {isProfile ? (
-                  <div
-                    className={`h-6 w-6 rounded-full flex items-center justify-center font-bold text-[10px] uppercase border transition-all ${
-                      isActive
-                        ? "bg-indigo-600 text-white border-white scale-110 shadow-sm shadow-indigo-500/50"
-                        : "bg-slate-700 text-slate-200 border-slate-600"
-                    }`}
-                  >
-                    {userData?.email ? userData.email.slice(0, 2).toUpperCase() : "ME"}
-                  </div>
-                ) : (
-                  <Icon
-                    className={`h-5 w-5 ${
-                      isActive ? "text-indigo-400 scale-110" : "text-slate-400"
-                    }`}
-                  />
-                )}
-                <span
-                  className={`text-[10px] mt-1 tracking-tight ${
-                    isActive ? "text-white font-bold" : "text-slate-400"
-                  }`}
-                >
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
+      <button type="button" className="nv-signout" onClick={handleLogout}><LogOut size={17} />Sign out</button>
+    </aside>
+    <div className="nv-workspace">
+      <header className="nv-toolbar">
+        <div className="nv-toolbar-title"><button type="button" className="nv-icon-button nv-menu-trigger" onClick={() => setMobileMenuOpen(true)} aria-label="Open activities menu"><Menu size={21} /></button><div><span className="nv-toolbar-role">{role} workspace</span><strong>{activeItem.label}</strong></div></div>
+        <div className="nv-toolbar-actions">
+          {canInstall && !isStandaloneMode && <button type="button" className="nv-download-button" onClick={() => setWizardOpen(true)}><Download size={16} /><span>Install app</span></button>}
+          <button type="button" className="nv-icon-button" onClick={toggleMotion} aria-pressed={motion} aria-label={motion ? 'Pause animations' : 'Enable animations'} title={motion ? 'Pause animations' : 'Enable animations'}>{motion ? <Pause size={17} /> : <Play size={17} />}</button>
+          <button type="button" className="nv-icon-button" onClick={toggleTheme} aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'} title={theme === 'dark' ? 'Light theme' : 'Dark theme'}>{theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}</button>
+          <div className="nv-notifications"><NotificationCenter onSelectNotification={onSelectNotification} /></div>
         </div>
-      </nav>
-      <InstallWizardModal
-        isOpen={wizardOpen}
-        onClose={() => setWizardOpen(false)}
-        onInstalled={() => { setCanInstall(false); setWizardOpen(false); }}
-      />
+      </header>
+      <main ref={scrollArea} id="nivas-main" className="nv-main" tabIndex={-1}>
+        <div className="nivas-content nv-content">
+          {activeTab === 'dashboard' ? <PortalDashboardHeader role={role} name={name} meta={portalMeta} items={items} onNavigate={openActivity} motion={motion} /> : <section className="nv-activity-heading" data-color={activeItem.color}>
+            <div className="nv-activity-heading-copy"><button type="button" className="nv-back-button" onClick={() => openActivity('dashboard')}><ArrowLeft size={16} />Back to home</button><h1>{activeItem.label}</h1><p>{activeItem.hint}</p></div>
+            <span className="nv-activity-emblem" aria-hidden="true"><ActiveIcon size={43} strokeWidth={1.6} /></span>
+          </section>}
+          <div className="nv-activity-body">{children}</div>
+        </div>
+      </main>
     </div>
-  );
+    <nav className="nv-bottom-nav" aria-label="Quick navigation">
+      {mobileItems.map(item => {
+        const Icon = item.icon;
+        return <button key={item.id} type="button" data-color={item.color} aria-current={activeTab === item.id ? 'page' : undefined} onClick={() => openActivity(item.id)}><span><Icon size={21} /></span><small>{shortLabels[item.id]}</small></button>;
+      })}
+    </nav>
+    <dialog ref={drawer} className="nv-drawer" onCancel={() => setMobileMenuOpen(false)} onClose={() => setMobileMenuOpen(false)} onClick={event => { if (event.target === event.currentTarget) setMobileMenuOpen(false); }} aria-labelledby="nv-drawer-title">
+      <div className="nv-drawer-header"><h2 id="nv-drawer-title">Your activities</h2><button type="button" autoFocus className="nv-icon-button" aria-label="Close activities menu" onClick={() => setMobileMenuOpen(false)}><X size={20} /></button></div>
+      <nav aria-label="All activities" className="nv-navigation">{renderNavigation()}</nav>
+      <button type="button" className="nv-signout" onClick={handleLogout}><LogOut size={18} />Sign out</button>
+    </dialog>
+    <InstallWizardModal isOpen={wizardOpen} onClose={() => setWizardOpen(false)} onInstalled={() => { setCanInstall(false); setWizardOpen(false); }} />
+  </div>;
 }

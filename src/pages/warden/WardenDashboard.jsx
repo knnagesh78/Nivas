@@ -569,6 +569,7 @@ export default function WardenDashboard() {
 
   return (
     <Layout
+      displayName={currentUser?.displayName || currentUser?.email?.split("@")[0]}
       activeTab={activeTab}
       setActiveTab={setTab}
       onSelectNotification={handleSelectNotification}

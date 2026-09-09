@@ -519,28 +519,10 @@ export default function AdminDashboard() {
   };
 
   return (
-    <Layout activeTab={activeTab} setActiveTab={setTab}>
+    <Layout activeTab={activeTab} setActiveTab={setTab} displayName={userData?.name} portalMeta={userData}>
       {/* 1. Dashboard / Statistics */}
       {activeTab === "dashboard" && (
         <div className="space-y-6 animate-fadeIn">
-          {/* Admin Control Panel Hero Banner */}
-          <div className="rounded-3xl bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-indigo-800/40">
-            <div className="absolute -top-12 -right-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="relative z-10 space-y-3">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 backdrop-blur-md">
-                <Shield className="h-3.5 w-3.5 mr-1.5 text-indigo-400 animate-pulse" />
-                Hostel Administration
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">Hostel Control Panel</h2>
-              <p className="text-indigo-200 text-sm max-w-md leading-relaxed">
-                Central management portal. Configure rooms, manage warden access, override requests, and system settings.
-              </p>
-            </div>
-            <div className="absolute right-8 bottom-4 text-[10rem] font-black text-indigo-900/30 pointer-events-none uppercase">
-              Admin
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>

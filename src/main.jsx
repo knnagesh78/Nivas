@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import './nivas-3d.css'
+import './nivas-workspace.css'
 import App from './App.jsx'
 
 // ── PWA Install Prompt: capture BEFORE React mounts so it is never lost ──────

@@ -21,8 +21,8 @@ export function createAdminScene() {
   const navy = 0x070d1e;
   const teal = 0x0f3b46;
   const emerald = 0x10b981;
-  const violet = 0x8b5cf6;
-  const indigo = 0x6366f1;
+  const violet = 0xffc76b;
+  const indigo = 0xeaa948;
   const mint = 0xa7f3d0;
 
   // 1. Hexagonal Control Podium
