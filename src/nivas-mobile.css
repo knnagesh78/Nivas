@@ -1,0 +1,170 @@
+/* Shared touch experience for browser and installed Nivas. */
+.nivas-app.nv-shell { height:100dvh; }
+.nv-shell[data-portal="admin"] { --portal-accent:#d1b6ff; --portal-rgb:201,173,255; --nv-primary:#7750cf; --nv-primary-deep:#52339d; --nv-accent:#ead8ff; --nv-hero-a:#30205a; --nv-hero-b:#7041bb; --nv-tint:#f0eaff; }
+.nv-shell[data-portal="admin"][data-theme="dark"] { --nv-tint:#30254a; }
+.nv-shell .nv-welcome { grid-template-columns:minmax(0,1fr) minmax(310px,1fr); min-height:310px; }
+.nv-shell .nv-welcome-scene { height:310px; min-height:0; align-self:center; }
+.nv-welcome-scene .nivas-world-controls { padding-bottom:20px; gap:8px; }
+.nv-welcome-scene .nivas-world-controls p { font-size:12px; color:#e0ebff; }
+.nv-welcome-scene .nivas-world-buttons { width:100%; max-width:300px; gap:7px; }
+.nv-welcome-scene .nivas-world-buttons button { flex:0 0 44px; min-width:44px; }
+.nv-welcome-scene .nivas-world-buttons .nivas-world-action { flex:1 1 auto; min-width:0; color:#fff; background:#ffffff1c; padding:0 7px; }
+.nv-shell .nivas-world-viewport:focus-visible { outline-color:#fff; }
+.nv-shell .nv-shortcut-label { font-size:14px; overflow-wrap:anywhere; }
+.nv-shell .nv-welcome p { font-size:16px; }
+.nv-shell .nv-activity-body { animation:nv-mobile-fade .32s ease-out; }
+.nv-shell [data-depth] {
+  position:relative; isolation:isolate; transform:perspective(850px) rotateX(var(--depth-x,0deg)) rotateY(var(--depth-y,0deg));
+  transition:transform .2s ease-out,box-shadow .2s,border-color .2s;
+}
+.nv-shell [data-depth]::after {
+  content:""; position:absolute; inset:0; z-index:2; border-radius:inherit; pointer-events:none;
+  background:radial-gradient(160px circle at var(--touch-x,50%) var(--touch-y,50%),rgba(var(--portal-rgb),.23),transparent 75%);
+  opacity:0; transition:opacity .3s;
+}
+.nv-shell [data-depth][data-pressed="true"]::after { opacity:1; }
+.nv-shell [data-depth][data-pressed="true"] { transform:perspective(850px) translateY(3px) scale(.992); }
+.nv-shell .nv-shortcut { animation:nv-touch-card-in .45s both; }
+.nv-shell .nv-shortcut:nth-child(2) { animation-delay:.045s; }
+.nv-shell .nv-shortcut:nth-child(3) { animation-delay:.09s; }
+.nv-shell .nv-shortcut:nth-child(4) { animation-delay:.135s; }
+.nv-shell .nv-stat-card { min-width:0; }
+.nv-shell .nv-stat-card > div:first-child { min-width:0; }
+.nv-shell .nv-stat-card p { overflow-wrap:anywhere; }
+.nv-shell .nv-student-card { min-width:0; border-color:var(--tile-edge); border-top:4px solid var(--tile-bright); background:linear-gradient(155deg,var(--nv-panel),var(--tile-soft)); }
+.nv-shell .nv-student-card[data-depth] { transform:none!important; }
+.nv-shell .nv-activity-body :is([class~="rounded-2xl"],[class~="rounded-3xl"])[class~="bg-white"]:not([data-depth]) { background-color:var(--nv-panel); }
+.nv-shell .nv-activity-body [class~="overflow-x-auto"] { max-width:100%; overscroll-behavior-x:contain; }
+.nv-shell .nv-activity-body .grid > * { min-width:0; }
+.nv-shell .nv-activity-body :is(input,textarea,select) { scroll-margin-block:30px; }
+.nv-shell .nv-activity-body button { touch-action:manipulation; }
+.nivas-login button { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+.nivas-login { padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); }
+.nivas-login .nivas-field { scroll-margin-block:24px; }
+.nivas-login .nivas-field button { min-width:44px; }
+.nivas-login .nivas-label-row button, .nivas-login .nivas-register button { min-height:44px; }
+.nivas-login .nivas-label-row { align-items:center; }
+.nivas-splash { padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+@keyframes nv-mobile-fade { from { opacity:.45; } to { opacity:1; } }
+@keyframes nv-touch-card-in { from { opacity:0; translate:0 9px; } to { opacity:1; translate:0 0; } }
+@media (hover:hover) and (pointer:fine) {
+  .nv-shell [data-depth]:hover { transform:perspective(850px) translateY(-3px) rotateX(var(--depth-x,0deg)) rotateY(var(--depth-y,0deg)); }
+  .nv-shell [data-depth]:hover::after { opacity:.6; }
+}
+@media (max-width:1050px) and (min-width:769px) {
+  .nv-shell .nv-welcome { grid-template-columns:1fr; }
+  .nv-shell .nv-welcome-copy { padding:24px 26px 0; }
+  .nv-shell .nv-welcome h1 br { display:none; }
+  .nv-shell .nv-welcome h1 strong::before { content:" "; }
+  .nv-shell .nv-welcome-scene { height:275px; }
+}
+@media (max-width:800px) {
+  .nivas-login { padding-left:max(12px,env(safe-area-inset-left)); padding-right:max(12px,env(safe-area-inset-right)); }
+  .nivas-login .nivas-topbar { min-height:72px; }
+  .nivas-login .nivas-mobile-portals { padding:10px 12px; }
+  .nivas-login .nivas-mobile-portals button { font-size:14px; min-height:46px; }
+  .nivas-login .nivas-world-heading { padding:17px 23px 0; }
+  .nivas-login .nivas-world-heading h1 { display:none; }
+  .nivas-login .nivas-world-heading .nivas-eyebrow { font-size:12px; }
+  .nivas-login .nivas-world-stage { height:254px; flex-basis:254px; }
+  .nivas-login .nivas-world-controls { gap:7px; padding:0 12px 18px; }
+  .nivas-login .nivas-world-buttons { width:100%; max-width:310px; gap:6px; }
+  .nivas-login .nivas-world-buttons button { flex:0 0 44px; min-width:44px; }
+  .nivas-login .nivas-world-buttons .nivas-world-action { flex:1; min-width:0; padding:0 5px; }
+  .nivas-login .nivas-form-side { padding:19px 12px 28px; }
+  .nivas-login .nivas-form-card { padding:23px 20px; }
+  .nivas-login .nivas-role-mark { display:none; }
+  .nivas-login .nivas-form-heading { margin-bottom:20px; }
+  .nivas-login .nivas-form-heading p { font-size:16px; line-height:1.45; }
+  .nivas-login .nivas-form-heading h2 { font-size:28px; }
+  .nivas-login .nivas-field { min-height:54px; margin-bottom:14px; }
+  .nivas-login .nivas-form-card[data-field="email"], .nivas-login .nivas-form-card[data-field="password"] { box-shadow:0 6px 0 rgba(var(--portal-rgb),.4),0 0 0 3px var(--portal-soft),0 22px 30px -14px #17375d30; }
+  .nivas-login .nivas-submit { min-height:56px; }
+  .nivas-login .nivas-page-footer { font-size:12px; }
+}
+@media (max-width:768px) {
+  .nv-shell .nv-toolbar { padding:calc(10px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 12px max(12px,env(safe-area-inset-left)); gap:8px; }
+  .nv-shell .nv-toolbar-title { gap:9px; flex:1; }
+  .nv-shell .nv-toolbar-title > div { min-width:0; }
+  .nv-shell .nv-toolbar-title strong { font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .nv-shell .nv-toolbar-role { font-size:12px; line-height:1.3; }
+  .nv-shell .nv-toolbar-actions { gap:6px; }
+  .nv-shell .nv-icon-button, .nv-shell .nv-notifications > div > button { width:44px; height:44px; min-width:44px; min-height:44px; }
+  .nv-shell main.nv-main { padding:16px max(14px,env(safe-area-inset-right)) calc(112px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left)); scroll-padding-block:20px 110px; }
+  .nv-shell .nv-welcome { display:grid; grid-template-columns:minmax(0,1fr); min-height:0; border-radius:23px; }
+  .nv-shell .nv-welcome-copy { padding:21px 23px 0; }
+  .nv-shell .nv-welcome h1 { font-size:27px; margin:12px 0 0; line-height:1.18; }
+  .nv-shell .nv-welcome h1 br { display:none; }
+  .nv-shell .nv-welcome h1 strong::before { content:" "; }
+  .nv-shell .nv-welcome p { display:none; }
+  .nv-shell .nv-welcome-label { font-size:12px; }
+  .nv-shell .nv-welcome-meta { margin-top:10px; font-size:12px; }
+  .nv-shell .nv-welcome-scene { height:252px; min-height:0; width:100%; }
+  .nv-shell .nv-shortcuts { gap:15px 12px; margin:21px 0 26px; }
+  .nv-shell .nv-shortcut { min-height:88px; padding:14px 12px; flex-wrap:wrap; gap:10px; align-content:center; }
+  .nv-shell .nv-shortcut-icon { width:39px; height:39px; }
+  .nv-shell .nv-shortcut-label { flex:1; min-width:60px; font-size:14px; }
+  .nv-shell .nv-stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+  .nv-shell .nv-stat-card { padding:16px 14px; gap:12px; align-items:flex-start; }
+  .nv-shell .nv-stat-card > div:first-child { min-width:0; flex-basis:100%; }
+  .nv-shell .nv-stat-card [class~="text-3xl"] { font-size:29px; }
+  .nv-shell .nv-stat-card span { font-size:12px; line-height:1.5; letter-spacing:.03em; }
+  .nv-shell .nv-student-card { padding:20px; }
+  .nv-shell .nv-student-card > div:first-child { flex-wrap:wrap; gap:10px; }
+  .nv-shell .nv-student-card > div:first-child > div { min-width:0; }
+  .nv-shell .nv-activity-heading { padding:18px; }
+  .nv-shell .nv-activity-heading h1 { font-size:25px; overflow-wrap:anywhere; }
+  .nv-shell .nv-activity-heading p { font-size:14px; }
+  .nv-shell .nv-back-button { min-height:44px; font-size:14px; }
+  .nv-shell .nv-activity-emblem { width:57px; height:57px; border-radius:17px; }
+  .nv-shell .nv-activity-body button:not([data-plain]) { min-height:44px; }
+  .nv-shell .nv-activity-body :is([class~="p-6"],[class~="p-8"]):not(button) { padding:18px; }
+  .nv-shell .nv-activity-body :is(input,textarea,select) { max-width:100%; font-size:16px; }
+  .nv-shell .nv-activity-body :is([class~="overflow-x-auto"]) { border-radius:13px; }
+  .nv-shell .nv-activity-body table { min-width:480px; }
+  .nv-shell .nv-bottom-nav { padding:9px max(5px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(5px,env(safe-area-inset-left)); gap:2px; background:var(--nv-panel); }
+  .nv-shell .nv-bottom-nav button { min-height:60px; gap:7px; justify-content:flex-start; }
+  .nv-shell .nv-bottom-nav small { font-size:12px; line-height:1.25; white-space:normal; text-align:center; overflow-wrap:anywhere; }
+  .nv-shell .nv-bottom-nav button > span { width:44px; height:36px; transition:transform .2s,background .2s; }
+  .nv-shell .nv-bottom-nav button:active > span { transform:translateY(2px) scale(.94); box-shadow:none; }
+  .nv-shell .nv-drawer { height:100dvh; padding:calc(23px + env(safe-area-inset-top)) 18px calc(25px + env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left)); }
+  .nv-shell .nv-nav-item { min-height:52px; }
+  .nv-shell .nv-notification-panel { position:fixed; top:calc(80px + env(safe-area-inset-top)); left:max(12px,env(safe-area-inset-left)); right:max(12px,env(safe-area-inset-right)); width:auto; max-height:calc(100dvh - 180px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y:auto; }
+  .nv-shell:has(.nv-activity-body input:focus,.nv-activity-body textarea:focus) .nv-bottom-nav { display:none; }
+  .nv-shell:has(.nv-activity-body input:focus,.nv-activity-body textarea:focus) main.nv-main { padding-bottom:30px; }
+}
+@media (max-width:360px) {
+  .nv-shell .nv-toolbar { flex-wrap:wrap; }
+  .nv-shell .nv-toolbar-title { min-width:126px; }
+  .nv-shell .nv-toolbar-title strong { font-size:14px; }
+  .nv-shell .nv-shortcut { flex-direction:column; align-items:flex-start; gap:13px; }
+  .nv-shell .nv-shortcut-label { flex:auto; }
+  .nv-shell .nv-welcome h1 { font-size:25px; }
+  .nv-shell .nv-welcome-copy { padding-left:19px; padding-right:19px; }
+  .nv-shell .nv-activity-emblem { display:none; }
+  .nivas-login .nivas-form-card { padding:22px 16px; }
+}
+@media (max-height:500px) and (orientation:landscape) and (max-width:1000px) {
+  .nv-shell .nv-sidebar { display:none; }
+  .nv-shell .nv-menu-trigger { display:grid; }
+  .nv-shell .nv-toolbar { padding-left:max(16px,env(safe-area-inset-left)); padding-right:max(16px,env(safe-area-inset-right)); }
+  .nv-shell main.nv-main { padding-left:max(16px,env(safe-area-inset-left)); padding-right:max(16px,env(safe-area-inset-right)); }
+  .nivas-login { padding-left:max(16px,env(safe-area-inset-left)); padding-right:max(16px,env(safe-area-inset-right)); }
+  .nivas-login .nivas-world-stage { height:220px; flex-basis:220px; }
+  .nv-shell .nv-welcome { grid-template-columns:minmax(0,1fr) minmax(275px,1fr); }
+  .nv-shell .nv-welcome-copy { padding:20px; }
+  .nv-shell .nv-welcome-scene { height:240px; }
+  .nv-shell .nv-bottom-nav button { min-height:49px; }
+}
+@media (hover:none) {
+  .nv-shell [data-depth]:hover { transform:none; }
+  .nv-shell [data-depth][data-pressed="true"], .nv-shell .nv-shortcut:active { transform:translateY(3px) scale(.992); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .nv-shell [data-depth], .nv-shell [data-depth]:hover, .nv-shell [data-depth][data-pressed="true"], .nv-shell .nv-activity-emblem, .nv-shell .nv-bottom-nav button > span { transform:none!important; translate:none!important; }
+}
+html[data-nivas-motion="off"] .nv-shell [data-depth],
+html[data-nivas-motion="off"] .nv-shell [data-depth]:hover,
+html[data-nivas-motion="off"] .nv-shell [data-depth][data-pressed="true"],
+html[data-nivas-motion="off"] .nv-shell .nv-activity-emblem,
+html[data-nivas-motion="off"] .nv-shell .nv-bottom-nav button > span { transform:none!important; translate:none!important; }

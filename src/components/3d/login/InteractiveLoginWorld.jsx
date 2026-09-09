@@ -43,6 +43,12 @@ export default function InteractiveLoginWorld({ role = 'student', motion = true,
     const weights = { student: 0, warden: 0, admin: 0 };
     weights[config.current.role] = 1;
     const geometries = new Set(), materials = new Set();
+    const mobileDevice = window.matchMedia('(any-pointer: coarse)').matches || window.innerWidth < 768;
+    function addWorld(key) {
+      const sculpture = createLoginSculpture(key);
+      const pivot = new THREE.Group(); pivot.add(sculpture.group); scene.add(pivot);
+      worlds[key] = { ...sculpture, pivot };
+    }
     function disposeContents() {
       scene.traverse(object => {
         if (object.geometry) geometries.add(object.geometry);
@@ -56,11 +62,11 @@ export default function InteractiveLoginWorld({ role = 'student', motion = true,
     }
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.5 : 1.8));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobileDevice ? 1.25 : 1.8));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.0;
-      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.enabled = !mobileDevice;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       element.appendChild(renderer.domElement);
       const room = new RoomEnvironment();
@@ -77,11 +83,7 @@ export default function InteractiveLoginWorld({ role = 'student', motion = true,
       const rim = new THREE.DirectionalLight(0xb2bdff, 2.1); rim.position.set(4, 2, -2); scene.add(rim);
       const floor = new THREE.Mesh(new THREE.PlaneGeometry(15, 15), new THREE.ShadowMaterial({ opacity: 0.16 }));
       floor.rotation.x = -Math.PI / 2; floor.position.y = -1.58; floor.receiveShadow = true; scene.add(floor);
-      for (const key of Object.keys(LOGIN_WORLDS)) {
-        const sculpture = createLoginSculpture(key);
-        const pivot = new THREE.Group(); pivot.add(sculpture.group); scene.add(pivot);
-        worlds[key] = { ...sculpture, pivot };
-      }
+      addWorld(config.current.role);
     } catch (error) {
       console.warn('Interactive illustration could not start.', error);
       disposeContents();
@@ -98,7 +100,7 @@ export default function InteractiveLoginWorld({ role = 'student', motion = true,
       raf = 0;
       if (stopped || !inView || document.hidden) return;
       const enabled = config.current.motion;
-      if (enabled && now - lastPaint < (window.innerWidth < 768 ? 32 : 16)) { requestDraw(); return; }
+      if (enabled && now - lastPaint < (mobileDevice ? 32 : 16)) { requestDraw(); return; }
       const delta = Math.min(lastFrame ? (now - lastFrame) / 1000 : 1 / 30, 0.05);
       lastFrame = now; lastPaint = now;
       if (enabled) { elapsed += delta; burst *= Math.exp(-delta * 1.6); }
@@ -108,6 +110,7 @@ export default function InteractiveLoginWorld({ role = 'student', motion = true,
       rotation.y = THREE.MathUtils.lerp(rotation.y, orbit.yaw, damping);
       pointer.lerp(targetPointer, damping);
       const current = config.current.role;
+      if (!worlds[current]) addWorld(current);
       for (const [key, sculpture] of Object.entries(worlds)) {
         const target = key === current ? 1 : 0;
         weights[key] = THREE.MathUtils.lerp(weights[key], target, damping);
@@ -194,7 +197,7 @@ export default function InteractiveLoginWorld({ role = 'student', motion = true,
     <div className={`nivas-world-viewport${dragging ? ' is-dragging' : ''}`} role={controls ? 'group' : undefined} tabIndex={controls && !failed ? 0 : undefined} aria-label={world.label} aria-describedby={controls ? hintId : undefined}
       onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerCancel} onLostPointerCapture={pointerCancel} onPointerLeave={event => { if (!event.currentTarget.hasPointerCapture(event.pointerId)) { inputs.current.cancel(event.pointerId); engine.current?.point(0, 0); } }} onKeyDown={keyDown}>
       <div className="nivas-world-renderer" ref={mount} aria-hidden="true" />
-      {failed && <div className="nivas-world-fallback"><img src="/logo.svg" alt="" /><span>{world.label}</span><small>You can continue signing in below.</small></div>}
+      {failed && <div className="nivas-world-fallback"><img src="/logo.svg" alt="" /><span>{world.label}</span><small>Your portal is ready to use.</small></div>}
     </div>
     {controls && <div className="nivas-world-controls">
       <p id={hintId}><MoveHorizontal size={14} />Drag to rotate · Tap to interact<span className="nivas-sr-only">. Arrow keys rotate. Enter plays the animation. R resets the view.</span></p>

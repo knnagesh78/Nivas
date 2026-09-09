@@ -457,7 +457,7 @@ export default function InstallWizardModal({ isOpen, onClose, onInstalled }) {
                   window.dispatchEvent(new Event("storage"));
                   onClose();
                 }}
-                className="py-2 px-5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-600/20 transition-all cursor-pointer"
+                className="py-2 px-5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-all"
               >
                 Close Now
               </button>

@@ -197,15 +197,8 @@ export default function AdminDashboard() {
       setNotices(noticesList);
 
       // 7. Today's Attendance summary
-      const now = new Date();
-      const localDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-      let attSnap = await getDocs(collection(db, "attendance", localDateStr, "records"));
-      if (attSnap.empty) {
-        const isoDateStr = now.toISOString().split("T")[0];
-        if (isoDateStr !== localDateStr) {
-          attSnap = await getDocs(collection(db, "attendance", isoDateStr, "records"));
-        }
-      }
+      const todayStr = new Date().toISOString().split("T")[0];
+      const attSnap = await getDocs(collection(db, "attendance", todayStr, "records"));
       let presentTodayCount = 0;
       attSnap.forEach((doc) => {
         if (doc.data().status === "present") presentTodayCount++;
@@ -530,8 +523,8 @@ export default function AdminDashboard() {
       {/* 1. Dashboard / Statistics */}
       {activeTab === "dashboard" && (
         <div className="space-y-6 animate-fadeIn">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
+          <div className="nv-stat-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div data-depth data-color="blue" className="nv-stat-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Students</span>
                 <p className="text-3xl font-black text-slate-900 dark:text-white mt-1">{stats.totalStudents}</p>
@@ -541,7 +534,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
+            <div data-depth data-color="purple" className="nv-stat-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Active Wardens</span>
                 <p className="text-3xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{stats.totalWardens}</p>
@@ -551,7 +544,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
+            <div data-depth data-color="amber" className="nv-stat-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Rooms Configured</span>
                 <p className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-1">{stats.totalRooms}</p>
@@ -561,7 +554,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
+            <div data-depth data-color="teal" className="nv-stat-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Beds Occupied</span>
                 <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
@@ -712,7 +705,7 @@ export default function AdminDashboard() {
                   <tr key={s.id} className="text-sm">
                     <td className="py-3.5">
                       <div className="flex items-center space-x-3">
-                        <div className="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 overflow-hidden shrink-0">
+                        <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">
                           {s.photoUrl ? (
                             <img src={s.photoUrl} className="h-full w-full rounded-full object-cover" onError={(e) => e.target.style.display='none'} />
                           ) : (
@@ -720,14 +713,7 @@ export default function AdminDashboard() {
                           )}
                         </div>
                         <div>
-                          <div className="flex items-center space-x-2">
-                            <p className="font-bold text-slate-800 dark:text-slate-200">{s.name || "Incomplete Profile"}</p>
-                            {s.idNumber && (
-                              <span className="px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 text-indigo-700 dark:text-indigo-300 text-[10px] font-extrabold">
-                                #{s.idNumber}
-                              </span>
-                            )}
-                          </div>
+                          <p className="font-bold text-slate-800">{s.name || "Incomplete Profile"}</p>
                           <p className="text-[10px] text-slate-400">UID: {s.id.substring(0, 8)}...</p>
                         </div>
                       </div>
@@ -821,7 +807,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={roomLoading}
-                className="w-full rounded-2xl bg-amber-600 hover:bg-amber-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-amber-600/20 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer"
+                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center"
               >
                 {roomLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -959,7 +945,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={wardenLoading}
-                className="w-full rounded-2xl bg-purple-600 hover:bg-purple-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-purple-600/20 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer"
+                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center"
               >
                 {wardenLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1063,7 +1049,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={noticeLoading}
-                className="w-full rounded-2xl bg-amber-600 hover:bg-amber-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-amber-600/20 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer"
+                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center transition-all"
               >
                 {noticeLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1185,7 +1171,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={credLoading}
-                className="w-full sm:w-auto px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-indigo-600/20 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer"
+                className="w-full sm:w-auto px-6 rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center"
               >
                 {credLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>

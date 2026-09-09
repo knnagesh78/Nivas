@@ -4,6 +4,7 @@ import './index.css'
 import './nivas-3d.css'
 import './nivas-workspace.css'
 import './nivas-login-interactive.css'
+import './nivas-mobile.css'
 import App from './App.jsx'
 
 // ── PWA Install Prompt: capture BEFORE React mounts so it is never lost ──────

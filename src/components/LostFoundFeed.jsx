@@ -261,9 +261,9 @@ export default function LostFoundFeed({ initialSelectedItem = null, onClearSelec
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Top Banner & Header CTA */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 border border-indigo-400/30 rounded-3xl p-6 sm:p-7 shadow-xl text-white relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 border border-indigo-900/40 rounded-3xl p-6 sm:p-7 shadow-xl text-white relative overflow-hidden">
         <div className="flex items-center space-x-4 relative z-10">
-          <div className="h-12 w-12 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-xs flex-shrink-0">
+          <div className="h-12 w-12 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shadow-xs flex-shrink-0">
             <Package className="h-6 w-6" />
           </div>
           <div>
@@ -329,7 +329,7 @@ export default function LostFoundFeed({ initialSelectedItem = null, onClearSelec
               onClick={() => setStatusTab(tab.id)}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex-shrink-0 cursor-pointer ${
                 statusTab === tab.id
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                  ? "bg-slate-900 text-white shadow-xs"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >

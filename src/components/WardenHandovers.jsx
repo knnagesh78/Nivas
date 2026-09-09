@@ -97,22 +97,22 @@ export default function WardenHandovers() {
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-teal-700 via-teal-600 to-emerald-600 border border-teal-500/30 rounded-3xl p-6 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <ShieldCheck className="h-6 w-6 text-teal-200" />
+            <ShieldCheck className="h-6 w-6 text-indigo-400" />
             <h2 className="text-2xl font-black tracking-tight">Warden Handover Dashboard</h2>
           </div>
-          <p className="text-xs text-teal-100/90 mt-1 max-w-xl">
+          <p className="text-xs text-slate-300 mt-1 max-w-xl">
             Review ownership claims, inspect submitted proof details side-by-side with original photos, and authorize item handovers.
           </p>
         </div>
 
-        <div className="bg-white/15 border border-white/20 rounded-2xl px-5 py-3 text-center backdrop-blur-sm">
-          <span className="text-[10px] uppercase font-bold text-teal-100 tracking-wider">
+        <div className="bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 text-center">
+          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
             Pending Verifications
           </span>
-          <p className="text-3xl font-black text-amber-300">{pendingItems.length}</p>
+          <p className="text-3xl font-black text-amber-400">{pendingItems.length}</p>
         </div>
       </div>
 

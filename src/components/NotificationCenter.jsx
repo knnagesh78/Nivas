@@ -120,13 +120,13 @@ export default function NotificationCenter({ onSelectNotification }) {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border border-slate-200 shadow-2xl z-50 overflow-hidden animate-fadeIn">
-            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white">
+          <div className="nv-notification-panel absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border border-slate-200 shadow-2xl z-50 overflow-hidden animate-fadeIn">
+            <div className="flex items-center justify-between px-4 py-3 bg-slate-900 text-white">
               <div className="flex items-center space-x-2">
-                <Bell className="h-4 w-4 text-indigo-200" />
+                <Bell className="h-4 w-4 text-indigo-400" />
                 <h3 className="text-sm font-bold">Notifications</h3>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 text-[10px] font-extrabold bg-white/25 text-white rounded-full">
+                  <span className="px-2 py-0.5 text-[10px] font-extrabold bg-indigo-500 text-white rounded-full">
                     {unreadCount} new
                   </span>
                 )}

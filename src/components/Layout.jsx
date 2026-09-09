@@ -6,6 +6,7 @@ import InstallWizardModal from './InstallWizardModal';
 import NotificationCenter from './NotificationCenter';
 import PortalDashboardHeader from './PortalDashboardHeader';
 import useMotionPreference from '../hooks/useMotionPreference';
+import useSurfaceDepth from '../hooks/useSurfaceDepth';
 
 const navigation = {
   student: [
@@ -47,6 +48,7 @@ const shortLabels = { dashboard: 'Home', attendance: 'Attendance', lostFound: 'L
 export default function Layout({ children, activeTab = 'dashboard', setActiveTab, onSelectNotification, displayName, portalMeta }) {
   const { userData, logout } = useAuth();
   const { motion, toggleMotion } = useMotionPreference();
+  const depthEvents = useSurfaceDepth(motion);
   const navigate = useNavigate();
   const role = navigation[userData?.role] ? userData.role : 'student';
   const items = navigation[role];
@@ -116,7 +118,7 @@ export default function Layout({ children, activeTab = 'dashboard', setActiveTab
         </div>
       </header>
       <main ref={scrollArea} id="nivas-main" className="nv-main" tabIndex={-1}>
-        <div className="nivas-content nv-content">
+        <div className="nivas-content nv-content" {...depthEvents}>
           {activeTab === 'dashboard' ? <PortalDashboardHeader role={role} name={name} meta={portalMeta} items={items} onNavigate={openActivity} motion={motion} /> : <section className="nv-activity-heading" data-color={activeItem.color}>
             <div className="nv-activity-heading-copy"><button type="button" className="nv-back-button" onClick={() => openActivity('dashboard')}><ArrowLeft size={16} />Back to home</button><h1>{activeItem.label}</h1><p>{activeItem.hint}</p></div>
             <span className="nv-activity-emblem" aria-hidden="true"><ActiveIcon size={43} strokeWidth={1.6} /></span>

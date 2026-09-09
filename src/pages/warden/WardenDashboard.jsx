@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase";
 import {
   collection,
   query,
-  where,
   getDocs,
-  getDoc,
-  setDoc,
   doc,
   addDoc,
   updateDoc,
@@ -37,16 +34,7 @@ import {
   Key,
   Mail,
   Eye,
-  EyeOff,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Calendar,
-  RotateCcw,
-  Phone,
-  Hash,
-  UserCheck,
-  AlertTriangle
+  EyeOff
 } from "lucide-react";
 
 export default function WardenDashboard() {
@@ -109,23 +97,9 @@ export default function WardenDashboard() {
     return `${year}-${month}-${day}`;
   };
   const [attendanceDate, setAttendanceDate] = useState(getLocalDateString());
-  const [attendanceRecords, setAttendanceRecords] = useState({}); // studentUid -> "present" | "absent" | "leave"
+  const [attendanceRecords, setAttendanceRecords] = useState({}); // studentUid -> "present"/"absent"
   const [attendanceLoading, setAttendanceLoading] = useState(false);
   const [attendanceSuccess, setAttendanceSuccess] = useState("");
-  const [attendanceMeta, setAttendanceMeta] = useState({
-    isSubmitted: false,
-    updatedAt: null,
-    markedByEmail: ""
-  });
-  const [attendanceSearchQuery, setAttendanceSearchQuery] = useState("");
-  const [attendanceStatusFilter, setAttendanceStatusFilter] = useState("all");
-  const [todayAttendanceSummary, setTodayAttendanceSummary] = useState({
-    total: 0,
-    present: 0,
-    absent: 0,
-    leave: 0,
-    isMarked: false
-  });
 
   // Assign Room modal/form
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -239,31 +213,6 @@ export default function WardenDashboard() {
       });
       setNotices(noticesList);
 
-      // 6. Today's Attendance summary for dashboard
-      const todayStr = getLocalDateString();
-      try {
-        const todayAttSnap = await getDocs(collection(db, "attendance", todayStr, "records"));
-        const summaryDoc = await getDoc(doc(db, "attendance", todayStr));
-        let pCount = 0;
-        let aCount = 0;
-        let lCount = 0;
-        todayAttSnap.forEach((d) => {
-          const st = d.data().status;
-          if (st === "present") pCount++;
-          else if (st === "absent") aCount++;
-          else if (st === "leave") lCount++;
-        });
-        setTodayAttendanceSummary({
-          total: studentsList.length,
-          present: pCount,
-          absent: aCount,
-          leave: lCount,
-          isMarked: !todayAttSnap.empty || (summaryDoc.exists() && summaryDoc.data().isSubmitted)
-        });
-      } catch (attErr) {
-        console.warn("Could not fetch today attendance summary:", attErr);
-      }
-
     } catch (err) {
       console.error("Error fetching Warden data:", err);
     } finally {
@@ -275,55 +224,24 @@ export default function WardenDashboard() {
     fetchData();
   }, []);
 
-  // Approved leaves active on selected attendanceDate
-  const studentsOnLeaveToday = useMemo(() => {
-    const map = {};
-    leaves.forEach((l) => {
-      const isApproved = l.status === "approved";
-      const from = l.fromDate || l.startDate;
-      const to = l.toDate || l.endDate;
-      const sId = l.studentUid || l.studentId;
-      if (isApproved && from && to && sId) {
-        if (attendanceDate >= from && attendanceDate <= to) {
-          map[sId] = l;
-        }
-      }
-    });
-    return map;
-  }, [leaves, attendanceDate]);
-
   // Fetch attendance for selected date
   useEffect(() => {
     const fetchAttendanceForDate = async () => {
       if (!attendanceDate) return;
       try {
         const attendanceSnap = await getDocs(collection(db, "attendance", attendanceDate, "records"));
-        const summaryDoc = await getDoc(doc(db, "attendance", attendanceDate));
-        
         const records = {};
-        const hasExistingRecords = !attendanceSnap.empty;
         attendanceSnap.forEach((doc) => {
           records[doc.id] = doc.data().status;
         });
         
+        // Pre-fill with "present" for unmarked students to make marking faster
         const defaultRecords = {};
         students.forEach((student) => {
-          if (records[student.id]) {
-            defaultRecords[student.id] = records[student.id];
-          } else if (studentsOnLeaveToday[student.id]) {
-            defaultRecords[student.id] = "leave";
-          } else {
-            // Default to present for quick marking
-            defaultRecords[student.id] = "present";
-          }
+          defaultRecords[student.id] = records[student.id] || "present";
         });
         
         setAttendanceRecords(defaultRecords);
-        setAttendanceMeta({
-          isSubmitted: hasExistingRecords || (summaryDoc.exists() && summaryDoc.data().isSubmitted),
-          updatedAt: summaryDoc.exists() ? summaryDoc.data().updatedAt : null,
-          markedByEmail: summaryDoc.exists() ? summaryDoc.data().markedByEmail : ""
-        });
         setAttendanceSuccess("");
       } catch (err) {
         console.error("Error fetching attendance for date:", err);
@@ -333,40 +251,7 @@ export default function WardenDashboard() {
     if (students.length > 0) {
       fetchAttendanceForDate();
     }
-  }, [attendanceDate, students, studentsOnLeaveToday]);
-
-  // Quick bulk marking handlers
-  const handleMarkAllPresent = () => {
-    const updated = {};
-    students.forEach((s) => {
-      if (studentsOnLeaveToday[s.id]) {
-        updated[s.id] = "leave";
-      } else {
-        updated[s.id] = "present";
-      }
-    });
-    setAttendanceRecords(updated);
-  };
-
-  const handleMarkAllAbsent = () => {
-    const updated = {};
-    students.forEach((s) => {
-      updated[s.id] = "absent";
-    });
-    setAttendanceRecords(updated);
-  };
-
-  const handleResetAttendance = () => {
-    const updated = {};
-    students.forEach((s) => {
-      if (studentsOnLeaveToday[s.id]) {
-        updated[s.id] = "leave";
-      } else {
-        updated[s.id] = "present";
-      }
-    });
-    setAttendanceRecords(updated);
-  };
+  }, [attendanceDate, students]);
 
   // Mark Attendance submit
   const handleSaveAttendance = async () => {
@@ -374,68 +259,18 @@ export default function WardenDashboard() {
     setAttendanceSuccess("");
     try {
       const batch = writeBatch(db);
-      let presentCount = 0;
-      let absentCount = 0;
-      let leaveCount = 0;
       
-      students.forEach((student) => {
-        const status = attendanceRecords[student.id] || "absent";
-        if (status === "present") presentCount++;
-        else if (status === "absent") absentCount++;
-        else if (status === "leave") leaveCount++;
-
-        const recordRef = doc(db, "attendance", attendanceDate, "records", student.id);
+      for (const [studentUid, status] of Object.entries(attendanceRecords)) {
+        const recordRef = doc(db, "attendance", attendanceDate, "records", studentUid);
         batch.set(recordRef, {
-          studentId: student.id,
-          studentName: student.name || "Incomplete Profile",
-          idNumber: student.idNumber || "",
-          roomNumber: student.roomNumber || "Unassigned",
-          course: student.course || "",
-          year: student.year || "",
-          phone: student.phone || "",
-          parentContact: student.parentContact || "",
           status,
-          date: attendanceDate,
-          updatedAt: serverTimestamp(),
-          wardenId: currentUser.uid,
-          wardenEmail: currentUser.email || ""
-        }, { merge: true });
-      });
-
-      // Also set parent document summary
-      const summaryRef = doc(db, "attendance", attendanceDate);
-      batch.set(summaryRef, {
-        date: attendanceDate,
-        totalStudents: students.length,
-        presentCount,
-        absentCount,
-        leaveCount,
-        isSubmitted: true,
-        markedBy: currentUser.uid,
-        markedByEmail: currentUser.email || "",
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-
-      await batch.commit();
-
-      setAttendanceMeta({
-        isSubmitted: true,
-        updatedAt: new Date(),
-        markedByEmail: currentUser.email || ""
-      });
-
-      setAttendanceSuccess(`Attendance for ${attendanceDate} saved successfully! (${presentCount} Present, ${absentCount} Absent, ${leaveCount} On Leave)`);
-
-      // Update today's banner if saving for today
-      if (attendanceDate === getLocalDateString()) {
-        setTodayAttendanceSummary({
-          total: students.length,
-          present: presentCount,
-          absent: absentCount,
-          leave: leaveCount,
-          isMarked: true
+          markedBy: currentUser.uid,
+          timestamp: serverTimestamp()
         });
       }
+
+      await batch.commit();
+      setAttendanceSuccess(`Attendance for ${attendanceDate} saved successfully!`);
     } catch (err) {
       console.error("Error saving attendance:", err);
     } finally {
@@ -638,27 +473,13 @@ export default function WardenDashboard() {
 
     if (type === "attendance") {
       filename = `attendance_report_${attendanceDate}.csv`;
-      headers = [
-        "Student Name",
-        "Student ID / Roll No",
-        "Room Number",
-        "Course",
-        "Year",
-        "Student Phone",
-        "Parent Contact",
-        "Attendance Status",
-        "Date"
-      ];
-      rows = students.map(student => [
-        `"${student.name || ""}"`,
-        `"${student.idNumber || ""}"`,
+      headers = ["Student Name", "Room Number", "Course", "Year", "Attendance Status"];
+      rows = filteredStudents.map(student => [
+        `"${student.name}"`,
         `"${student.roomNumber || "Unassigned"}"`,
         `"${student.course || ""}"`,
         `"${student.year || ""}"`,
-        `"${student.phone || ""}"`,
-        `"${student.parentContact || ""}"`,
-        `"${attendanceRecords[student.id] || "absent"}"`,
-        `"${attendanceDate}"`
+        `"${attendanceRecords[student.id] || "Absent"}"`
       ]);
     } else if (type === "complaints") {
       filename = "complaints_log.csv";
@@ -693,33 +514,8 @@ export default function WardenDashboard() {
     return (
       s.name?.toLowerCase().includes(q) ||
       s.roomNumber?.toLowerCase().includes(q) ||
-      s.course?.toLowerCase().includes(q) ||
-      s.year?.toLowerCase().includes(q) ||
-      s.idNumber?.toLowerCase().includes(q) ||
-      s.phone?.toLowerCase().includes(q) ||
-      s.parentContact?.toLowerCase().includes(q)
+      s.course?.toLowerCase().includes(q)
     );
-  });
-
-  // Filter for Attendance Tab
-  const filteredAttendanceStudents = students.filter(s => {
-    const q = attendanceSearchQuery.toLowerCase();
-    const matchesSearch =
-      !q ||
-      s.name?.toLowerCase().includes(q) ||
-      s.roomNumber?.toLowerCase().includes(q) ||
-      s.course?.toLowerCase().includes(q) ||
-      s.idNumber?.toLowerCase().includes(q) ||
-      s.phone?.toLowerCase().includes(q);
-
-    const status = attendanceRecords[s.id] || "unmarked";
-    const matchesFilter =
-      attendanceStatusFilter === "all" ||
-      (attendanceStatusFilter === "present" && status === "present") ||
-      (attendanceStatusFilter === "absent" && status === "absent") ||
-      (attendanceStatusFilter === "leave" && status === "leave");
-
-    return matchesSearch && matchesFilter;
   });
 
   const filteredComplaints = complaints.filter(c => {
@@ -785,8 +581,8 @@ export default function WardenDashboard() {
       {activeTab === "dashboard" && (
         <div className="space-y-6 animate-fadeIn">
           {/* Top stats banner */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
+          <div className="nv-stat-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div data-depth data-color="blue" className="nv-stat-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Students</span>
                 <p className="text-3xl font-black text-slate-900 dark:text-white mt-1">{totalStudents}</p>
@@ -796,44 +592,7 @@ export default function WardenDashboard() {
               </div>
             </div>
 
-            {/* Today's Attendance Card */}
-            <div
-              onClick={() => setTab("attendance")}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover cursor-pointer group"
-              title="Click to manage attendance"
-            >
-              <div>
-                <div className="flex items-center space-x-1.5">
-                  <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Today's Attendance</span>
-                  <span className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
-                    todayAttendanceSummary.isMarked
-                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
-                      : "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400"
-                  }`}>
-                    {todayAttendanceSummary.isMarked ? "Marked" : "Pending"}
-                  </span>
-                </div>
-                <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                  {todayAttendanceSummary.isMarked
-                    ? `${todayAttendanceSummary.present} / ${totalStudents}`
-                    : "Not Marked"}
-                </p>
-                <p className="text-[10px] font-semibold text-slate-400 mt-0.5">
-                  {todayAttendanceSummary.isMarked
-                    ? `${todayAttendanceSummary.absent} Absent • ${todayAttendanceSummary.leave} On Leave`
-                    : "Tap to record check-in"}
-                </p>
-              </div>
-              <div className={`h-12 w-12 rounded-2xl border flex items-center justify-center shadow-xs transition-transform group-hover:scale-110 ${
-                todayAttendanceSummary.isMarked
-                  ? "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
-                  : "bg-amber-50 dark:bg-amber-950/60 border-amber-100 dark:border-amber-800 text-amber-600 dark:text-amber-400"
-              }`}>
-                <CheckCircle2 className="h-6 w-6" />
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
+            <div data-depth data-color="amber" className="nv-stat-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Pending Leaves</span>
                 <p className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-1">{pendingLeavesCount}</p>
@@ -843,7 +602,7 @@ export default function WardenDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
+            <div data-depth data-color="rose" className="nv-stat-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Open Complaints</span>
                 <p className="text-3xl font-black text-rose-600 dark:text-rose-400 mt-1">{openComplaintsCount}</p>
@@ -853,7 +612,7 @@ export default function WardenDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
+            <div data-depth data-color="teal" className="nv-stat-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex items-center justify-between shadow-sm card-hover">
               <div>
                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Occupied Beds</span>
                 <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
@@ -987,7 +746,7 @@ export default function WardenDashboard() {
                   <tr key={s.id} className="text-sm">
                     <td className="py-3.5">
                       <div className="flex items-center space-x-3">
-                        <div className="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 overflow-hidden shrink-0">
+                        <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">
                           {s.photoUrl ? (
                             <img src={s.photoUrl} className="h-full w-full rounded-full object-cover" onError={(e) => e.target.style.display='none'} />
                           ) : (
@@ -995,14 +754,7 @@ export default function WardenDashboard() {
                           )}
                         </div>
                         <div>
-                          <div className="flex items-center space-x-2">
-                            <p className="font-bold text-slate-800 dark:text-slate-200">{s.name || "Incomplete Profile"}</p>
-                            {s.idNumber && (
-                              <span className="px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 text-indigo-700 dark:text-indigo-300 text-[10px] font-extrabold">
-                                #{s.idNumber}
-                              </span>
-                            )}
-                          </div>
+                          <p className="font-bold text-slate-800">{s.name || "Incomplete Profile"}</p>
                           <p className="text-[10px] text-slate-400">UID: {s.id.substring(0, 8)}...</p>
                         </div>
                       </div>
@@ -1061,11 +813,11 @@ export default function WardenDashboard() {
 
           {/* Assign Room Modal Popup */}
           {selectedStudent && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-50 p-4 backdrop-blur-xs">
               <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden animate-fadeIn">
-                <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-4 text-white">
+                <div className="bg-slate-800 p-4 text-white">
                   <h3 className="font-bold text-base">Reassign Room</h3>
-                  <p className="text-xs text-teal-100">Set room for {selectedStudent.name}</p>
+                  <p className="text-xs text-slate-300">Set room for {selectedStudent.name}</p>
                 </div>
                 <form onSubmit={handleAssignRoom} className="p-4 space-y-4">
                   <div>
@@ -1086,13 +838,13 @@ export default function WardenDashboard() {
                     <button
                       type="button"
                       onClick={() => setSelectedStudent(null)}
-                      className="flex-1 border border-slate-200 rounded-xl py-2 text-center text-xs font-bold text-slate-500 hover:bg-slate-50 cursor-pointer"
+                      className="flex-1 border border-slate-200 rounded-xl py-2 text-center text-xs font-bold text-slate-500 hover:bg-slate-50"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 bg-teal-600 rounded-xl py-2 text-center text-xs font-bold text-white hover:bg-teal-700 shadow-sm transition-all cursor-pointer"
+                      className="flex-1 bg-slate-900 rounded-xl py-2 text-center text-xs font-bold text-white hover:bg-slate-800"
                     >
                       Save Room
                     </button>
@@ -1106,77 +858,23 @@ export default function WardenDashboard() {
 
       {/* 3. Mark Attendance Tab */}
       {activeTab === "attendance" && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-6 animate-fadeIn">
-          {/* Header & Date Controls */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 animate-fadeIn">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="flex items-center space-x-2.5">
-                <h2 className="text-xl font-black text-slate-900 dark:text-white">Daily Attendance Log</h2>
-                {attendanceMeta.isSubmitted ? (
-                  <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
-                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                    Saved in Database
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-xs font-bold">
-                    <Clock className="h-3.5 w-3.5 mr-1" />
-                    Unsaved Draft
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                Record hostel check-in present/absent logs, detect approved leaves, and synchronize with Firebase.
-              </p>
+              <h2 className="text-xl font-bold text-slate-900">Daily Attendance Log</h2>
+              <p className="text-xs text-slate-500">Record hostel check-in present/absent logs.</p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              {/* Quick Date buttons */}
-              <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700 text-xs">
-                <button
-                  onClick={() => setAttendanceDate(getLocalDateString())}
-                  className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                    attendanceDate === getLocalDateString()
-                      ? "bg-white dark:bg-slate-900 text-indigo-600 shadow-xs"
-                      : "text-slate-500 hover:text-slate-800 dark:hover:text-white"
-                  }`}
-                >
-                  Today
-                </button>
-                <button
-                  onClick={() => {
-                    const y = new Date();
-                    y.setDate(y.getDate() - 1);
-                    setAttendanceDate(getLocalDateString(y));
-                  }}
-                  className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                    (() => {
-                      const y = new Date();
-                      y.setDate(y.getDate() - 1);
-                      return attendanceDate === getLocalDateString(y);
-                    })()
-                      ? "bg-white dark:bg-slate-900 text-indigo-600 shadow-xs"
-                      : "text-slate-500 hover:text-slate-800 dark:hover:text-white"
-                  }`}
-                >
-                  Yesterday
-                </button>
-              </div>
-
-              {/* Date picker */}
-              <div className="flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5">
-                <Calendar className="h-4 w-4 text-slate-400" />
-                <input
-                  type="date"
-                  className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none"
-                  value={attendanceDate}
-                  onChange={(e) => setAttendanceDate(e.target.value)}
-                />
-              </div>
-
-              {/* Export CSV */}
+            <div className="flex flex-wrap items-center gap-3">
+              <input
+                type="date"
+                className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
+                value={attendanceDate}
+                onChange={(e) => setAttendanceDate(e.target.value)}
+              />
               <button
                 onClick={() => handleExportCSV("attendance")}
-                className="flex items-center space-x-1.5 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
+                className="flex items-center space-x-2 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-950 transition-all hover:bg-slate-50"
               >
                 <Download className="h-4 w-4" />
                 <span>Export CSV</span>
@@ -1185,343 +883,79 @@ export default function WardenDashboard() {
           </div>
 
           {attendanceSuccess && (
-            <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 p-4 text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center space-x-2 animate-fadeIn">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-              <span>{attendanceSuccess}</span>
+            <div className="rounded-xl bg-green-50 border border-green-200 p-4 text-sm text-green-600">
+              {attendanceSuccess}
             </div>
           )}
 
-          {/* Date Summary Metric Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Students</span>
-                <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{students.length}</p>
-              </div>
-              <div className="h-9 w-9 rounded-xl bg-slate-200/60 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
-                <Users className="h-4 w-4" />
-              </div>
-            </div>
-
-            <div className="bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 p-4 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Present</span>
-                <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                  {Object.values(attendanceRecords).filter((v) => v === "present").length}
-                </p>
-              </div>
-              <div className="h-9 w-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-            </div>
-
-            <div className="bg-rose-50/60 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40 p-4 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-extrabold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Absent</span>
-                <p className="text-2xl font-black text-rose-600 dark:text-rose-400 mt-0.5">
-                  {Object.values(attendanceRecords).filter((v) => v === "absent").length}
-                </p>
-              </div>
-              <div className="h-9 w-9 rounded-xl bg-rose-100 dark:bg-rose-950/80 flex items-center justify-center text-rose-600 dark:text-rose-400">
-                <XCircle className="h-4 w-4" />
-              </div>
-            </div>
-
-            <div className="bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40 p-4 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-wider">On Leave</span>
-                <p className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5">
-                  {Object.values(attendanceRecords).filter((v) => v === "leave").length}
-                </p>
-              </div>
-              <div className="h-9 w-9 rounded-xl bg-amber-100 dark:bg-amber-950/80 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                <Clock className="h-4 w-4" />
-              </div>
-            </div>
-          </div>
-
-          {/* Search, Filter & Bulk Controls Toolbar */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/70 dark:bg-slate-950/50 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800">
-            {/* Search Box */}
-            <div className="relative flex-1 max-w-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-slate-400" />
-              </div>
-              <input
-                type="text"
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 pl-9 pr-3 py-2 text-xs bg-white dark:bg-slate-900 focus:outline-none focus:border-indigo-500 dark:text-white"
-                placeholder="Search student, roll no, room..."
-                value={attendanceSearchQuery}
-                onChange={(e) => setAttendanceSearchQuery(e.target.value)}
-              />
-            </div>
-
-            {/* Status Filter tabs */}
-            <div className="flex items-center space-x-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-1 rounded-xl text-xs">
-              <button
-                type="button"
-                data-plain="true"
-                onClick={() => setAttendanceStatusFilter("all")}
-                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                  attendanceStatusFilter === "all"
-                    ? "bg-teal-600 text-white shadow-md shadow-teal-600/20"
-                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                }`}
-              >
-                All ({students.length})
-              </button>
-              <button
-                type="button"
-                data-plain="true"
-                onClick={() => setAttendanceStatusFilter("present")}
-                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                  attendanceStatusFilter === "present"
-                    ? "bg-emerald-600 text-white shadow-xs"
-                    : "text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
-                }`}
-              >
-                Present ({Object.values(attendanceRecords).filter((v) => v === "present").length})
-              </button>
-              <button
-                type="button"
-                data-plain="true"
-                onClick={() => setAttendanceStatusFilter("absent")}
-                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                  attendanceStatusFilter === "absent"
-                    ? "bg-rose-600 text-white shadow-xs"
-                    : "text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                }`}
-              >
-                Absent ({Object.values(attendanceRecords).filter((v) => v === "absent").length})
-              </button>
-              <button
-                type="button"
-                data-plain="true"
-                onClick={() => setAttendanceStatusFilter("leave")}
-                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                  attendanceStatusFilter === "leave"
-                    ? "bg-amber-600 text-white shadow-xs"
-                    : "text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/40"
-                }`}
-              >
-                Leave ({Object.values(attendanceRecords).filter((v) => v === "leave").length})
-              </button>
-            </div>
-
-            {/* Quick Bulk Action Buttons */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handleMarkAllPresent}
-                className="px-3 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600 hover:text-white text-xs font-bold transition-all shadow-xs"
-                title="Mark all active students present"
-              >
-                Mark All Present
-              </button>
-              <button
-                onClick={handleMarkAllAbsent}
-                className="px-3 py-1.5 rounded-xl border border-rose-200 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 hover:bg-rose-600 hover:text-white text-xs font-bold transition-all shadow-xs"
-                title="Mark all students absent"
-              >
-                Mark All Absent
-              </button>
-              <button
-                onClick={handleResetAttendance}
-                className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-                title="Reset to default leave detection"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          </div>
-
           {students.length === 0 ? (
-            <div className="text-center py-16 text-slate-400 italic">
-              <Users className="h-10 w-10 text-slate-300 mx-auto mb-2" />
-              <p className="font-semibold text-slate-600">No students registered in database.</p>
-              <p className="text-xs text-slate-400 mt-0.5">Students can complete their onboarding profile from student portal.</p>
-            </div>
+            <p className="text-center py-12 text-slate-400 italic">No students registered to mark attendance.</p>
           ) : (
             <div className="space-y-4">
-              <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
+              <div className="overflow-x-auto border border-slate-100 rounded-xl">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-                      <th className="p-4">Student & Identity</th>
-                      <th className="p-4">Room</th>
-                      <th className="p-4">Contacts / Parent</th>
-                      <th className="p-4">Leave Status</th>
-                      <th className="p-4 text-center">Attendance Toggle</th>
+                    <tr className="bg-slate-50 border-b border-slate-150 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      <th className="p-3">Student Name</th>
+                      <th className="p-3">Room</th>
+                      <th className="p-3 text-center">Status (Toggle)</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-                    {filteredAttendanceStudents.map((student) => {
-                      const onLeave = studentsOnLeaveToday[student.id];
-                      const status = attendanceRecords[student.id] || "absent";
-
-                      return (
-                        <tr
-                          key={student.id}
-                          className="text-sm hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
-                        >
-                          {/* Student Details Column */}
-                          <td className="p-4">
-                            <div className="flex items-center space-x-3">
-                              <div className="h-10 w-10 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm shadow-xs overflow-hidden shrink-0">
-                                {student.photoUrl ? (
-                                  <img
-                                    src={student.photoUrl}
-                                    alt={student.name}
-                                    className="h-full w-full object-cover"
-                                    onError={(e) => (e.target.style.display = "none")}
-                                  />
-                                ) : (
-                                  student.name ? student.name[0].toUpperCase() : "S"
-                                )}
-                              </div>
-                              <div>
-                                <div className="flex items-center space-x-2">
-                                  <p className="font-bold text-slate-800 dark:text-slate-200">
-                                    {student.name || "Incomplete Profile"}
-                                  </p>
-                                  {student.idNumber && (
-                                    <span className="px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 text-indigo-700 dark:text-indigo-300 text-[10px] font-extrabold">
-                                      #{student.idNumber}
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-[11px] text-slate-400">
-                                  {student.course || "Course N/A"} {student.year ? `• ${student.year}` : ""}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Room Column */}
-                          <td className="p-4 whitespace-nowrap">
-                            <span className="whitespace-nowrap inline-flex items-center text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
-                              {student.roomNumber ? `Room ${student.roomNumber}` : "Unassigned"}
-                            </span>
-                          </td>
-
-                          {/* Emergency Contacts Column */}
-                          <td className="p-4 text-xs text-slate-500 space-y-0.5">
-                            {student.phone ? (
-                              <p className="flex items-center">
-                                <span className="font-semibold text-slate-600 dark:text-slate-400 mr-1">Self:</span>
-                                <span>{student.phone}</span>
-                              </p>
-                            ) : null}
-                            {student.parentContact ? (
-                              <p className="flex items-center text-amber-700 dark:text-amber-400 font-semibold">
-                                <span className="font-bold mr-1">Parent:</span>
-                                <span>{student.parentContact}</span>
-                              </p>
-                            ) : null}
-                            {!student.phone && !student.parentContact && (
-                              <span className="text-slate-400 italic text-[11px]">No contact added</span>
-                            )}
-                          </td>
-
-                          {/* Leave Status Column */}
-                          <td className="p-4">
-                            {onLeave ? (
-                              <div className="space-y-0.5">
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  Approved Leave
-                                </span>
-                                <p className="text-[10px] text-slate-400 max-w-40 truncate" title={onLeave.reason}>
-                                  {onLeave.reason || "Out-station permission"}
-                                </p>
-                              </div>
-                            ) : (
-                              <span className="text-[11px] text-slate-400 font-medium">In Hostel</span>
-                            )}
-                          </td>
-
-                          {/* 3-Way Attendance Status Toggle with Distinct Colors */}
-                          <td className="p-4 text-center">
-                            <div className="att-toggle-group">
-                              <button
-                                type="button"
-                                data-plain="true"
-                                onClick={() =>
-                                  setAttendanceRecords((prev) => ({ ...prev, [student.id]: "present" }))
-                                }
-                                className={`att-btn ${status === "present" ? "is-present" : ""}`}
-                                title="Mark Present (Green)"
-                              >
-                                <Check className="h-3.5 w-3.5" />
-                                <span>Present</span>
-                              </button>
-
-                              <button
-                                type="button"
-                                data-plain="true"
-                                onClick={() =>
-                                  setAttendanceRecords((prev) => ({ ...prev, [student.id]: "absent" }))
-                                }
-                                className={`att-btn ${status === "absent" ? "is-absent" : ""}`}
-                                title="Mark Absent (Red)"
-                              >
-                                <X className="h-3.5 w-3.5" />
-                                <span>Absent</span>
-                              </button>
-
-                              <button
-                                type="button"
-                                data-plain="true"
-                                onClick={() =>
-                                  setAttendanceRecords((prev) => ({ ...prev, [student.id]: "leave" }))
-                                }
-                                className={`att-btn ${status === "leave" ? "is-leave" : ""}`}
-                                title="Mark Leave (Amber)"
-                              >
-                                <Clock className="h-3.5 w-3.5" />
-                                <span>Leave</span>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                  <tbody className="divide-y divide-slate-100">
+                    {students.map((student) => (
+                      <tr key={student.id} className="text-sm hover:bg-slate-50/50">
+                        <td className="p-3 font-semibold text-slate-700">{student.name || "Incomplete Profile"}</td>
+                        <td className="p-3">
+                          <span className="text-xs font-semibold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
+                            {student.roomNumber || "Unassigned"}
+                          </span>
+                        </td>
+                        <td className="p-3 flex justify-center">
+                          <div className="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200">
+                            <button
+                              onClick={() =>
+                                setAttendanceRecords((prev) => ({ ...prev, [student.id]: "present" }))
+                              }
+                              className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                                attendanceRecords[student.id] === "present"
+                                  ? "bg-emerald-500 text-white shadow-sm"
+                                  : "text-slate-500"
+                              }`}
+                            >
+                              Present
+                            </button>
+                            <button
+                              onClick={() =>
+                                setAttendanceRecords((prev) => ({ ...prev, [student.id]: "absent" }))
+                              }
+                              className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                                attendanceRecords[student.id] === "absent"
+                                  ? "bg-rose-500 text-white shadow-sm"
+                                  : "text-slate-500"
+                              }`}
+                            >
+                              Absent
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
 
-              {/* Bottom Action / Save Bar */}
-              <div className="pt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                <div className="text-xs text-slate-500">
-                  <span>Selected Date: </span>
-                  <strong className="text-slate-800 dark:text-slate-200 font-bold">{attendanceDate}</strong>
-                  <span className="mx-2">•</span>
-                  <span>
-                    Summary:{" "}
-                    <strong className="text-emerald-600">
-                      {Object.values(attendanceRecords).filter((v) => v === "present").length} Present
-                    </strong>
-                    ,{" "}
-                    <strong className="text-rose-600">
-                      {Object.values(attendanceRecords).filter((v) => v === "absent").length} Absent
-                    </strong>
-                    ,{" "}
-                    <strong className="text-amber-600">
-                      {Object.values(attendanceRecords).filter((v) => v === "leave").length} On Leave
-                    </strong>
-                  </span>
-                </div>
-
+              <div className="pt-2 flex justify-end">
                 <button
                   onClick={handleSaveAttendance}
                   disabled={attendanceLoading}
-                  className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md shadow-indigo-600/20 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer"
+                  className="px-6 rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center"
                 >
                   {attendanceLoading ? (
                     <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></span>
                   ) : (
                     <Check className="h-4 w-4 mr-2" />
                   )}
-                  Save Attendance Sheet to Database
+                  Save Attendance Sheet
                 </button>
               </div>
             </div>
@@ -1788,7 +1222,7 @@ export default function WardenDashboard() {
                       <div className="flex items-end">
                         <button
                           onClick={() => handleActionComplaint(item.id)}
-                          className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-xl py-2.5 text-center text-xs font-bold shadow-md shadow-teal-600/20 transition-all cursor-pointer"
+                          className="w-full bg-slate-900 text-white rounded-lg py-2.5 text-center text-xs font-bold hover:bg-slate-800"
                         >
                           Update Complaint
                         </button>
@@ -1927,7 +1361,7 @@ export default function WardenDashboard() {
               <button
                 type="submit"
                 disabled={noticeLoading}
-                className="w-full rounded-2xl bg-teal-600 hover:bg-teal-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-teal-600/20 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer"
+                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center transition-all"
               >
                 {noticeLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -2075,7 +1509,7 @@ export default function WardenDashboard() {
               <button
                 type="submit"
                 disabled={settingsLoading}
-                className="w-full sm:w-auto px-6 rounded-2xl bg-teal-600 hover:bg-teal-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-teal-600/20 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer"
+                className="w-full sm:w-auto px-6 rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer"
               >
                 {settingsLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>

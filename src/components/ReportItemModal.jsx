@@ -43,17 +43,17 @@ export default function ReportItemModal({ isOpen, onClose, onSubmit, isSubmittin
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-60 p-4 backdrop-blur-xs">
       <div className="w-full max-w-lg bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden animate-fadeIn flex flex-col max-h-[90vh]">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+        <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white">
           <div className="flex items-center space-x-2">
-            <Package className="h-5 w-5 text-indigo-200" />
+            <Package className="h-5 w-5 text-indigo-400" />
             <h3 className="font-bold text-base tracking-tight">Report Lost Item</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/20 transition-all"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
           >
             <X className="h-5 w-5" />
           </button>
@@ -143,7 +143,7 @@ export default function ReportItemModal({ isOpen, onClose, onSubmit, isSubmittin
                 <button
                   type="button"
                   onClick={() => setImageUrl("")}
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-rose-600 text-white hover:bg-rose-700 transition-all shadow-md"
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 text-white hover:bg-slate-900 transition-all"
                 >
                   <X className="h-4 w-4" />
                 </button>
