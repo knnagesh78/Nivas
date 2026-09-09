@@ -821,7 +821,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={roomLoading}
-                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center"
+                className="w-full rounded-2xl bg-amber-600 hover:bg-amber-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-amber-600/20 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer"
               >
                 {roomLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -959,7 +959,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={wardenLoading}
-                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center"
+                className="w-full rounded-2xl bg-purple-600 hover:bg-purple-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-purple-600/20 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer"
               >
                 {wardenLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1063,7 +1063,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={noticeLoading}
-                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center transition-all"
+                className="w-full rounded-2xl bg-amber-600 hover:bg-amber-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-amber-600/20 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer"
               >
                 {noticeLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1185,7 +1185,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 disabled={credLoading}
-                className="w-full sm:w-auto px-6 rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center"
+                className="w-full sm:w-auto px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 py-3 text-center text-sm font-bold text-white shadow-md shadow-indigo-600/20 disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer"
               >
                 {credLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>

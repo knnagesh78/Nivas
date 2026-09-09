@@ -553,7 +553,7 @@ export default function StudentDashboard() {
       {activeTab === "calls" && (
         <div className="space-y-6 animate-fadeIn">
           {/* Header */}
-          <div className="relative rounded-3xl bg-gradient-to-br from-slate-950 via-green-950 to-slate-900 p-6 sm:p-8 text-white overflow-hidden shadow-2xl border border-green-500/20">
+          <div className="relative rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 p-6 sm:p-8 text-white overflow-hidden shadow-xl border border-teal-400/30">
             {/* Background decoration */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
@@ -978,7 +978,7 @@ export default function StudentDashboard() {
               <button
                 type="submit"
                 disabled={leaveLoading}
-                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center transition-all"
+                className="w-full rounded-2xl bg-indigo-600 py-3 text-center text-sm font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer"
               >
                 {leaveLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1133,7 +1133,7 @@ export default function StudentDashboard() {
               <button
                 type="submit"
                 disabled={complaintLoading}
-                className="w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center transition-all"
+                className="w-full rounded-2xl bg-indigo-600 py-3 text-center text-sm font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center transition-all cursor-pointer"
               >
                 {complaintLoading ? (
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -1221,16 +1221,16 @@ export default function StudentDashboard() {
       {activeTab === "profile" && (
         <div className="space-y-8 animate-fadeIn max-w-4xl mx-auto">
           {/* Digital Hostel Student ID Card Header */}
-          <div className="relative rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-6 sm:p-8 text-white overflow-hidden shadow-2xl border border-indigo-500/30">
+          <div className="relative rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 p-6 sm:p-8 text-white overflow-hidden shadow-2xl border border-indigo-400/30">
             {/* Ambient Lighting */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl pointer-events-none"></div>
 
             <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
               {/* Avatar Box */}
               <div className="relative shrink-0">
-                <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-1 shadow-xl">
-                  <div className="h-full w-full rounded-[14px] bg-slate-900 overflow-hidden flex items-center justify-center">
+                <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-2xl bg-gradient-to-tr from-white/30 via-white/50 to-white/30 p-1 shadow-xl">
+                  <div className="h-full w-full rounded-[14px] bg-indigo-950/40 overflow-hidden flex items-center justify-center">
                     {editPhoto || studentDetails?.photoUrl ? (
                       <img src={editPhoto || studentDetails.photoUrl} alt="Profile" className="h-full w-full object-cover" />
                     ) : (
@@ -1240,7 +1240,7 @@ export default function StudentDashboard() {
                     )}
                   </div>
                 </div>
-                <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-slate-950 p-1.5 rounded-full shadow-lg border-2 border-slate-900" title="Active Verified Resident">
+                <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-full shadow-lg border-2 border-indigo-700" title="Active Verified Resident">
                   <BadgeCheck className="h-4 w-4" />
                 </div>
               </div>
@@ -1268,16 +1268,16 @@ export default function StudentDashboard() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 text-xs">
-                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Room Assigned</span>
+                  <div className="p-2.5 rounded-xl bg-white/15 border border-white/20 backdrop-blur-sm">
+                    <span className="text-[10px] text-blue-100 uppercase tracking-wider block font-bold">Room Assigned</span>
                     <span className="font-extrabold text-white">{studentDetails?.roomNumber || "Unassigned"}</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Mobile Phone</span>
+                  <div className="p-2.5 rounded-xl bg-white/15 border border-white/20 backdrop-blur-sm">
+                    <span className="text-[10px] text-blue-100 uppercase tracking-wider block font-bold">Mobile Phone</span>
                     <span className="font-extrabold text-white truncate block">{studentDetails?.phone || "Not set"}</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm col-span-2 sm:col-span-1">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Parent Contact</span>
+                  <div className="p-2.5 rounded-xl bg-white/15 border border-white/20 backdrop-blur-sm col-span-2 sm:col-span-1">
+                    <span className="text-[10px] text-blue-100 uppercase tracking-wider block font-bold">Parent Contact</span>
                     <span className="font-extrabold text-white truncate block">{studentDetails?.parentContact || "Not set"}</span>
                   </div>
                 </div>
@@ -1598,7 +1598,7 @@ export default function StudentDashboard() {
                 <button
                   type="submit"
                   disabled={passwordLoading}
-                  className="px-6 py-3 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center justify-center space-x-2"
+                  className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center justify-center space-x-2"
                 >
                   {passwordLoading ? (
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>

@@ -110,19 +110,19 @@ export default function ItemDetailModal({
   const StatusIcon = statusConfig.icon;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-60 p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
       <div className="w-full max-w-2xl bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden animate-fadeIn flex flex-col max-h-[90vh]">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white">
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
           <div className="flex items-center space-x-3">
             <span className={`px-3 py-1 text-xs font-black uppercase tracking-wider rounded-full border ${statusConfig.bg}`}>
               {statusConfig.label}
             </span>
-            <span className="text-xs text-slate-400 font-mono">#{item.id.substring(0, 7)}</span>
+            <span className="text-xs text-indigo-200 font-mono">#{item.id.substring(0, 7)}</span>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+            className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/20 transition-all"
           >
             <X className="h-5 w-5" />
           </button>

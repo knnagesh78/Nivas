@@ -162,7 +162,7 @@ export default function CameraCapture({ photoUrl, onCapture, label = "Profile Pi
                 <button
                   type="button"
                   onClick={startCamera}
-                  className="inline-flex items-center px-4 py-2 text-xs font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all shadow-sm"
+                  className="inline-flex items-center px-4 py-2 text-xs font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-600/20"
                 >
                   <Camera className="mr-1.5 h-3.5 w-3.5" />
                   Use Camera
